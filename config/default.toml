@@ -1,0 +1,11 @@
+#
+# Default config
+#
+# Each option is documented in README.md
+#
+app_path = "/data"
+password = "adminadmin"
+secure_cookies = true
+private_library = true
+thumbnail_size = "1280x720"
+page_title = "Better Clipface"
