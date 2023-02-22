@@ -19,17 +19,24 @@
     "strictNullChecks": true,
     "noImplicitAny": true,
     "jsx": "preserve",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@server/*": [
+        "./server/*"
+      ],
+      "@client/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts",
-    "./*.ts",
-    "next.config.ts",
-    "next.config.ts",
+    "src/**/*.tsx",
+    "server/**/*.ts",
     "server/utils/auth.ts",
-    "playwright/config/playwright.config.ts",
+    "playwright/**/.ts",
   ],
   "exclude": [
-    "node_modules",
+    "node_modules"
   ]
 }

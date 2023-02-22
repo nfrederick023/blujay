@@ -1,6 +1,6 @@
 import { NextPageContext, Redirect } from "next";
 
-import { NextRedirect } from "./types";
+import { NextRedirect } from "../types/types";
 
 const getRedirect = (url: string): NextRedirect => {
   const redirect: Redirect = {

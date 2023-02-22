@@ -4,15 +4,15 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Video } from "../../utils/types";
-import { getVideoList, setVideoList } from "../../backend/config";
-import { isTokenValid } from "../../../server/utils/auth";
+import { Video } from "@client/types/types";
+import { getVideoList, setVideoList } from "@server/utils/config";
+import { isTokenValid } from "@server/utils/auth";
 
 const clipList = (async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
 
   const videoList = await getVideoList();
 
-  if (!(await isTokenValid(req))) {
+  if (!(await isTokenValid(req.cookies.authToken))) {
     res.statusCode = 401;
     res.end(JSON.stringify("Unauthorized"));
     return;

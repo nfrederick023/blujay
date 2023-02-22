@@ -3,9 +3,9 @@
  */
 
 import { Request, Response } from "express";
+import { getUserPassword } from "@server/utils/config";
+import { hashPassword } from "@server/utils/auth";
 
-import { getUserPassword, hasUserPassword } from "../../backend/config";
-import { hashPassword } from "../../../server/utils/auth";
 
 const login = async (req: Request, res: Response): Promise<void> => {
 
@@ -15,9 +15,9 @@ const login = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const userPassword = getUserPassword();
+  const userPassword = await getUserPassword();
 
-  if (!hasUserPassword()) {
+  if (!userPassword) {
     res.statusCode = 400;
     res.end("User authentication not configured!");
     return;

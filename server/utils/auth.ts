@@ -1,14 +1,21 @@
 import { randomBytes, scryptSync } from "crypto";
 
-import { AuthStatus } from "../../src/utils/types";
-import { NextApiRequest, NextPageContext } from "next";
+import { AuthStatus } from "../../src/types/types";
+import { GetServerSidePropsContext, NextApiRequest, NextPageContext, PreviewData } from "next";
+import { IncomingMessage } from "http";
+import { ParsedUrlQuery } from "querystring";
 import { getUserPassword } from "./config";
 
-export const getAuthStatus = async (ctx: NextPageContext): Promise<AuthStatus> => {
+type RequestCookes = IncomingMessage & {
+  cookies: Partial<{
+    [key: string]: string;
+  }>;
+};
 
+const getAuthStatus = async (ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData> | NextPageContext): Promise<AuthStatus> => {
 
   const hasAuthToken = !!(ctx.req as NextApiRequest | undefined)?.cookies.authToken;
-  const isAuthTokenValid = await isTokenValid(ctx.req as NextApiRequest);
+  const isAuthTokenValid = await isTokenValid((ctx.req as RequestCookes).cookies.authToken);
 
   if (hasAuthToken && !isAuthTokenValid && ctx.res) {
     ctx.res.setHeader("Set-Cookie", "authToken=; Max-Age=0");
@@ -21,12 +28,12 @@ export const getAuthStatus = async (ctx: NextPageContext): Promise<AuthStatus> =
   return AuthStatus.notAuthenticated;
 };
 
-export const isTokenValid = async (req: NextApiRequest): Promise<boolean> => {
-  return await checkHashedPassword("default", req.cookies.authToken ?? "");
+export const isTokenValid = async (authToken: string | undefined): Promise<boolean> => {
+  return await checkHashedPassword("default", authToken ?? "");
 };
 
 export const checkHashedPassword = async (user: string, hashedPassword: string): Promise<boolean> => {
-  const configPassword = getUserPassword();
+  const configPassword = await getUserPassword();
 
   if (!configPassword) {
     return false;
@@ -41,3 +48,5 @@ export const hashPassword = async (password: string): Promise<string> => {
   const salt = randomBytes(16).toString("hex");
   return scryptSync(password, salt, 32).toString("hex") + salt;
 };
+
+export default getAuthStatus;

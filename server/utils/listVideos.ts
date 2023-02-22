@@ -3,7 +3,7 @@ import glob from "glob";
 import path from "path";
 import seedrandom from "seedrandom";
 
-import { Video } from "../utils/types";
+import { Video } from "@client/types/types";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
 import fse from "fs-extra";
