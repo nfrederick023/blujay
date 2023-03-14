@@ -1,19 +1,21 @@
+import GradientText from "../Styled/GradientText";
 import React, { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import theme from "@client/utils/themes";
 
 const SidebarWapper = styled.div`
-  height: 100vh;
   max-width: 310px;
   width: 30%;
   background: ${theme.backgroundContrast};
   transition: 0.2s;
-  text-align: center;
   padding-top: 15px;
+  user-select: none;
+  z-index: 999;
 
   @media (max-width: ${theme.tabletScreenSize}px) {
     position: absolute;
     min-width: 100%;
+    height: 100%;
 
     ${(props: { isCollapsed: boolean }): string =>
       props.isCollapsed ? "min-width: 60px; left: -60px;" : ""}
@@ -23,17 +25,29 @@ const SidebarWapper = styled.div`
     props.isCollapsed ? "max-width: 60px" : ""}
 `;
 
+const SidebarContent = styled.div`
+  position: fixed;
+  max-width: inherit;
+  width: inherit;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+`;
+
 const BarsIcon = styled.i`
   position: absolute;
   left: 15px;
-
   @media (max-width: ${theme.tabletScreenSize}px) {
     ${(props: { isCollapsed: boolean }): string =>
       props.isCollapsed ? "left: 75px;" : ""}
   }
 `;
 
-const Sidebar: FC = () => {
+interface SidebarProps {
+  libraryDirs: string[];
+}
+
+const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
@@ -48,22 +62,34 @@ const Sidebar: FC = () => {
 
   return (
     <SidebarWapper isCollapsed={isCollapsed}>
-      <BarsIcon
-        isCollapsed={isCollapsed}
-        onClick={handleIsCollapsedChange}
-        className="fa fa-bars fa-2xl"
-      />
-      {!isCollapsed && (
-        <div>
-          BlueJay
-          <br />
-          Home
-          <br />
-          Favorites
-          <br />
-          Library
-        </div>
-      )}
+      <SidebarContent>
+        <BarsIcon
+          isCollapsed={isCollapsed}
+          onClick={handleIsCollapsedChange}
+          className="fa fa-bars fa-2xl"
+        />
+
+        {!isCollapsed && (
+          <>
+            <div>
+              <GradientText>
+                <h1>BLU</h1>
+              </GradientText>
+              <h1>JAY</h1>
+            </div>
+            <div>
+              Home
+              <br />
+              Favorites
+              <br />
+              Library
+              {libraryDirs.map((dir) => {
+                return <>{dir}</>;
+              })}
+            </div>
+          </>
+        )}
+      </SidebarContent>
     </SidebarWapper>
   );
 };

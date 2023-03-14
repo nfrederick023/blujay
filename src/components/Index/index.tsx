@@ -1,4 +1,5 @@
 import { Video } from "@client/types/types";
+import GradientText from "../Common/Styled/GradientText";
 import React, { FC } from "react";
 import VideoSlider from "../Common/VideoSlider";
 
@@ -19,11 +20,29 @@ const IndexPage: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
 
   return (
     <>
-      <h2>Recent Videos</h2>
+      <GradientText>
+        <h2>Recent Videos</h2>
+      </GradientText>
       <VideoSlider videos={recentVideos} />
-      <h2>Recent Favorites</h2>
+      <GradientText>
+        <h2>Recent Favorites</h2>
+      </GradientText>
       <VideoSlider videos={favoritedVideos} />
-      <h2>All Videos</h2>
+      <GradientText>
+        <h2>All Videos</h2>
+      </GradientText>
+      <VideoSlider videos={sortedVideos} />
+      <GradientText>
+        <h2>All Videos</h2>
+      </GradientText>
+      <VideoSlider videos={sortedVideos} />
+      <GradientText>
+        <h2>All Videos</h2>
+      </GradientText>
+      <VideoSlider videos={sortedVideos} />
+      <GradientText>
+        <h2>All Videos</h2>
+      </GradientText>
       <VideoSlider videos={sortedVideos} />
     </>
   );

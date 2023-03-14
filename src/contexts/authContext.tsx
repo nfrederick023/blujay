@@ -11,23 +11,25 @@ interface AuthProviderProps {
   authStatus: AuthStatus;
 }
 
-const AuthProvider: NextPage<AuthProviderProps> = ({ children, authStatus }: AuthProviderProps) => {
-
+const AuthProvider: NextPage<AuthProviderProps> = ({
+  children,
+  authStatus,
+}: AuthProviderProps) => {
   const router = useRouter();
   const protectedRoutes = ["/login"];
 
   if (typeof window !== "undefined") {
-    if (protectedRoutes.includes(router.pathname) && authStatus === AuthStatus.notAuthenticated)
+    if (
+      protectedRoutes.includes(router.pathname) &&
+      authStatus === AuthStatus.notAuthenticated
+    )
       router.push("/");
   }
 
-
   return (
-    <Provider
-      value={authStatus ?? AuthStatus.notAuthenticated}
-    >
+    <Provider value={authStatus ?? AuthStatus.notAuthenticated}>
       {children}
-    </ Provider>
+    </Provider>
   );
 };
 

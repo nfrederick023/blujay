@@ -19,7 +19,7 @@ export const getThumnailSize = async (): Promise<string> => {
 };
 
 export const getPath = async (): Promise<string> => {
-  const dir = "/snacksable" as string | undefined;
+  const dir = "/blujay" as string | undefined;
   if (dir)
     return checkCreateDir(dir);
   throw ("Required: \"path\" configuration property not found!");
@@ -40,8 +40,8 @@ export const getThumbnailsPath = async (): Promise<string> => {
   return checkCreateDir(dir);
 };
 
-export const getVideosPath = async (): Promise<string> => {
-  const dir = await getPath() + "/videos/";
+export const getLibraryPath = async (): Promise<string> => {
+  const dir = await getPath() + "/library/";
   return checkCreateDir(dir);
 };
 
@@ -94,6 +94,13 @@ export const createVideoListBackup = async (): Promise<void> => {
 export const deleteThumbnail = async (thumbnailName: string): Promise<void> => {
   const fse = await import("fs-extra");
   await fse.unlink(await getThumbnailsPath() + thumbnailName);
+};
+
+export const getDirListOfLibrarySubfolders = async (): Promise<string[]> => {
+  const fse = await import("fs-extra");
+  return (await fse.readdir(await getLibraryPath(), { withFileTypes: true }))
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
 };
 
 const checkCreateJSON = async <T>(dir: string, defaultValue: T): Promise<string> => {

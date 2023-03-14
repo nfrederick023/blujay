@@ -1,3 +1,4 @@
+import Header from "./Header";
 import React, { FC } from "react";
 import SearchBar from "./SearchBar";
 import Sidebar from "./Sidebar";
@@ -19,14 +20,15 @@ const ContentWrapper = styled.div`
 
 interface LayoutProps {
   children: React.ReactNode;
+  libraryDirs: string[];
 }
 
-const Layout: FC<LayoutProps> = ({ children }: LayoutProps) => {
+const Layout: FC<LayoutProps> = ({ children, libraryDirs }: LayoutProps) => {
   return (
     <FlexContainer>
-      <Sidebar />
+      <Sidebar libraryDirs={libraryDirs} />
       <MainContent>
-        <SearchBar />
+        <Header />
         <ContentWrapper>{children}</ContentWrapper>
       </MainContent>
     </FlexContainer>

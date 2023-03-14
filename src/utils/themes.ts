@@ -12,6 +12,8 @@ interface BluJayGlobalTheme {
   readonly smallScreenSize: number;
   readonly tabletScreenSize: number;
   readonly mobileScreenSize: number;
+  readonly highlightLight: string;
+  readonly highlightDark: string;
 }
 
 type BluJayTheme = BluJayGlobalTheme & BluJayColorTheme
@@ -34,7 +36,9 @@ const globalTheme: BluJayGlobalTheme = {
   largeScreenSize: 1200,
   smallScreenSize: 1024,
   tabletScreenSize: 768,
-  mobileScreenSize: 480
+  mobileScreenSize: 480,
+  highlightLight: "#3c81eb",
+  highlightDark: "#04befe"
 };
 
 const getTheme = (): BluJayTheme => {

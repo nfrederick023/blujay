@@ -2,18 +2,18 @@ import React, { FC, useRef } from "react";
 import styled from "styled-components";
 import theme from "@client/utils/themes";
 
-const SearchBarWrapper = styled.div`
+const SearchBarContent = styled.div`
   border-radius: 18px;
   border: 1px solid ${theme.textContrast};
   color: ${theme.textContrast};
   text-align: center;
-
   display: flex;
   max-width: 49rem;
   min-height: 1.3rem;
 
-  margin: auto;
+  width: 30%;
   margin-top: 15px;
+  margin-bottom: 15px;
   padding: 5px;
 
   &:hover {
@@ -48,16 +48,15 @@ const SearchBar: FC = () => {
   };
 
   return (
-    <SearchBarWrapper onClick={handleSearchClick}>
+    <SearchBarContent onClick={handleSearchClick}>
       <SearchIcon className="fa fa-magnifying-glass" />
       <SearchBarInput
         ref={searchInput}
         id="default-search"
         placeholder="Search"
         autoComplete="off"
-        required
       />
-    </SearchBarWrapper>
+    </SearchBarContent>
   );
 };
 

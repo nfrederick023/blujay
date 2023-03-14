@@ -11,7 +11,19 @@ class MyDocument extends Document {
           <link rel="icon" href="/images/favicon.ico" />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800"
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900"
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700"
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500"
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
           />

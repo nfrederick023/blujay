@@ -1,28 +1,33 @@
 import { Video } from "@client/types/types";
 import React, { FC } from "react";
+import VideoThumb from "./VideoThumb";
 import styled from "styled-components";
-interface IndexPageProps {
-  videos: Video[];
-}
 
 const VideoSliderWrapper = styled.div`
   display: flex;
 `;
 
-const Thumbnail = styled.img`
+const VideoThumbWrapper = styled.div`
   width: 25rem;
-  margin: 15px;
+  margin-right: 20px;
 `;
 
-const VideoSlider: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
+interface VideoSliderProps {
+  videos: Video[];
+}
+
+const VideoSlider: FC<VideoSliderProps> = ({ videos }: VideoSliderProps) => {
   return (
-    <VideoSliderWrapper>
-      {videos.map((video) => (
-        <div key={`recent_${video.id}`}>
-          <Thumbnail src={"/api/thumb/" + encodeURIComponent(video.id)} />
-        </div>
-      ))}
-    </VideoSliderWrapper>
+    <>
+      <VideoSliderWrapper>
+        {!videos.length && <>No Videos Found</>}
+        {videos.map((video) => (
+          <VideoThumbWrapper key={`${video.id}`}>
+            <VideoThumb video={video} />
+          </VideoThumbWrapper>
+        ))}
+      </VideoSliderWrapper>
+    </>
   );
 };
 

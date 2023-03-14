@@ -9,6 +9,7 @@ export interface Video {
   created: number,
   filePath: string,
   thumbnailPath: string,
+  category: string,
   description: string,
   requireAuth: boolean,
   isFavorite: boolean,
