@@ -13,7 +13,7 @@ import { getCookieDefault, getCookieSetOptions } from "../utils/cookies";
 import { getDirListOfLibrarySubfolders } from "@server/utils/config";
 import App from "next/app";
 import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
-import Layout from "../components/Common/Layout";
+import Layout from "../components/Common/Layout/Layout";
 import React from "react";
 import getAuthStatus from "../../server/utils/auth";
 import getConfig from "next/config";
