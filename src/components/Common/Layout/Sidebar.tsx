@@ -1,5 +1,7 @@
 import { useWindowWidth } from "@react-hook/window-size";
-import GradientText from "../Styled/GradientText";
+import ContrastText from "../Styled/ContrastText";
+import Gradient from "../Styled/Gradient";
+import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useEffect, useState } from "react";
 import SideBarButton from "./SideBarButton";
 import styled from "styled-components";
@@ -60,9 +62,21 @@ const Logo = styled.div`
 const BarsIcon = styled.i`
   position: fixed;
   left: 15px;
-  top: 3px;
+  top: 6px;
   font-size: 2.5rem !important;
   z-index: 2;
+`;
+
+const Library = styled.div`
+  border-left: ${theme.textContrastLight} 2px solid;
+  width: 100%;
+  margin-top: 5px;
+  margin-left: 36px;
+`;
+
+const LibraryButton = styled.div`
+  padding: 7px;
+  padding-left: 25px;
 `;
 
 interface SidebarProps {
@@ -87,13 +101,14 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
 
   return (
     <>
-      {width <= theme.mobileScreenSize && (
-        <BarsIcon
-          onClick={handleIsCollapsedChange}
-          className="bx bx-menu bx-lg"
-        />
-      )}
-
+      <NoSSR>
+        {width <= theme.mobileScreenSize && (
+          <BarsIcon
+            onClick={handleIsCollapsedChange}
+            className="bx bx-menu bx-lg"
+          />
+        )}
+      </NoSSR>
       <SidebarWapper
         isCollapsed={isCollapsed}
         onClick={handleIsCollapsedChange}
@@ -102,37 +117,41 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
           {!isCollapsed && (
             <>
               <Logo>
-                <GradientText>
+                <Gradient type="text">
                   <h1>BLU</h1>
-                </GradientText>
+                </Gradient>
                 <h1>JAY</h1>
               </Logo>
-              <div>
-                <SideBarButton
-                  title={"Home"}
-                  icon={"bx bx-home-alt-2 bx-sm"}
-                  url={"/"}
-                />
+              <SideBarButton
+                title={"Home"}
+                icon={"bx bx-home-alt-2 bx-sm"}
+                url={"/"}
+              />
 
-                <SideBarButton
-                  title={"Favorites"}
-                  icon={"bx bx-heart bx-sm"}
-                  url={"/"}
-                />
-                <SideBarButton
-                  title={"All Videos"}
-                  icon={"bx bx-list-ul bx-sm"}
-                  url={"/"}
-                />
-                {libraryDirs.map((dir) => {
-                  return (
-                    <div key={dir}>
-                      <br />
-                      {dir}
-                    </div>
-                  );
-                })}
-              </div>
+              <SideBarButton
+                title={"Favorites"}
+                icon={"bx bx-heart bx-sm"}
+                url={"/favorites"}
+              />
+
+              <SideBarButton
+                title={"All Videos"}
+                icon={"bx bx-list-ul bx-sm"}
+                url={"/all"}
+              />
+
+              <SideBarButton
+                title={"Library"}
+                icon={"bx bx-folder bx-sm"}
+                url={"/library"}
+              />
+              <Library>
+                <ContrastText type={"light"}>
+                  {libraryDirs.map((dir) => {
+                    return <LibraryButton key={dir}>{dir}</LibraryButton>;
+                  })}
+                </ContrastText>
+              </Library>
             </>
           )}
         </SidebarContent>
