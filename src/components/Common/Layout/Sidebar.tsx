@@ -1,19 +1,30 @@
+import { useWindowWidth } from "@react-hook/window-size";
 import GradientText from "../Styled/GradientText";
 import React, { FC, useEffect, useState } from "react";
+import SideBarButton from "./SideBarButton";
 import styled from "styled-components";
 import theme from "@client/utils/themes";
 
 const SidebarWapper = styled.div`
-  max-width: 310px;
-  width: 30%;
   background: ${theme.backgroundContrast};
+  border-right: ${theme.backgroundContrast} 1px solid;
+
+  max-width: 210px;
+  min-width: 175px;
   transition: 0.2s;
-  padding-top: 15px;
+  padding-top: 20px;
   user-select: none;
-  z-index: 999;
+  min-height: 100vh;
+  z-index: 1;
+  width: 20%;
+
+  &:hover {
+    transition: 0.2s;
+    border-right: ${theme.highlightLight} 1px solid;
+  }
 
   @media (max-width: ${theme.tabletScreenSize}px) {
-    position: absolute;
+    position: fixed;
     min-width: 100%;
     height: 100%;
 
@@ -22,25 +33,36 @@ const SidebarWapper = styled.div`
   }
 
   ${(props: { isCollapsed: boolean }): string =>
-    props.isCollapsed ? "max-width: 60px" : ""}
+    props.isCollapsed ? "max-width: 48px; min-width: 48px;" : ""}
 `;
 
 const SidebarContent = styled.div`
-  position: fixed;
   max-width: inherit;
-  width: inherit;
+  min-width: inherit;
   justify-content: center;
   display: flex;
   flex-wrap: wrap;
+  padding-right: 10px;
+
+  @media (max-width: ${theme.tabletScreenSize}px) {
+    max-width: 100%;
+    width: 100%;
+  }
+`;
+
+const Logo = styled.div`
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 5px;
+  text-align: center;
 `;
 
 const BarsIcon = styled.i`
-  position: absolute;
+  position: fixed;
   left: 15px;
-  @media (max-width: ${theme.tabletScreenSize}px) {
-    ${(props: { isCollapsed: boolean }): string =>
-      props.isCollapsed ? "left: 75px;" : ""}
-  }
+  top: 3px;
+  font-size: 2.5rem !important;
+  z-index: 2;
 `;
 
 interface SidebarProps {
@@ -48,11 +70,14 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const width = useWindowWidth({ wait: 10 });
 
   useEffect(() => {
-    if (window.outerWidth <= theme.tabletScreenSize) {
+    if (width <= theme.mobileScreenSize) {
       setIsCollapsed(true);
+    } else {
+      setIsCollapsed(false);
     }
   }, []);
 
@@ -61,36 +86,58 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
   };
 
   return (
-    <SidebarWapper isCollapsed={isCollapsed}>
-      <SidebarContent>
+    <>
+      {width <= theme.mobileScreenSize && (
         <BarsIcon
-          isCollapsed={isCollapsed}
           onClick={handleIsCollapsedChange}
-          className="fa fa-bars fa-2xl"
+          className="bx bx-menu bx-lg"
         />
+      )}
 
-        {!isCollapsed && (
-          <>
-            <div>
-              <GradientText>
-                <h1>BLU</h1>
-              </GradientText>
-              <h1>JAY</h1>
-            </div>
-            <div>
-              Home
-              <br />
-              Favorites
-              <br />
-              Library
-              {libraryDirs.map((dir) => {
-                return <>{dir}</>;
-              })}
-            </div>
-          </>
-        )}
-      </SidebarContent>
-    </SidebarWapper>
+      <SidebarWapper
+        isCollapsed={isCollapsed}
+        onClick={handleIsCollapsedChange}
+      >
+        <SidebarContent>
+          {!isCollapsed && (
+            <>
+              <Logo>
+                <GradientText>
+                  <h1>BLU</h1>
+                </GradientText>
+                <h1>JAY</h1>
+              </Logo>
+              <div>
+                <SideBarButton
+                  title={"Home"}
+                  icon={"bx bx-home-alt-2 bx-sm"}
+                  url={"/"}
+                />
+
+                <SideBarButton
+                  title={"Favorites"}
+                  icon={"bx bx-heart bx-sm"}
+                  url={"/"}
+                />
+                <SideBarButton
+                  title={"All Videos"}
+                  icon={"bx bx-list-ul bx-sm"}
+                  url={"/"}
+                />
+                {libraryDirs.map((dir) => {
+                  return (
+                    <div key={dir}>
+                      <br />
+                      {dir}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </SidebarContent>
+      </SidebarWapper>
+    </>
   );
 };
 

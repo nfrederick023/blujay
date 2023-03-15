@@ -3,17 +3,16 @@ import styled from "styled-components";
 import theme from "@client/utils/themes";
 
 const SearchBarContent = styled.div`
-  border-radius: 18px;
   border: 1px solid ${theme.textContrast};
   color: ${theme.textContrast};
+  border-radius: 18px;
   text-align: center;
   display: flex;
-  max-width: 49rem;
   min-height: 1.3rem;
-
-  width: 30%;
-  margin-top: 15px;
+  max-width: 35rem;
+  margin: auto;
   margin-bottom: 15px;
+  margin-top: 15px;
   padding: 5px;
 
   &:hover {
@@ -21,23 +20,31 @@ const SearchBarContent = styled.div`
   }
 
   @media (max-width: ${theme.tabletScreenSize}px) {
+    max-width: 100%;
     margin-left: 60px;
-    margin-right: 15px;
+    margin-right: 20px;
   }
 `;
 
 const SearchBarInput = styled.input`
   border: 0px;
-  margin: 1px 0px 0px 4px;
+  margin: 1px 0px 0px 2px;
   color: ${theme.textContrast};
   background-color: rgba(0, 0, 0, 0);
+  vertical-align: bottom;
   &:focus {
     outline: none;
   }
 `;
 
 const SearchIcon = styled.i`
-  margin-left: 10px;
+  font-size: 1.1rem !important;
+  margin-left: 5px;
+  padding-top: 2px;
+
+  &::before {
+    vertical-align: top;
+  }
 `;
 
 const SearchBar: FC = () => {
@@ -49,7 +56,7 @@ const SearchBar: FC = () => {
 
   return (
     <SearchBarContent onClick={handleSearchClick}>
-      <SearchIcon className="fa fa-magnifying-glass" />
+      <SearchIcon className="bx bx-search" />
       <SearchBarInput
         ref={searchInput}
         id="default-search"

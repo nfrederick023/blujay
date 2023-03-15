@@ -8,36 +8,42 @@ html {
   color: ${theme.text};
 }
 
-body {
+// hide scrollbar on 100vh
+* {
+    box-sizing: border-box;
+}
+
+// hide scrollbar on 100vh
+html, body {
+  margin: 0px;
+  padding: 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  display: inline;
   margin: 0px;
 }
 
 h1 {
   line-height: 75%;
-  font-size: 3em;
+  font-size: 1.9em;
   font-weight: 900;
-  display: inline;
-  margin: 0px;
 }
 
 h2 {
+  font-size: 1.7em;
   font-weight: 700;
-  display: inline;
-  margin: 0px;
-}
-
-h4{
-  font-weight: 500;
-  display: inline;
-  margin: 0px;
 }
 
 h5{
+  font-size: 1em;
   font-weight: 500;
-  display: inline;
-  margin: 0px;
 }
 
+h6{
+  font-size: 0.83em;
+  font-weight: 500;
+}
 
 .sidebar-button {
     background: linear-gradient(to top right, #4481eb, #04befe);
@@ -52,8 +58,8 @@ h5{
     font-size: large;
 }
 
-.fa::before {
-  line-height: normal;
+// global position fix for FontAwesome icons 
+.bx::before {
   vertical-align: middle;
 }
 `;

@@ -5,8 +5,8 @@ import theme from "@client/utils/themes";
 const GradientWrapper = styled.span`
   background: linear-gradient(
     174deg,
-    ${theme.highlightDark} 30%,
-    ${theme.highlightLight} 70%
+    ${theme.highlightLight} 20%,
+    ${theme.highlightDark} 80%
   );
   -webkit-background-clip: text;
   background-clip: text;

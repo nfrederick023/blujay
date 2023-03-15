@@ -15,12 +15,15 @@
     "fs": false
   },
   "dependencies": {
+    "@mpth/react-no-ssr": "^1.0.1",
+    "@react-hook/window-size": "^3.1.1",
     "@tippyjs/react": "^4.2.0",
     "ffmpeg-static": "^5.1.0",
     "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^10.1.0",
-    "glob": "^7.1.7",
+    "glob": "^8.1.0",
+    "glob-promise": "^6.0.2",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.20",
     "mime-types": "^2.1.30",

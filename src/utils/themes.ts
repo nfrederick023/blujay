@@ -5,10 +5,12 @@ interface BluJayColorTheme {
   readonly backgroundContrast: string;
   readonly text: string;
   readonly textContrast: string;
+  readonly textContrastLight: string;
 }
 
 interface BluJayGlobalTheme {
   readonly largeScreenSize: number;
+  readonly mediumScreenSize: number;
   readonly smallScreenSize: number;
   readonly tabletScreenSize: number;
   readonly mobileScreenSize: number;
@@ -22,20 +24,23 @@ const lightTheme: BluJayColorTheme = {
   background: "white",
   backgroundContrast: "white",
   text: "black",
-  textContrast: "#868686"
+  textContrast: "#868686",
+  textContrastLight: "#8c8c8c"
 };
 
 const darkTheme: BluJayColorTheme = {
   background: "#0e0e0f",
   backgroundContrast: "#181819",
   text: "white",
-  textContrast: "#868686"
+  textContrast: "#868686",
+  textContrastLight: "#8c8c8c"
 };
 
 const globalTheme: BluJayGlobalTheme = {
-  largeScreenSize: 1200,
-  smallScreenSize: 1024,
-  tabletScreenSize: 768,
+  largeScreenSize: 2560,
+  mediumScreenSize: 1920,
+  smallScreenSize: 1280,
+  tabletScreenSize: 720,
   mobileScreenSize: 480,
   highlightLight: "#3c81eb",
   highlightDark: "#04befe"
