@@ -1,0 +1,14 @@
+.env
+.envrc
+*.log
+
+# Local config file
+/config/local.toml
+/config/default.toml
+
+
+# Auto-generated files and directories
+yarn.lock
+node_modules
+.next
+package-lock.json
