@@ -15,6 +15,10 @@ const VideoSliderWrapper = styled.div`
   min-width: auto;
 `;
 
+const NoVideosWrapper = styled.div`
+  min-width: 100vw;
+`;
+
 interface VideoSliderProps {
   videos: Video[];
   sliderType: "verticle" | "horizontal";
@@ -39,7 +43,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
   return (
     <VideoSliderWrapper>
       {!videos.length ? (
-        <>No Videos Found</>
+        <NoVideosWrapper>No Videos Found</NoVideosWrapper>
       ) : (
         <NoSSR>
           {sliderType === "horizontal" ? (

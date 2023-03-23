@@ -21,7 +21,7 @@ const SearchBarContent = styled.div`
 
   @media (max-width: ${theme.tabletScreenSize}px) {
     max-width: 100%;
-    margin-left: 60px;
+    margin-left: 65px;
     margin-right: 20px;
   }
 `;

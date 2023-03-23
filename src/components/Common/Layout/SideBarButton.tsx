@@ -35,7 +35,7 @@ const SideBarButton: FC<SideBarButtonProps> = ({
   icon,
   url,
 }: SideBarButtonProps) => {
-  const isSelected = window.location.pathname === url;
+  const isSelected = window.location.pathname.split("/")[1] === url;
 
   return (
     <>
