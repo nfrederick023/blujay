@@ -16,6 +16,7 @@ const SidebarWapper = styled.div`
   transition: 0.2s;
   user-select: none;
   min-height: 100vh;
+  position: sticky;
   z-index: 1;
 
   @media (max-width: ${theme.tabletScreenSize}px) {
@@ -36,6 +37,7 @@ const SidebarContent = styled.div`
   min-width: inherit;
   justify-content: center;
   display: flex;
+  position: fixed;
   flex-wrap: wrap;
   padding-right: 10px;
   padding-top: 20px;
@@ -76,7 +78,7 @@ const Library = styled.div`
 const MinimizeButton = styled.div`
   position: absolute;
   min-width: inherit;
-  min-height: inherit;
+  min-height: 100%;
   z-index: -1;
 `;
 

@@ -28,10 +28,11 @@ const CategoryButtonWrapper = styled.div`
   &:hover {
     div {
       color: ${theme.text};
-      ::after {
+      // uncomment to enable underline animation
+      /* ::after {
         transform: scaleX(1);
         transform-origin: bottom left;
-      }
+      } */
     }
     cursor: pointer;
   }
