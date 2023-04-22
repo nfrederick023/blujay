@@ -10,6 +10,7 @@ const HeaderWrapper = styled.div`
 `;
 
 const HeaderContent = styled.div`
+  background-color: ${(props): string => props.theme.background};
   position: fixed;
   top: 0;
   width: 100%;

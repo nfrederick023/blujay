@@ -53,6 +53,11 @@ const SortIcon = styled.i`
   }
 `;
 
+const ChevronIcon = styled(SortIcon)`
+  ${(props: { isEnabled: boolean }): string =>
+    props.isEnabled ? "visibility: visible; " : "visibility: hidden;"};
+`;
+
 type SliderType = "verticle" | "horizontal";
 type ViewTypes = "List View" | "Grid View";
 type SortTypes =
@@ -76,6 +81,8 @@ const VideoSlider: FC<VideoSliderProps> = ({
   const [sort, setSort] = useState<SortTypes>("Alphabetical");
   const [isAscending, setIsAscending] = useState<boolean>(true);
   const [isGridView, setIsGridView] = useState<boolean>(true);
+  const [offSet, setOffset] = useState(0);
+  const [isMaxOffset, setIsMaxOffset] = useState(false);
 
   const handleSortChange = (newSort: string): void => {
     setSort(newSort as SortTypes);
@@ -87,6 +94,14 @@ const VideoSlider: FC<VideoSliderProps> = ({
 
   const handleViewChange = (): void => {
     setIsGridView(!isGridView);
+  };
+
+  const handleIncrementOffset = (): void => {
+    if (!isMaxOffset) setOffset(offSet + 1);
+  };
+
+  const handleDecrementOffset = (): void => {
+    if (offSet) setOffset(offSet - 1);
   };
 
   const viewTypes: ViewTypes[] = ["Grid View", "List View"];
@@ -111,6 +126,14 @@ const VideoSlider: FC<VideoSliderProps> = ({
   const videosPerRow = Math.floor(width / (width * (videoWidthPercent / 100)));
   const sortValue = sort + " " + (isAscending ? "Ascending" : "Descending");
   const listValue = isGridView ? "Grid View" : "List View";
+
+  if (videosPerRow + offSet >= videos.length && !isMaxOffset) {
+    setIsMaxOffset(true);
+  }
+
+  if (videosPerRow + offSet < videos.length && isMaxOffset) {
+    setIsMaxOffset(false);
+  }
 
   const sortedVideos: Video[] = [...videos];
 
@@ -146,8 +169,16 @@ const VideoSlider: FC<VideoSliderProps> = ({
         <HeaderIconsWrapper>
           {sliderType === "horizontal" ? (
             <>
-              <SortIcon className={"bx bx-chevron-left"} />
-              <SortIcon className={"bx bx-chevron-right"} />
+              <ChevronIcon
+                className={"bx bx-chevron-left"}
+                isEnabled={!!offSet}
+                onClick={handleDecrementOffset}
+              />
+              <ChevronIcon
+                className={"bx bx-chevron-right"}
+                isEnabled={!isMaxOffset}
+                onClick={handleIncrementOffset}
+              />
             </>
           ) : (
             <>
@@ -184,7 +215,11 @@ const VideoSlider: FC<VideoSliderProps> = ({
           <NoSSR>
             {sliderType === "horizontal" ? (
               <>
-                <HorizontalSlider videos={videos} videosPerRow={videosPerRow} />
+                <HorizontalSlider
+                  videos={videos}
+                  videosPerRow={videosPerRow}
+                  offset={offSet}
+                />
               </>
             ) : (
               <VerticleSlider

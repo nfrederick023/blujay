@@ -1,4 +1,5 @@
 import { IncomingMessage } from "http";
+import { Redirect } from "next/types";
 
 export interface BluJayTheme {
   readonly background: string;
@@ -54,5 +55,9 @@ export interface PropsWithAuth {
 
 export interface IncomingMessageCookies extends IncomingMessage {
   readonly cookies: { [key: string]: string | boolean | number };
+}
+
+export interface NextRedirect {
+  redirect: Redirect
 }
 

@@ -4,10 +4,11 @@ import { AuthStatus } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement } from "react";
 import { Request } from "express";
+import { ThemeProvider } from "styled-components";
+import { darkTheme, lightTheme } from "@client/utils/themes";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookies";
 import { getDirListOfLibrarySubfolders } from "@server/utils/config";
 import App from "next/app";
-import BluJayThemeProvider from "@client/components/Common/Providers/ThemeProvider";
 import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
 import Layout from "../components/Common/Layout/Layout";
 import React from "react";
@@ -35,17 +36,19 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
     if (value === "")
       cookies.set(cookie, getCookieDefault(cookie), getCookieSetOptions());
 
+  const theme = cookies.get("isDarkMode") === "true" ? darkTheme : lightTheme;
+
   return (
     <>
       <title>{publicRuntimeConfig.pageTitle}</title>
       <CookiesProvider cookies={cookies}>
         <AuthProvider authStatus={authStatus}>
-          <BluJayThemeProvider>
+          <ThemeProvider theme={theme}>
             <GlobalStyle />
             <Layout libraryDirs={libraryDirs}>
               <Component {...pageProps} />
             </Layout>
-          </BluJayThemeProvider>
+          </ThemeProvider>
         </AuthProvider>
       </CookiesProvider>
     </>
