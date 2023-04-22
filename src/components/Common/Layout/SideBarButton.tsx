@@ -5,23 +5,24 @@ import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
   width: 100%;
-  padding: 7px;
   border-radius: 5px;
   margin-left: 10px;
   line-height: 5px;
-  span {
+
+  height: 38px;
+
+  > span {
     border-radius: 12px;
-    height: 38px;
+    height: 34px;
+    align-items: center;
+    display: flex;
     padding-left: 8px;
-    padding-top: 2px;
   }
 `;
 
 const Icon = styled.i`
   padding-right: 10px;
-  position: relative;
-  font-size: 1.5rem !important;
-  top: 1px;
+  vertical-align: middle;
 `;
 
 interface SideBarButtonProps {
@@ -42,12 +43,12 @@ const SideBarButton: FC<SideBarButtonProps> = ({
       <ButtonWrapper>
         {isSelected ? (
           <Gradient type="background">
-            <Icon className={icon}></Icon>
+            <Icon className={icon} />
             {title}
           </Gradient>
         ) : (
           <ContrastText type={"light"}>
-            <Icon className={icon}></Icon>
+            <Icon className={icon} />
             {title}
           </ContrastText>
         )}

@@ -1,6 +1,6 @@
 import { randomBytes, scryptSync } from "crypto";
 
-import { AuthStatus } from "../../src/types/types";
+import { AuthStatus } from "../../src/utils/types";
 import { GetServerSidePropsContext, NextApiRequest, NextPageContext, PreviewData } from "next";
 import { IncomingMessage } from "http";
 import { ParsedUrlQuery } from "querystring";

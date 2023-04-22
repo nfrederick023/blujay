@@ -1,11 +1,9 @@
+import { AuthContext } from "@client/components/Common/Providers/AuthProvider";
 import { GetServerSideProps, NextPage } from "next";
-
-import React from "react";
-
-import { AuthContext } from "@client/contexts/authContext";
-import { Video } from "@client/types/types";
+import { Video } from "@client/utils/types";
 import { listVideos } from "@server/utils/listVideos";
 import CategoryPage from "@client/components/Library/Category";
+import React from "react";
 
 interface CategoryProps {
   videos: Video[];
@@ -14,11 +12,7 @@ interface CategoryProps {
 const Category: NextPage<CategoryProps> = ({ videos }: CategoryProps) => {
   const authContext = React.useContext(AuthContext);
 
-  return (
-    <>
-      <CategoryPage videos={videos} />
-    </>
-  );
+  return <CategoryPage videos={videos} />;
 };
 
 export const getServerSideProps: GetServerSideProps<

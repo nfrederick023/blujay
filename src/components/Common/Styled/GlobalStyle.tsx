@@ -1,11 +1,10 @@
 import { createGlobalStyle } from "styled-components";
-import theme from "@client/utils/themes";
 
 const GlobalStyle = createGlobalStyle`
 html {
   font-family: 'Montserrat';
-  background-color: ${theme.background};
-  color: ${theme.text};
+  background-color: ${(props): string => props.theme.background};
+  color: ${(props): string => props.theme.text};
 }
 
 // hide scrollbar on 100vh
@@ -45,6 +44,11 @@ h6{
   font-weight: 500;
 }
 
+input, textarea, select { 
+  font-family:inherit; 
+  font-size: inherit; 
+}
+
 .sidebar-button {
     background: linear-gradient(to top right, #4481eb, #04befe);
     border: none;
@@ -56,11 +60,6 @@ h6{
     width: 200px;
     padding-left: 30px;
     font-size: large;
-}
-
-// global position fix for FontAwesome icons 
-.bx::before {
-  vertical-align: middle;
 }
 `;
 

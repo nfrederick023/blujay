@@ -1,4 +1,4 @@
-import { Video } from "../../src/types/types";
+import { Video } from "../../src/utils/types";
 
 interface Config {
   password: string;

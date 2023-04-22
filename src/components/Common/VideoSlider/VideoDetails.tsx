@@ -1,4 +1,4 @@
-import { Video } from "@client/types/types";
+import { Video } from "@client/utils/types";
 import ContrastText from "../Styled/ContrastText";
 import React, { FC } from "react";
 import TimeAgo from "react-timeago";

@@ -1,3 +1,4 @@
+import { screenSizes } from "@client/utils/themes";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./CategoryButton";
 import ContrastText from "../Styled/ContrastText";
@@ -6,10 +7,9 @@ import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useEffect, useState } from "react";
 import SideBarButton from "./SideBarButton";
 import styled from "styled-components";
-import theme from "@client/utils/themes";
 
 const SidebarWapper = styled.div`
-  background: ${theme.backgroundContrast};
+  background: ${(props): string => props.theme.backgroundContrast};
 
   min-width: 210px;
   max-width: 210px;
@@ -19,7 +19,7 @@ const SidebarWapper = styled.div`
   position: sticky;
   z-index: 1;
 
-  @media (max-width: ${theme.tabletScreenSize}px) {
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
     position: fixed;
     min-width: 100%;
     height: 100%;
@@ -42,7 +42,7 @@ const SidebarContent = styled.div`
   padding-right: 10px;
   padding-top: 20px;
 
-  @media (max-width: ${theme.tabletScreenSize}px) {
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
     max-width: 100%;
     width: 100%;
   }
@@ -53,7 +53,7 @@ const Logo = styled.div`
   padding: 5px;
   margin-bottom: 5px;
   text-align: center;
-  @media (max-width: ${theme.tabletScreenSize}px) {
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
     font-size: 1.75em;
     padding-top: 50px;
     padding-left: 20px;
@@ -62,14 +62,19 @@ const Logo = styled.div`
 
 const BarsIcon = styled.i`
   position: fixed;
+  verticle-align: middle;
   left: 10px;
-  top: -2px;
+  top: -3.5px;
   font-size: 3rem !important;
   z-index: 2;
+
+  &::before {
+    vertical-align: middle;
+  }
 `;
 
 const Library = styled.div`
-  border-left: ${theme.textContrastLight} 2px solid;
+  border-left: ${(props): string => props.theme.textContrastLight} 2px solid;
   width: 100%;
   margin-top: 5px;
   margin-left: 36px;
@@ -83,14 +88,14 @@ const MinimizeButton = styled.div`
 `;
 
 const ArrowIconContainer = styled.div`
-  border-right: ${theme.backgroundContrast} 1px solid;
+  border-right: ${(props): string => props.theme.backgroundContrast} 1px solid;
   position: absolute;
   right: 0px;
   min-height: inherit;
   width: 20px;
   &:hover {
     transition: 0.2s;
-    border-right: ${theme.highlightLight} 1px solid;
+    border-right: ${(props): string => props.theme.highlightLight} 1px solid;
     cursor: pointer;
   }
 `;
@@ -114,7 +119,7 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
   const width = useWindowWidth({ wait: 10 });
 
   useEffect(() => {
-    if (width <= theme.mobileScreenSize) {
+    if (width <= screenSizes.mobileScreenSize) {
       setIsCollapsed(true);
     } else {
       setIsCollapsed(false);
@@ -129,7 +134,7 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
     <>
       <NoSSR>
         <SidebarWapper isCollapsed={isCollapsed}>
-          {width <= theme.tabletScreenSize ? (
+          {width <= screenSizes.tabletScreenSize ? (
             <BarsIcon
               onClick={handleIsCollapsedChange}
               className="bx bx-menu bx-lg"

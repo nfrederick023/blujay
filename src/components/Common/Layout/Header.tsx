@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import SearchBar from "./SearchBar";
 import styled from "styled-components";
-import theme from "@client/utils/themes";
 
 const HeaderWrapper = styled.div`
   height: 40px;
@@ -11,7 +10,6 @@ const HeaderWrapper = styled.div`
 `;
 
 const HeaderContent = styled.div`
-  background-color: ${theme.background};
   position: fixed;
   top: 0;
   width: 100%;

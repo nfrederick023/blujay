@@ -1,60 +1,29 @@
-import Cookies from "js-cookie";
+import { BluJayTheme, ScreenSizes } from "./types";
 
-interface BluJayColorTheme {
-  readonly background: string;
-  readonly backgroundContrast: string;
-  readonly text: string;
-  readonly textContrast: string;
-  readonly textContrastLight: string;
-}
-
-interface BluJayGlobalTheme {
-  readonly largeScreenSize: number;
-  readonly mediumScreenSize: number;
-  readonly smallScreenSize: number;
-  readonly tabletScreenSize: number;
-  readonly mobileScreenSize: number;
-  readonly highlightLight: string;
-  readonly highlightDark: string;
-}
-
-type BluJayTheme = BluJayGlobalTheme & BluJayColorTheme
-
-const lightTheme: BluJayColorTheme = {
-  background: "white",
-  backgroundContrast: "white",
+export const lightTheme: BluJayTheme = {
+  background: "#ffffff",
+  backgroundContrast: "#f9f9f9",
   text: "black",
   textContrast: "#868686",
-  textContrastLight: "#8c8c8c"
+  textContrastLight: "#8c8c8c",
+  highlightLight: "#3c81eb",
+  highlightDark: "#04befe"
 };
 
-const darkTheme: BluJayColorTheme = {
+export const darkTheme: BluJayTheme = {
   background: "#0e0e0f",
   backgroundContrast: "#181819",
   text: "white",
   textContrast: "#868686",
-  textContrastLight: "#8c8c8c"
+  textContrastLight: "#8c8c8c",
+  highlightLight: "#3c81eb",
+  highlightDark: "#04befe"
 };
 
-const globalTheme: BluJayGlobalTheme = {
+export const screenSizes: ScreenSizes = {
   largeScreenSize: 2560,
   mediumScreenSize: 1920,
   smallScreenSize: 1280,
   tabletScreenSize: 720,
   mobileScreenSize: 480,
-  highlightLight: "#3c81eb",
-  highlightDark: "#04befe"
 };
-
-const getTheme = (): BluJayTheme => {
-  const isDarkMode = !(typeof window !== "undefined" && Cookies.get("isDarkMode") === "false");
-
-  if (isDarkMode)
-    return { ...darkTheme, ...globalTheme };
-  return { ...lightTheme, ...globalTheme };
-
-};
-
-const theme = getTheme();
-
-export default theme;

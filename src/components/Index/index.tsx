@@ -1,5 +1,4 @@
-import { Video } from "@client/types/types";
-import Gradient from "../Common/Styled/Gradient";
+import { Video } from "@client/utils/types";
 import React, { FC } from "react";
 import VideoSlider from "../Common/VideoSlider/VideoSlider";
 
@@ -8,30 +7,26 @@ interface IndexPageProps {
 }
 
 const IndexPage: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
-  const recentVideos = [...videos].sort(
-    ({ created: a }, { created: b }) => b - a
-  );
-
-  const sortedVideos = [...videos].sort(
-    ({ name: a }, { name: b }) => Number(b) - Number(a)
-  );
-
-  const favoritedVideos = videos.filter((video) => video.isFavorite);
+  const recentVideos = [...videos].sort((a, b) => b.created - a.created);
+  const favoritedVideos = recentVideos.filter((video) => video.isFavorite);
 
   return (
     <>
-      <Gradient type="text">
-        <h2>Recent Videos</h2>
-      </Gradient>
-      <VideoSlider videos={recentVideos} sliderType={"horizontal"} />
-      <Gradient type="text">
-        <h2>Recent Favorites</h2>
-      </Gradient>
-      <VideoSlider videos={favoritedVideos} sliderType={"horizontal"} />
-      <Gradient type="text">
-        <h2>All Videos</h2>
-      </Gradient>
-      <VideoSlider videos={sortedVideos} sliderType={"verticle"} />
+      <VideoSlider
+        videos={recentVideos}
+        sliderType={"horizontal"}
+        header={"Recent Videos"}
+      />
+      <VideoSlider
+        videos={favoritedVideos}
+        sliderType={"horizontal"}
+        header={"Recent Favorites"}
+      />
+      <VideoSlider
+        videos={videos}
+        sliderType={"verticle"}
+        header={"All Videos"}
+      />
     </>
   );
 };

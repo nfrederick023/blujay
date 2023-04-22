@@ -1,10 +1,10 @@
+import { screenSizes } from "@client/utils/themes";
 import React, { FC, useRef } from "react";
 import styled from "styled-components";
-import theme from "@client/utils/themes";
 
 const SearchBarContent = styled.div`
-  border: 1px solid ${theme.textContrast};
-  color: ${theme.textContrast};
+  border: 1px solid ${(props): string => props.theme.textContrast};
+  color: ${(props): string => props.theme.textContrast};
   border-radius: 18px;
   text-align: center;
   display: flex;
@@ -12,14 +12,14 @@ const SearchBarContent = styled.div`
   max-width: 35rem;
   margin: auto;
   margin-bottom: 15px;
-  margin-top: 15px;
+  margin-top: 13px;
   padding: 5px;
 
   &:hover {
     cursor: text;
   }
 
-  @media (max-width: ${theme.tabletScreenSize}px) {
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
     max-width: 100%;
     margin-left: 65px;
     margin-right: 20px;
@@ -28,8 +28,7 @@ const SearchBarContent = styled.div`
 
 const SearchBarInput = styled.input`
   border: 0px;
-  margin: 1px 0px 0px 2px;
-  color: ${theme.textContrast};
+  color: ${(props): string => props.theme.textContrast};
   background-color: rgba(0, 0, 0, 0);
   vertical-align: bottom;
   &:focus {
@@ -40,7 +39,7 @@ const SearchBarInput = styled.input`
 const SearchIcon = styled.i`
   font-size: 1.1rem !important;
   margin-left: 5px;
-  padding-top: 2px;
+  padding-top: 3.5px;
 
   &::before {
     vertical-align: top;

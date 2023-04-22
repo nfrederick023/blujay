@@ -1,4 +1,4 @@
-import { Video } from "@client/types/types";
+import { Video } from "@client/utils/types";
 import React, { FC } from "react";
 import VideoDetails from "./VideoDetails";
 

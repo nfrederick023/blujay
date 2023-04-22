@@ -1,17 +1,13 @@
 import { AppProps } from "next/app";
-import { AuthProvider } from "../contexts/authContext";
-import { AuthStatus } from "../types/types";
+import { AuthProvider } from "../components/Common/Providers/AuthProvider";
+import { AuthStatus } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement } from "react";
 import { Request } from "express";
-import {
-  ThemeProps,
-  ThemeProvider,
-  createGlobalStyle,
-} from "styled-components";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookies";
 import { getDirListOfLibrarySubfolders } from "@server/utils/config";
 import App from "next/app";
+import BluJayThemeProvider from "@client/components/Common/Providers/ThemeProvider";
 import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
 import Layout from "../components/Common/Layout/Layout";
 import React from "react";
@@ -44,10 +40,12 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
       <title>{publicRuntimeConfig.pageTitle}</title>
       <CookiesProvider cookies={cookies}>
         <AuthProvider authStatus={authStatus}>
-          <GlobalStyle />
-          <Layout libraryDirs={libraryDirs}>
-            <Component {...pageProps} />
-          </Layout>
+          <BluJayThemeProvider>
+            <GlobalStyle />
+            <Layout libraryDirs={libraryDirs}>
+              <Component {...pageProps} />
+            </Layout>
+          </BluJayThemeProvider>
         </AuthProvider>
       </CookiesProvider>
     </>

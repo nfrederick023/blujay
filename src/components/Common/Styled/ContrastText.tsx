@@ -1,12 +1,13 @@
+import { BluJayTheme } from "@client/utils/types";
 import React, { FC } from "react";
 import styled from "styled-components";
-import theme from "@client/utils/themes";
 
 const ContrastTexWrapper = styled.span`
-  color: ${theme.textContrast};
-  ${(props: { type: ContrastTypes }): string => {
-    if (props.type === "light") return `color: ${theme.textContrastLight};`;
-    if (props.type === "regular") return `color: ${theme.textContrast};`;
+  color: ${(props): string => props.theme.textContrast};
+  ${(props: { type: ContrastTypes; theme: BluJayTheme }): string => {
+    if (props.type === "light")
+      return `color: ${props.theme.textContrastLight};`;
+    if (props.type === "regular") return `color: ${props.theme.textContrast};`;
     return "";
   }}
 `;

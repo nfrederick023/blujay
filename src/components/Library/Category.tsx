@@ -1,6 +1,5 @@
-import { Video } from "@client/types/types";
+import { Video } from "@client/utils/types";
 import { useRouter } from "next/router";
-import Gradient from "../Common/Styled/Gradient";
 import React, { FC } from "react";
 import VideoSlider from "../Common/VideoSlider/VideoSlider";
 
@@ -20,12 +19,11 @@ const CategoryPage: FC<CategoryPageProps> = ({ videos }: CategoryPageProps) => {
   const cateogryName = categoryVideos[0]?.category ?? category;
 
   return (
-    <>
-      <Gradient type="text">
-        <h2>{cateogryName}</h2>
-      </Gradient>
-      <VideoSlider videos={categoryVideos} sliderType={"verticle"} />
-    </>
+    <VideoSlider
+      videos={categoryVideos}
+      sliderType={"verticle"}
+      header={cateogryName}
+    />
   );
 };
 

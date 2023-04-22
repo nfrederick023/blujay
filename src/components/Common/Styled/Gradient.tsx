@@ -1,12 +1,11 @@
 import React, { FC } from "react";
 import styled from "styled-components";
-import theme from "@client/utils/themes";
 
 const GradientBackground = styled.span`
   background-image: linear-gradient(
     174deg,
-    ${theme.highlightLight} 20%,
-    ${theme.highlightDark} 80%
+    ${(props): string => props.theme.highlightLight} 20%,
+    ${(props): string => props.theme.highlightDark} 80%
   );
   display: block;
 `;
@@ -14,8 +13,8 @@ const GradientBackground = styled.span`
 const GradientText = styled.span`
   background: linear-gradient(
     174deg,
-    ${theme.highlightLight} 20%,
-    ${theme.highlightDark} 80%
+    ${(props): string => props.theme.highlightLight} 20%,
+    ${(props): string => props.theme.highlightDark} 80%
   );
   -webkit-background-clip: text;
   background-clip: text;

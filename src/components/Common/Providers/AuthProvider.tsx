@@ -1,7 +1,6 @@
-import { AuthStatus } from "../types/types";
-import { NextPage } from "next";
+import { AuthStatus } from "../../../utils/types";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { FC } from "react";
 
 const AuthContext = React.createContext(AuthStatus.notAuthenticated);
 const { Provider } = AuthContext;
@@ -11,7 +10,7 @@ interface AuthProviderProps {
   authStatus: AuthStatus;
 }
 
-const AuthProvider: NextPage<AuthProviderProps> = ({
+const AuthProvider: FC<AuthProviderProps> = ({
   children,
   authStatus,
 }: AuthProviderProps) => {

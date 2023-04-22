@@ -2,7 +2,7 @@ import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPa
 import path from "path";
 import seedrandom from "seedrandom";
 
-import { Video } from "@client/types/types";
+import { Video } from "@client/utils/types";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
 import fse from "fs-extra";
@@ -15,7 +15,7 @@ export const listVideos = async (): Promise<Video[]> => {
   await createVideoListBackup();
 
   const libraryPath = await getLibraryPath();
-  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv)`);
+  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv|gif)`);
 
   await cleanState(videoFilePaths);
 
@@ -43,12 +43,17 @@ const createThumbnails = async (videos: Video[]): Promise<void> => {
     const filename = video.name + ".jpg";
     oldThumbnails = oldThumbnails.filter(thumbnail => !(thumbnail === filename));
     if (!thumbnails.includes(filename)) {
+      let timemarks = ["20%"];
+      if (video.fileName.split(".").pop() === "gif")
+        timemarks = ["0"];
       ffmpeg(video.filePath)
+        .inputOptions("-t 10")
         .screenshots({
           count: 1,
           filename,
           folder,
-          size
+          size,
+          timemarks
         });
     }
   });
@@ -71,20 +76,19 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
   const category = path.dirname(filePath).split("\\")[3] ?? "";
   const thumbnailPath = path.join(await getThumbnailsPath() + name + ".jpg");
 
-
   // check if the video already is persisted within the state
   const videoState = videoList.find((video) => { return video.filePath === filePath; });
 
   if (videoState) {
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.size !== videoStats.size || videoState.saved !== videoStats.mtimeMs || videoState.created !== videoStats.birthtimeMs || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category) {
+    if (videoState.size !== videoStats.size || videoState.saved !== videoStats.mtime.getTime() || videoState.created !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
         ...videoState,
         size: videoStats.size,
-        saved: videoStats.mtimeMs,
-        created: videoStats.birthtimeMs ? videoStats.birthtimeMs : videoState.created,
+        saved: videoStats.atime.getTime(),
+        created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : videoState.created,
         name,
         fileName,
         filePath,
@@ -105,8 +109,8 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
     fileName,
     name,
     size: videoStats.size,
-    saved: videoStats.mtimeMs,
-    created: videoStats.birthtimeMs ? videoStats.birthtimeMs : Date.now(),
+    saved: videoStats.mtime.getTime(),
+    created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : Date.now(),
     filePath,
     thumbnailPath,
     description: "",

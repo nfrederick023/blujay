@@ -3,7 +3,7 @@
  */
 
 import { NextApiRequest, NextApiResponse } from "next";
-import { Video } from "@client/types/types";
+import { Video } from "@client/utils/types";
 import { getThumbnailsPath, getVideoList } from "@server/utils/config";
 import { isTokenValid } from "@server/utils/auth";
 import fs from "fs";
