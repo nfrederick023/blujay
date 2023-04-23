@@ -1,6 +1,6 @@
 import { AppProps } from "next/app";
 import { AuthProvider } from "../components/Common/Providers/AuthProvider";
-import { AuthStatus, PublicConfig } from "../utils/types";
+import { AuthStatus, CookieTypes, PublicConfig } from "../utils/types";
 import { ConfigProvider } from "@client/components/Common/Providers/ConfigProvider";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement } from "react";
@@ -38,9 +38,22 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
 }: ExtendedAppProps): ReactElement => {
   // assign default values to cookies if not set
   const cookies = new Cookies(appCookies);
-  for (const [cookie, value] of Object.entries(appCookies))
-    if (value === "")
-      cookies.set(cookie, getCookieDefault(cookie), getCookieSetOptions());
+
+  const allCookieTypes: CookieTypes[] = [
+    "authToken",
+    "isDarkMode",
+    "theaterMode",
+    "videoVolume",
+  ];
+
+  allCookieTypes.forEach((cookieType) => {
+    if (!cookies.get(cookieType))
+      cookies.set(
+        cookieType,
+        getCookieDefault(cookieType),
+        getCookieSetOptions()
+      );
+  });
 
   const theme = cookies.get("isDarkMode") === "true" ? darkTheme : lightTheme;
 

@@ -25,6 +25,10 @@ const Icon = styled.i`
   vertical-align: middle;
 `;
 
+const WhiteColor = styled.div`
+  color: white;
+`;
+
 interface SideBarButtonProps {
   title: string;
   icon: string;
@@ -43,8 +47,10 @@ const SideBarButton: FC<SideBarButtonProps> = ({
       <ButtonWrapper>
         {isSelected ? (
           <Gradient type="background">
-            <Icon className={icon} />
-            {title}
+            <WhiteColor>
+              <Icon className={icon} />
+              {title}
+            </WhiteColor>
           </Gradient>
         ) : (
           <ContrastText type={"light"}>

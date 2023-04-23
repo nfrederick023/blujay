@@ -76,3 +76,5 @@ export interface Config {
 export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
+
+export type CookieTypes = "theaterMode" | "videoVolume" | "isDarkMode" | "authToken"
