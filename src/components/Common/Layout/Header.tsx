@@ -10,11 +10,12 @@ const HeaderWrapper = styled.div`
 `;
 
 const HeaderContent = styled.div`
-  background-color: ${(props): string => props.theme.background};
+  background-color: ${(p): string => p.theme.background};
   position: fixed;
   top: 0;
   width: 100%;
   margin: auto;
+  z-index: 2;
 `;
 
 const Header: FC = () => {

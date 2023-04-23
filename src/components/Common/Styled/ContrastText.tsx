@@ -3,13 +3,11 @@ import React, { FC } from "react";
 import styled from "styled-components";
 
 const ContrastTexWrapper = styled.span`
-  color: ${(props): string => props.theme.textContrast};
-  ${(props: { type: ContrastTypes; theme: BluJayTheme }): string => {
-    if (props.type === "light")
-      return `color: ${props.theme.textContrastLight};`;
-    if (props.type === "regular") return `color: ${props.theme.textContrast};`;
-    return "";
-  }}
+  color: ${(p: { type: ContrastTypes; theme: BluJayTheme }): string => {
+    return p.type === "light"
+      ? `${p.theme.textContrastLight}`
+      : `${p.theme.textContrast};`;
+  }};
 `;
 
 type ContrastTypes = "light" | "regular";

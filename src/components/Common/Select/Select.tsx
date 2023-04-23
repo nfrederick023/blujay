@@ -9,17 +9,17 @@ const SelectBoxWrapper = styled.div`
 `;
 
 const SelectBox = styled.div`
-  color: ${(props): string => props.theme.textContrast};
+  color: ${(p): string => p.theme.textContrast};
   display: flex;
   user-select: none;
 
   &:hover {
-    color: ${(props): string => props.theme.text};
+    color: ${(p): string => p.theme.text};
     cursor: pointer;
   }
 
-  ${(props: { isFocused: boolean; theme: BluJayTheme }): string =>
-    props.isFocused ? `color: ${props.theme.text}` : ""}
+  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
+    p.isFocused ? `${p.theme.text}` : ""};
 `;
 
 const UnselectedBox = styled.div`
@@ -30,23 +30,23 @@ const UnselectedBox = styled.div`
   transition: 1s;
   width: 110%;
   padding: 5px;
-  background-color: ${(props): string => props.theme.background};
-  border-left: 3px solid ${(props): string => props.theme.highlightLight};
-  z-index: 100;
+  background-color: ${(p): string => p.theme.background};
+  border-left: 3px solid ${(p): string => p.theme.highlightLight};
+  z-index: 2;
   left: -20px;
 
   &:hover {
-    border-left: 3px solid ${(props): string => props.theme.highlightDark};
+    border-left: 3px solid ${(p): string => p.theme.highlightDark};
   }
 `;
 
 const UnselectedOption = styled.div`
   padding: 5px;
-  color: ${(props): string => props.theme.textContrast};
+  color: ${(p): string => p.theme.textContrast};
   transition: 0.15s;
 
   &:hover {
-    color: ${(props): string => props.theme.text};
+    color: ${(p): string => p.theme.text};
     cursor: pointer;
     border-radius: 5px;
   }
@@ -59,11 +59,12 @@ const SelectedBox = styled.div`
 `;
 
 const SelectedOption = styled.div`
-  border: 1px solid ${(props): string => props.theme.textContrast};
   font-size: 85%;
 
-  ${(props: { isMulti: boolean | undefined }): string =>
-    props.isMulti ? "" : "border: 0px; font-size: 1rem;"}
+  border: ${(p: { isMulti: boolean | undefined; theme: BluJayTheme }): string =>
+    p.isMulti
+      ? `1px solid ${p.theme.textContrast};`
+      : "border: 0px; font-size: 1rem;"};
 `;
 
 const SelectedIcon = styled.i`
@@ -87,7 +88,7 @@ const RightIcons = styled.i`
 `;
 
 const ClearButton = styled.div`
-  border-right: 1px solid ${(props): string => props.theme.text};
+  border-right: 1px solid ${(p): string => p.theme.text};
   height: 85%;
 `;
 

@@ -61,3 +61,18 @@ export interface NextRedirect {
   redirect: Redirect
 }
 
+export interface Thumbnail {
+  height: number,
+  width: number
+}
+
+export interface Config {
+  readonly password: string;
+  readonly privateLibrary: boolean;
+  readonly thumbnailSettings: Thumbnail;
+}
+
+// DO NOT ALLOW SENSITIVE PARAMETERS IN PUBLICCONFIG!!!!! 
+export interface PublicConfig {
+  readonly thumbnailSettings: Thumbnail;
+}

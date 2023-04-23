@@ -1,4 +1,4 @@
-import { Video } from "@client/utils/types";
+import { BluJayTheme, Video } from "@client/utils/types";
 import { screenSizes } from "@client/utils/themes";
 import { useWindowWidth } from "@react-hook/window-size";
 import Gradient from "../Styled/Gradient";
@@ -29,6 +29,7 @@ const HeaderIconsWrapper = styled.div`
 
 const SortSelect = styled.div`
   display: flex;
+  width: 260px;
 `;
 
 const TypeSelect = styled.div`
@@ -41,21 +42,27 @@ const NoVideosWrapper = styled.div`
   min-width: 100vw;
 `;
 const SortIcon = styled.i`
-  color: ${(props): string => props.theme.textContrast};
+  color: ${(p): string => p.theme.textContrast};
   font-size: 1.25rem;
   vertical-align: baseline;
   margin-left: auto;
   margin-right: 5px;
 
   &:hover {
-    color: ${(props): string => props.theme.text};
+    color: ${(p): string => p.theme.text};
     cursor: pointer;
   }
 `;
 
 const ChevronIcon = styled(SortIcon)`
-  ${(props: { isEnabled: boolean }): string =>
-    props.isEnabled ? "visibility: visible; " : "visibility: hidden;"};
+  opacity: ${(p: { isEnabled: boolean; theme: BluJayTheme }): number =>
+    p.isEnabled ? 1 : 0.5};
+
+  &:hover {
+    color: ${(p): string =>
+      p.isEnabled ? p.theme.text : p.theme.textContrast};
+    cursor: ${(p): string => (p.isEnabled ? "pointer" : "auto")};
+  }
 `;
 
 type SliderType = "verticle" | "horizontal";
@@ -81,8 +88,8 @@ const VideoSlider: FC<VideoSliderProps> = ({
   const [sort, setSort] = useState<SortTypes>("Alphabetical");
   const [isAscending, setIsAscending] = useState<boolean>(true);
   const [isGridView, setIsGridView] = useState<boolean>(true);
-  const [offSet, setOffset] = useState(0);
-  const [isMaxOffset, setIsMaxOffset] = useState(false);
+  const [displayedPosition, setDisplayedPosition] = useState(0);
+  const [position, setPosition] = useState(0);
 
   const handleSortChange = (newSort: string): void => {
     setSort(newSort as SortTypes);
@@ -97,11 +104,12 @@ const VideoSlider: FC<VideoSliderProps> = ({
   };
 
   const handleIncrementOffset = (): void => {
-    if (!isMaxOffset) setOffset(offSet + 1);
+    if (!isMaxOffset && displayedPosition === position)
+      setPosition(position + 1);
   };
 
   const handleDecrementOffset = (): void => {
-    if (offSet) setOffset(offSet - 1);
+    if (position && displayedPosition === position) setPosition(position - 1);
   };
 
   const viewTypes: ViewTypes[] = ["Grid View", "List View"];
@@ -127,13 +135,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
   const sortValue = sort + " " + (isAscending ? "Ascending" : "Descending");
   const listValue = isGridView ? "Grid View" : "List View";
 
-  if (videosPerRow + offSet >= videos.length && !isMaxOffset) {
-    setIsMaxOffset(true);
-  }
-
-  if (videosPerRow + offSet < videos.length && isMaxOffset) {
-    setIsMaxOffset(false);
-  }
+  const isMaxOffset = videosPerRow + position >= videos.length;
 
   const sortedVideos: Video[] = [...videos];
 
@@ -168,10 +170,10 @@ const VideoSlider: FC<VideoSliderProps> = ({
         </Gradient>
         <HeaderIconsWrapper>
           {sliderType === "horizontal" ? (
-            <>
+            <NoSSR>
               <ChevronIcon
                 className={"bx bx-chevron-left"}
-                isEnabled={!!offSet}
+                isEnabled={!!position}
                 onClick={handleDecrementOffset}
               />
               <ChevronIcon
@@ -179,7 +181,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
                 isEnabled={!isMaxOffset}
                 onClick={handleIncrementOffset}
               />
-            </>
+            </NoSSR>
           ) : (
             <>
               <SortSelect>
@@ -214,13 +216,13 @@ const VideoSlider: FC<VideoSliderProps> = ({
         ) : (
           <NoSSR>
             {sliderType === "horizontal" ? (
-              <>
-                <HorizontalSlider
-                  videos={videos}
-                  videosPerRow={videosPerRow}
-                  offset={offSet}
-                />
-              </>
+              <HorizontalSlider
+                videos={videos}
+                videosPerRow={videosPerRow}
+                displayedPosition={displayedPosition}
+                setDisplayedPosition={setDisplayedPosition}
+                position={position}
+              />
             ) : (
               <VerticleSlider
                 videos={sortedVideos}

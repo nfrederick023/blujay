@@ -1,11 +1,20 @@
 import { Video } from "@client/utils/types";
-import React, { FC } from "react";
+import { useBottomScrollListener } from "react-bottom-scroll-listener";
+import React, { FC, useState } from "react";
 import VideoDetails from "./VideoDetails";
 import styled from "styled-components";
+
+const VerticleSliderWrapper = styled.div`
+  width: 100%;
+`;
 
 const VideoRow = styled.div`
   display: flex;
   margin-bottom: 15px;
+
+  & :not(:last-child) {
+    margin-right: 15px;
+  }
 `;
 
 interface VerticleSliderProps {
@@ -17,10 +26,18 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
   videos,
   videosPerRow,
 }: VerticleSliderProps) => {
-  const numberOfRows = Math.ceil(videos.length / videosPerRow);
+  const [numberOfRows, setNumberOfRows] = useState(5);
+
+  const bottomScrollCallback = (): void => {
+    if (numberOfRows * videosPerRow < videos.length) {
+      setNumberOfRows(numberOfRows + 3);
+    }
+  };
+
+  useBottomScrollListener(bottomScrollCallback, {});
 
   return (
-    <div>
+    <VerticleSliderWrapper>
       {[...Array(numberOfRows)].map((undef, i) => (
         <VideoRow key={i}>
           {[...new Array(videosPerRow)].map((undef, j) => (
@@ -28,7 +45,7 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
           ))}
         </VideoRow>
       ))}
-    </div>
+    </VerticleSliderWrapper>
   );
 };
 

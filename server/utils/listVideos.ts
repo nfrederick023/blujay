@@ -1,4 +1,4 @@
-import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getThumnailSize, getUserPassword, getVideoList, setVideoList } from "./config";
+import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getThumnailSettings, getUserPassword, getVideoList, setVideoList } from "./config";
 import path from "path";
 import seedrandom from "seedrandom";
 
@@ -36,7 +36,8 @@ export const listVideos = async (): Promise<Video[]> => {
 const createThumbnails = async (videos: Video[]): Promise<void> => {
   const folder = await getThumbnailsPath();
   const thumbnails = await fse.readdir(folder);
-  const size = await getThumnailSize();
+  const thumbnailSettings = await getThumnailSettings();
+  const size = `${thumbnailSettings.width}x${thumbnailSettings.height}`;
   let oldThumbnails = thumbnails;
 
   videos.forEach(video => {

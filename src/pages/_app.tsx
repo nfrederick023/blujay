@@ -1,13 +1,17 @@
 import { AppProps } from "next/app";
 import { AuthProvider } from "../components/Common/Providers/AuthProvider";
-import { AuthStatus } from "../utils/types";
+import { AuthStatus, PublicConfig } from "../utils/types";
+import { ConfigProvider } from "@client/components/Common/Providers/ConfigProvider";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement } from "react";
 import { Request } from "express";
 import { ThemeProvider } from "styled-components";
 import { darkTheme, lightTheme } from "@client/utils/themes";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookies";
-import { getDirListOfLibrarySubfolders } from "@server/utils/config";
+import {
+  getDirListOfLibrarySubfolders,
+  getThumnailSettings,
+} from "@server/utils/config";
 import App from "next/app";
 import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
 import Layout from "../components/Common/Layout/Layout";
@@ -21,6 +25,7 @@ interface ExtendedAppProps extends AppProps {
   appCookies: { [key: string]: string | boolean | number };
   authStatus: AuthStatus;
   libraryDirs: string[];
+  publicConfig: PublicConfig;
 }
 
 const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
@@ -29,6 +34,7 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   appCookies,
   authStatus,
   libraryDirs,
+  publicConfig,
 }: ExtendedAppProps): ReactElement => {
   // assign default values to cookies if not set
   const cookies = new Cookies(appCookies);
@@ -43,12 +49,14 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
       <title>{publicRuntimeConfig.pageTitle}</title>
       <CookiesProvider cookies={cookies}>
         <AuthProvider authStatus={authStatus}>
-          <ThemeProvider theme={theme}>
-            <GlobalStyle />
-            <Layout libraryDirs={libraryDirs}>
-              <Component {...pageProps} />
-            </Layout>
-          </ThemeProvider>
+          <ConfigProvider publicConfig={publicConfig}>
+            <ThemeProvider theme={theme}>
+              <GlobalStyle />
+              <Layout libraryDirs={libraryDirs}>
+                <Component {...pageProps} />
+              </Layout>
+            </ThemeProvider>
+          </ConfigProvider>
         </AuthProvider>
       </CookiesProvider>
     </>
@@ -62,10 +70,16 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
   const request = ctx.req as Request | undefined;
   let authStatus = AuthStatus.notAuthenticated;
   let libraryDirs: string[] = [];
-  if (typeof window === "undefined") {
-    authStatus = await getAuthStatus(initialProps.ctx);
-    libraryDirs = await getDirListOfLibrarySubfolders();
-  }
+  authStatus = await getAuthStatus(initialProps.ctx);
+  libraryDirs = await getDirListOfLibrarySubfolders();
+  const thumbnailSettings = await getThumnailSettings();
+
+  // obviously, DO NOT! pass the full config to the onto MyApp. It contains the password.
+  // so pull out what we want and send that by itself
+
+  const publicConfig: PublicConfig = {
+    thumbnailSettings,
+  };
 
   // run the default getInitialProps for the main nextjs initialProps
   const appInitialProps = (await App.getInitialProps(initialProps)) as AppProps;
@@ -73,6 +87,7 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
     appCookies: request?.cookies ?? [],
     authStatus,
     libraryDirs,
+    publicConfig,
     ...appInitialProps,
   };
 };

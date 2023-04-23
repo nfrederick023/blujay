@@ -7,31 +7,12 @@ const CategoryButtonWrapper = styled.div`
   padding-left: 25px;
 
   div {
-    display: inline-block;
-    position: relative;
     transition: 0.1s;
-
-    ::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      transform: scaleX(0);
-      height: 1px;
-      bottom: 0;
-      left: 0;
-      background-color: ${(props): string => props.theme.textContrast};
-      transform-origin: bottom right;
-    }
   }
 
   &:hover {
     div {
-      color: ${(props): string => props.theme.text};
-      // uncomment to enable underline animation
-      /* ::after {
-        transform: scaleX(1);
-        transform-origin: bottom left;
-      } */
+      color: ${(p): string => p.theme.text};
     }
     cursor: pointer;
   }
@@ -40,7 +21,7 @@ const CategoryButtonWrapper = styled.div`
 const CategoryButtonName = styled.div``;
 
 const SelectedCategory = styled.div`
-  color: ${(props): string => props.theme.text};
+  color: ${(p): string => p.theme.text};
 `;
 
 interface CategoryButtonProps {

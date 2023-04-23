@@ -3,8 +3,8 @@ import { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
 html {
   font-family: 'Montserrat';
-  background-color: ${(props): string => props.theme.background};
-  color: ${(props): string => props.theme.text};
+  background-color: ${(p): string => p.theme.background};
+  color: ${(p): string => p.theme.text};
 }
 
 // hide scrollbar on 100vh

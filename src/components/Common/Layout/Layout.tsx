@@ -9,6 +9,7 @@ const FlexContainer = styled.div`
 
 const MainContent = styled.div`
   height: 100%;
+  width: 100%;
   overflow: hidden;
 `;
 

@@ -9,7 +9,7 @@ import SideBarButton from "./SideBarButton";
 import styled from "styled-components";
 
 const SidebarWapper = styled.div`
-  background: ${(props): string => props.theme.backgroundContrast};
+  background: ${(p): string => p.theme.backgroundContrast};
 
   min-width: 210px;
   max-width: 210px;
@@ -17,19 +17,18 @@ const SidebarWapper = styled.div`
   user-select: none;
   min-height: 100vh;
   position: sticky;
-  z-index: 1;
+  z-index: 3;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     position: fixed;
     min-width: 100%;
     height: 100%;
 
-    ${(props: { isCollapsed: boolean }): string =>
-      props.isCollapsed ? "min-width: 60px; left: -60px;" : ""}
+    ${(p: { isCollapsed: boolean }): string =>
+      p.isCollapsed ? "min-width: 60px; left: -60px;" : ""}
   }
 
-  ${(props: { isCollapsed: boolean }): string =>
-    props.isCollapsed ? "max-width: 48px; min-width: 48px;" : ""}
+  ${(p): string => (p.isCollapsed ? "max-width: 48px; min-width: 48px;" : "")}
 `;
 
 const SidebarContent = styled.div`
@@ -74,7 +73,7 @@ const BarsIcon = styled.i`
 `;
 
 const Library = styled.div`
-  border-left: ${(props): string => props.theme.textContrastLight} 2px solid;
+  border-left: ${(p): string => p.theme.textContrastLight} 2px solid;
   width: 100%;
   margin-top: 5px;
   margin-left: 36px;
@@ -88,14 +87,14 @@ const MinimizeButton = styled.div`
 `;
 
 const ArrowIconContainer = styled.div`
-  border-right: ${(props): string => props.theme.backgroundContrast} 1px solid;
+  border-right: ${(p): string => p.theme.backgroundContrast} 1px solid;
   position: absolute;
   right: 0px;
   min-height: inherit;
   width: 20px;
   &:hover {
     transition: 0.2s;
-    border-right: ${(props): string => props.theme.highlightLight} 1px solid;
+    border-right: ${(p): string => p.theme.highlightLight} 1px solid;
     cursor: pointer;
   }
 `;

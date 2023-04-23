@@ -3,8 +3,8 @@ import React, { FC, useRef } from "react";
 import styled from "styled-components";
 
 const SearchBarContent = styled.div`
-  border: 1px solid ${(props): string => props.theme.textContrast};
-  color: ${(props): string => props.theme.textContrast};
+  border: 1px solid ${(p): string => p.theme.textContrast};
+  color: ${(p): string => p.theme.textContrast};
   border-radius: 18px;
   text-align: center;
   display: flex;
@@ -28,7 +28,7 @@ const SearchBarContent = styled.div`
 
 const SearchBarInput = styled.input`
   border: 0px;
-  color: ${(props): string => props.theme.textContrast};
+  color: ${(p): string => p.theme.textContrast};
   background-color: rgba(0, 0, 0, 0);
   vertical-align: bottom;
   &:focus {

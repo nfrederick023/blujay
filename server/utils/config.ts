@@ -1,10 +1,4 @@
-import { Video } from "../../src/utils/types";
-
-interface Config {
-  password: string;
-  privateLibrary: boolean;
-  thumbnailSize: string;
-}
+import { Config, Thumbnail, Video } from "../../src/utils/types";
 
 export const getUserPassword = async (): Promise<string> => {
   return (await getConfig()).password;
@@ -14,8 +8,8 @@ export const getPrivateLibrary = async (): Promise<boolean> => {
   return (await getConfig()).privateLibrary;
 };
 
-export const getThumnailSize = async (): Promise<string> => {
-  return (await getConfig()).thumbnailSize;
+export const getThumnailSettings = async (): Promise<Thumbnail> => {
+  return (await getConfig()).thumbnailSettings;
 };
 
 export const getPath = async (): Promise<string> => {
@@ -63,7 +57,10 @@ export const getConfigPath = async (): Promise<string> => {
   const defaultConfig: Config = {
     password: "test",
     privateLibrary: true,
-    thumbnailSize: "1920x1080"
+    thumbnailSettings: {
+      width: 1920,
+      height: 1080,
+    }
   };
 
   await checkCreateJSON(dir, defaultConfig);
