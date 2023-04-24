@@ -1,13 +1,13 @@
-import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getThumnailSettings, getUserPassword, getVideoList, setVideoList } from "./config";
-import path from "path";
-import seedrandom from "seedrandom";
-
 import { Video } from "@client/utils/types";
+import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getThumnailSettings, getUserPassword, getVideoList, setVideoList } from "./config";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
 import fse from "fs-extra";
 import glob from "glob-promise";
+import path from "path";
 import pathToFfmpeg from "ffmpeg-static";
+import seedrandom from "seedrandom";
+
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
 
@@ -16,7 +16,6 @@ export const listVideos = async (): Promise<Video[]> => {
 
   const libraryPath = await getLibraryPath();
   const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv|gif)`);
-
   await cleanState(videoFilePaths);
 
   const videoDetails: Video[] = [];

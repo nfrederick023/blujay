@@ -1,8 +1,7 @@
 import { ConfigContext } from "../Providers/ConfigProvider";
 import { Video } from "@client/utils/types";
-import { useWindowSize } from "@react-hook/window-size";
 import ContrastText from "../Styled/ContrastText";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
 import styled from "styled-components";
 
@@ -49,20 +48,24 @@ interface VideoDetailsProps {
 const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const config = React.useContext(ConfigContext);
   const [loaded, setLoaded] = useState(false);
-  const [placeHolder, setPlaceHolder] = useState<HTMLElement | null>(null);
-
+  const [ref, setRef] = useState<HTMLDivElement | null>();
+  const [width, setwidth] = useState(0);
   const imageHeight =
-    ((placeHolder?.offsetWidth || 1) / config.thumbnailSettings.width) *
-    config.thumbnailSettings.height;
+    (width / config.thumbnailSettings.width) * config.thumbnailSettings.height;
 
-  // this is a hack to force the placeholder ref to update the size
-  useWindowSize({ wait: 10 });
+  useEffect((): (() => void) => {
+    const observer = new ResizeObserver((entries) => {
+      setwidth(entries[0].contentRect.width);
+    });
+    if (ref) observer.observe(ref);
+    return () => ref && observer.unobserve(ref);
+  }, [ref]);
 
   return (
     <VideoDetailsWrapper>
       {video ? (
         <>
-          <PlaceHolder ref={setPlaceHolder} />
+          <PlaceHolder ref={setRef} />
 
           <Thumbnail
             loaded={loaded}

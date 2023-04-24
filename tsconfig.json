@@ -18,6 +18,9 @@
     "isolatedModules": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "paths": {

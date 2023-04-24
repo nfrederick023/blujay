@@ -1,12 +1,20 @@
-import { BluJayTheme, Video } from "@client/utils/types";
-import { screenSizes } from "@client/utils/themes";
+import {
+  BluJayTheme,
+  OrderType,
+  QueryField,
+  SortType,
+  Video,
+} from "@client/utils/types";
+import { screenSizes } from "@client/utils/theme";
+import { sortVideos } from "@client/utils/sortVideo";
 import { useWindowWidth } from "@react-hook/window-size";
 import Gradient from "../Styled/Gradient";
 import HorizontalSlider from "./HorizontalSlider";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import Select from "../Select/Select";
 import VerticleSlider from "./VerticleSlider";
+import axios from "axios";
 import styled from "styled-components";
 
 const VideoSliderWrapper = styled.div`
@@ -67,36 +75,53 @@ const ChevronIcon = styled(SortIcon)`
 
 type SliderType = "verticle" | "horizontal";
 type ViewTypes = "List View" | "Grid View";
-type SortTypes =
-  | "Alphabetical"
-  | "Date Updated"
-  | "Date Created"
-  | "File Size"
-  | "View Count";
 
 interface VideoSliderProps {
-  videos: Video[];
+  sort?: SortType;
+  order?: OrderType;
   sliderType: SliderType;
   header: string;
 }
 
+interface GetVideosRequest {
+  page: number;
+  size: number;
+  sort: SortType;
+  order: OrderType;
+  query: string;
+  queryField: QueryField[];
+}
+
 const VideoSlider: FC<VideoSliderProps> = ({
-  videos,
+  sort,
+  order,
   sliderType,
   header,
 }: VideoSliderProps) => {
-  const [sort, setSort] = useState<SortTypes>("Alphabetical");
-  const [isAscending, setIsAscending] = useState<boolean>(true);
+  const [sortType, setSortType] = useState<SortType>(sort || "Alphabetical");
+  const [orderType, setOrderType] = useState<OrderType>(order || "Ascending");
   const [isGridView, setIsGridView] = useState<boolean>(true);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [displayedPosition, setDisplayedPosition] = useState(0);
   const [position, setPosition] = useState(0);
 
+  const getVideos = async (): Promise<void> => {
+    if (typeof window !== "undefined") {
+      const res = await fetch("/api/videoList", {
+        headers: { "Content-Type": "application/json" },
+        method: "GET",
+      });
+      setVideos(await res.json());
+    }
+  };
+
   const handleSortChange = (newSort: string): void => {
-    setSort(newSort as SortTypes);
+    setSortType(newSort as SortType);
   };
 
   const handleIsAscendingChange = (): void => {
-    setIsAscending(!isAscending);
+    if (orderType === "Ascending") setOrderType("Descending");
+    else setOrderType("Ascending");
   };
 
   const handleViewChange = (): void => {
@@ -113,7 +138,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
   };
 
   const viewTypes: ViewTypes[] = ["Grid View", "List View"];
-  const sortOptions: SortTypes[] = [
+  const sortOptions: SortType[] = [
     "Alphabetical",
     "Date Created",
     "Date Updated",
@@ -132,36 +157,16 @@ const VideoSlider: FC<VideoSliderProps> = ({
   if (width >= screenSizes.mediumScreenSize) videoWidthPercent = 15;
 
   const videosPerRow = Math.floor(width / (width * (videoWidthPercent / 100)));
-  const sortValue = sort + " " + (isAscending ? "Ascending" : "Descending");
   const listValue = isGridView ? "Grid View" : "List View";
 
   const isMaxOffset = videosPerRow + position >= videos.length;
 
-  const sortedVideos: Video[] = [...videos];
+  const sortedVideos: Video[] = sortVideos([...videos], sortType, orderType);
 
-  switch (sort) {
-    case "Date Updated": {
-      sortedVideos.sort((a, b) => b.saved - a.saved);
-      break;
-    }
-    case "Date Created": {
-      sortedVideos.sort((a, b) => b.created - a.created);
-      break;
-    }
-    case "File Size": {
-      sortedVideos.sort((a, b) => b.size - a.size);
-      break;
-    }
-    case "View Count": {
-      sortedVideos.sort((a, b) => a.id.localeCompare(b.id));
-      break;
-    }
-    default: {
-      sortedVideos.sort((a, b) => a.name.localeCompare(b.name));
-    }
-  }
+  useEffect(() => {
+    getVideos();
+  }, []);
 
-  if (!isAscending) sortedVideos.reverse();
   return (
     <>
       <Header>
@@ -187,12 +192,16 @@ const VideoSlider: FC<VideoSliderProps> = ({
               <SortSelect>
                 <SortIcon
                   onClick={handleIsAscendingChange}
-                  className={isAscending ? "bx bx-sort-up" : "bx bx-sort-down"}
+                  className={
+                    orderType === "Ascending"
+                      ? "bx bx-sort-up"
+                      : "bx bx-sort-down"
+                  }
                 />
                 <Select
                   options={sortOptions}
                   onChange={handleSortChange}
-                  value={[sortValue]}
+                  value={[orderType]}
                 />
               </SortSelect>
               <TypeSelect>

@@ -41,7 +41,10 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
       {[...Array(numberOfRows)].map((undef, i) => (
         <VideoRow key={i}>
           {[...new Array(videosPerRow)].map((undef, j) => (
-            <VideoDetails key={j} video={videos[i * videosPerRow + j]} />
+            <VideoDetails
+              key={videos[i * videosPerRow + j]?.id || j}
+              video={videos[i * videosPerRow + j]}
+            />
           ))}
         </VideoRow>
       ))}

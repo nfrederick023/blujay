@@ -6,12 +6,13 @@ import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement } from "react";
 import { Request } from "express";
 import { ThemeProvider } from "styled-components";
-import { darkTheme, lightTheme } from "@client/utils/themes";
-import { getCookieDefault, getCookieSetOptions } from "../utils/cookies";
+import { darkTheme, lightTheme } from "@client/utils/theme";
+import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import {
   getDirListOfLibrarySubfolders,
   getThumnailSettings,
 } from "@server/utils/config";
+import { listVideos } from "@server/utils/listVideos";
 import App from "next/app";
 import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
 import Layout from "../components/Common/Layout/Layout";
@@ -85,6 +86,7 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
   let libraryDirs: string[] = [];
   authStatus = await getAuthStatus(initialProps.ctx);
   libraryDirs = await getDirListOfLibrarySubfolders();
+
   const thumbnailSettings = await getThumnailSettings();
 
   // obviously, DO NOT! pass the full config to the onto MyApp. It contains the password.

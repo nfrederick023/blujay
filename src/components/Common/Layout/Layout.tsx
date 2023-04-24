@@ -1,5 +1,5 @@
-import Header from "./Header";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
+import SearchBar from "./SearchBar";
 import Sidebar from "./Sidebar";
 import styled from "styled-components";
 
@@ -13,6 +13,22 @@ const MainContent = styled.div`
   overflow: hidden;
 `;
 
+const HeaderWrapper = styled.div`
+  height: 40px;
+  padding-top: 5px;
+  justify-content: center;
+  display: flex;
+`;
+
+const HeaderContent = styled.div`
+  background-color: ${(p): string => p.theme.background};
+  position: fixed;
+  top: 0;
+  width: 100%;
+  margin: auto;
+  z-index: 2;
+`;
+
 const ContentWrapper = styled.div`
   margin: 20px;
 `;
@@ -23,12 +39,20 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children, libraryDirs }: LayoutProps) => {
+  const [searchInput, setSearchInput] = useState("");
+
   return (
     <FlexContainer>
       <Sidebar libraryDirs={libraryDirs} />
       <MainContent>
-        <Header />
-        <ContentWrapper>{children}</ContentWrapper>
+        <HeaderWrapper>
+          <HeaderContent>
+            <SearchBar search={searchInput} setSearch={setSearchInput} />
+          </HeaderContent>
+        </HeaderWrapper>
+        <ContentWrapper>
+          {searchInput ? <>searching...</> : <>{children}</>}
+        </ContentWrapper>
       </MainContent>
     </FlexContainer>
   );

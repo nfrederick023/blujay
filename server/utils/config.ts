@@ -41,13 +41,13 @@ export const getLibraryPath = async (): Promise<string> => {
 
 export const getVideoListPath = async (): Promise<string> => {
   const dir = await getAssetsPath() + "video_list.json";
-  await checkCreateJSON(dir, [{}]);
+  await checkCreateJSON(dir, []);
   return dir;
 };
 
 export const getBackupVideoListPath = async (): Promise<string> => {
   const dir = await getBackupPath() + "video_list.json";
-  await checkCreateJSON(dir, [{}]);
+  await checkCreateJSON(dir, []);
   return dir;
 };
 

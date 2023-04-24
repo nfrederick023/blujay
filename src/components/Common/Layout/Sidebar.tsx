@@ -1,4 +1,4 @@
-import { screenSizes } from "@client/utils/themes";
+import { screenSizes } from "@client/utils/theme";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./CategoryButton";
 import ContrastText from "../Styled/ContrastText";

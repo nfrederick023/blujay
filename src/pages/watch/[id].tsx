@@ -1,18 +1,8 @@
-/*
- * Watch page - this is where the video is displayed
- */
-
+import { NextPage } from "next";
 import React from "react";
 
-import { NextPage } from "next";
-
 const Watch: NextPage = () => {
-
-  return (
-    <>
-    </>
-  );
+  return <></>;
 };
-
 
 export default Watch;

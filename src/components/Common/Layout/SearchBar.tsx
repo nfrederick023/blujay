@@ -1,5 +1,7 @@
-import { screenSizes } from "@client/utils/themes";
+import { debounce } from "lodash";
+import { screenSizes } from "@client/utils/theme";
 import React, { FC, useRef } from "react";
+import router from "next/router";
 import styled from "styled-components";
 
 const SearchBarContent = styled.div`
@@ -31,6 +33,7 @@ const SearchBarInput = styled.input`
   color: ${(p): string => p.theme.textContrast};
   background-color: rgba(0, 0, 0, 0);
   vertical-align: bottom;
+  width: 100%;
   &:focus {
     outline: none;
   }
@@ -46,11 +49,28 @@ const SearchIcon = styled.i`
   }
 `;
 
-const SearchBar: FC = () => {
+interface SearchBarProps {
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const SearchBar: FC<SearchBarProps> = ({
+  search,
+  setSearch,
+}: SearchBarProps) => {
   const searchInput = useRef<HTMLInputElement>(null);
 
   const handleSearchClick = (): void => {
     searchInput.current?.focus();
+  };
+
+  const debounced = debounce((value) => {
+    setSearch(value);
+  }, 1000);
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (e.currentTarget.value) debounced(e.currentTarget.value);
+    else setSearch("");
   };
 
   return (
@@ -61,6 +81,7 @@ const SearchBar: FC = () => {
         id="default-search"
         placeholder="Search"
         autoComplete="off"
+        onInput={handleSearchInput}
       />
     </SearchBarContent>
   );
