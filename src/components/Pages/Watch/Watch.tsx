@@ -1,11 +1,8 @@
+"use client";
 import React, { FC } from "react";
 
 const WatchPage: FC = () => {
-
-  return (
-    <>
-    </>
-  );
+  return <></>;
 };
 
 export default WatchPage;

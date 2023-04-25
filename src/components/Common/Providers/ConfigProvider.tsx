@@ -1,3 +1,4 @@
+"use client";
 import { PublicConfig } from "../../../utils/types";
 import React, { FC } from "react";
 

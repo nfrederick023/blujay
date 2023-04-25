@@ -1,3 +1,4 @@
+"use client";
 import { ConfigContext } from "../Providers/ConfigProvider";
 import { Video } from "@client/utils/types";
 import ContrastText from "../Styled/ContrastText";

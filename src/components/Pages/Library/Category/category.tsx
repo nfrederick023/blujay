@@ -1,3 +1,4 @@
+"use client";
 import { useRouter } from "next/router";
 import React, { FC } from "react";
 import VideoSlider from "../../../Common/VideoSlider/VideoSlider";

@@ -1,3 +1,4 @@
+"use client";
 import { BluJayTheme } from "@client/utils/types";
 import React, { FC, useState } from "react";
 import styled from "styled-components";

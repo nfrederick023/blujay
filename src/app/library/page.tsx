@@ -1,4 +1,4 @@
-import "server-only";
+"use client";
 import { NextPage } from "next";
 import CategoryPage from "@client/components/Pages/Library/Category/category";
 import React from "react";

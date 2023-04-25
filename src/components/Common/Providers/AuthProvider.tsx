@@ -1,3 +1,4 @@
+"use client";
 import { AuthStatus } from "../../../utils/types";
 import { useRouter } from "next/router";
 import React, { FC } from "react";

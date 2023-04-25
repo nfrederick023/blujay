@@ -48,6 +48,18 @@ const SidebarContent = styled.div`
   }
 `;
 
+const Logo = styled.div`
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 5px;
+  text-align: center;
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    font-size: 1.75em;
+    padding-top: 50px;
+    padding-left: 20px;
+  }
+`;
+
 const BarsIcon = styled.i`
   position: fixed;
   verticle-align: middle;
@@ -114,18 +126,20 @@ const Sidebar: FC<SidebarProps> = ({ children }: SidebarProps) => {
   return (
     <>
       <SidebarWapper isCollapsed={isCollapsed}>
-        {width <= screenSizes.tabletScreenSize ? (
-          <BarsIcon
-            onClick={handleIsCollapsedChange}
-            className="bx bx-menu bx-lg"
-          />
-        ) : (
-          <MinimizeButton>
-            <ArrowIconContainer>
-              <ArrowIcon onClick={handleIsCollapsedChange} />
-            </ArrowIconContainer>
-          </MinimizeButton>
-        )}
+        <NoSSR>
+          {width <= screenSizes.tabletScreenSize ? (
+            <BarsIcon
+              onClick={handleIsCollapsedChange}
+              className="bx bx-menu bx-lg"
+            />
+          ) : (
+            <MinimizeButton>
+              <ArrowIconContainer>
+                <ArrowIcon onClick={handleIsCollapsedChange} />
+              </ArrowIconContainer>
+            </MinimizeButton>
+          )}
+        </NoSSR>
         <SidebarContent>{!isCollapsed && <>{children}</>}</SidebarContent>
       </SidebarWapper>
     </>

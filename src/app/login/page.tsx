@@ -1,4 +1,4 @@
-import "server-only";
+"use client";
 import { NextPage } from "next";
 import LoginPage from "@client/components/Pages/Login/Login";
 import React from "react";

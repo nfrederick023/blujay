@@ -1,71 +1,8 @@
-import { createGlobalStyle } from "styled-components";
-import Head from "@client/app/head";
+import { StyledComponentsRegistry } from "./registry";
 import Layout from "@client/components/Common/Layout/Layout";
 import Providers from "./providers";
 import React, { FC, ReactNode } from "react";
-
-const GlobalStyle = createGlobalStyle`
-html {
-  font-family: 'Montserrat';
-  background-color: ${(p): string => p.theme.background};
-  color: ${(p): string => p.theme.text};
-}
-
-// hide scrollbar on 100vh
-* {
-    box-sizing: border-box;
-}
-
-// hide scrollbar on 100vh
-html, body {
-  margin: 0px;
-  padding: 0px;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  display: inline;
-  margin: 0px;
-}
-
-h1 {
-  line-height: 75%;
-  font-size: 1.9em;
-  font-weight: 900;
-}
-
-h2 {
-  font-size: 1.7em;
-  font-weight: 700;
-}
-
-h5{
-  font-size: 1em;
-  font-weight: 500;
-}
-
-h6{
-  font-size: 0.83em;
-  font-weight: 500;
-}
-
-input, textarea, select { 
-  font-family:inherit; 
-  font-size: inherit; 
-}
-
-.sidebar-button {
-    background: linear-gradient(to top right, #4481eb, #04befe);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-family: 'Montserrat SemiBold', sans-serif;
-    text-align: left;
-    height: 45px;
-    width: 200px;
-    padding-left: 30px;
-    font-size: large;
-}
-`;
+import styled, { createGlobalStyle } from "styled-components";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -74,13 +11,12 @@ interface RootLayoutProps {
 const RootLayout: FC<RootLayoutProps> = ({ children }) => {
   return (
     <html>
-      <Head />
-      {/* <body>
-        <Providers>
-          <GlobalStyle />
+      <head></head>
+      <body>
+        <StyledComponentsRegistry>
           <Layout>{children}</Layout>
-        </Providers>
-      </body> */}
+        </StyledComponentsRegistry>
+      </body>
     </html>
   );
 };

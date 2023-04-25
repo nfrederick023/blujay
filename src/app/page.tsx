@@ -1,4 +1,4 @@
-import "server-only";
+"use client";
 import { NextPage } from "next";
 import IndexPage from "@client/components/Pages/Index";
 import React from "react";

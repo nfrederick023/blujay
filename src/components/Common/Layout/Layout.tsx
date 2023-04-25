@@ -38,18 +38,18 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+const getComponenet = () => {
+  return <SidebarContent />;
+};
+
 const Layout: FC<LayoutProps> = ({ children }: LayoutProps) => {
   return (
     <FlexContainer>
-      <Sidebar>
-        {/* @ts-expect-error Server Component */}
-        <SidebarContent />
-      </Sidebar>
+      <Sidebar children={<></>}></Sidebar>
       <MainContent>
         <HeaderWrapper>
           <HeaderContent>{/* <SearchBar /> */}</HeaderContent>
         </HeaderWrapper>
-        <ContentWrapper>{children}</ContentWrapper>
       </MainContent>
     </FlexContainer>
   );
