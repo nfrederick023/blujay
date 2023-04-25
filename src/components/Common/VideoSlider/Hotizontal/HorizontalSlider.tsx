@@ -1,6 +1,7 @@
+"use client";
 import { Video } from "@client/utils/types";
 import React, { FC, useState } from "react";
-import VideoDetails from "./VideoDetails";
+import VideoDetails from "../VideoDetails";
 import styled from "styled-components";
 
 const transitionTimeMS = 150;

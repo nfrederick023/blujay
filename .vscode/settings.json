@@ -11,5 +11,7 @@
     "**/.settings": true,
     "**/.factorypath": true,
     "**/node_modules": false
-  }
+  },
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BluJayTheme,
   OrderType,
@@ -9,12 +11,11 @@ import { screenSizes } from "@client/utils/theme";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useWindowWidth } from "@react-hook/window-size";
 import Gradient from "../Styled/Gradient";
-import HorizontalSlider from "./HorizontalSlider";
+import HorizontalSlider from "./Hotizontal/HorizontalSlider";
 import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useEffect, useState } from "react";
 import Select from "../Select/Select";
-import VerticleSlider from "./VerticleSlider";
-import axios from "axios";
+import VerticleSlider from "./Verticle/VerticleSlider";
 import styled from "styled-components";
 
 const VideoSliderWrapper = styled.div`

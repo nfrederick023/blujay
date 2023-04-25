@@ -30,7 +30,12 @@
       "@client/*": [
         "./src/*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "src/**/*.ts",
@@ -38,6 +43,7 @@
     "server/**/*.ts",
     "server/utils/auth.ts",
     "playwright/**/.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

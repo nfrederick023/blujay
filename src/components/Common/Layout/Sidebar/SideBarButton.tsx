@@ -1,5 +1,6 @@
-import ContrastText from "../Styled/ContrastText";
-import Gradient from "../Styled/Gradient";
+"use client";
+import ContrastText from "../../Styled/ContrastText";
+import Gradient from "../../Styled/Gradient";
 import React, { FC } from "react";
 import styled from "styled-components";
 

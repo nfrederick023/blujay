@@ -1,6 +1,7 @@
-import React, { FC, useState } from "react";
-import SearchBar from "./SearchBar";
-import Sidebar from "./Sidebar";
+"use client";
+import { SidebarContent } from "./Sidebar/SidebarContent";
+import React, { FC } from "react";
+import Sidebar from "./Sidebar/Sidebar";
 import styled from "styled-components";
 
 const FlexContainer = styled.div`
@@ -35,24 +36,20 @@ const ContentWrapper = styled.div`
 
 interface LayoutProps {
   children: React.ReactNode;
-  libraryDirs: string[];
 }
 
-const Layout: FC<LayoutProps> = ({ children, libraryDirs }: LayoutProps) => {
-  const [searchInput, setSearchInput] = useState("");
-
+const Layout: FC<LayoutProps> = ({ children }: LayoutProps) => {
   return (
     <FlexContainer>
-      <Sidebar libraryDirs={libraryDirs} />
+      <Sidebar>
+        {/* @ts-expect-error Server Component */}
+        <SidebarContent />
+      </Sidebar>
       <MainContent>
         <HeaderWrapper>
-          <HeaderContent>
-            <SearchBar search={searchInput} setSearch={setSearchInput} />
-          </HeaderContent>
+          <HeaderContent>{/* <SearchBar /> */}</HeaderContent>
         </HeaderWrapper>
-        <ContentWrapper>
-          {searchInput ? <>searching...</> : <>{children}</>}
-        </ContentWrapper>
+        <ContentWrapper>{children}</ContentWrapper>
       </MainContent>
     </FlexContainer>
   );

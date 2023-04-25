@@ -1,8 +1,9 @@
+"use client";
 import { screenSizes } from "@client/utils/theme";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./CategoryButton";
-import ContrastText from "../Styled/ContrastText";
-import Gradient from "../Styled/Gradient";
+import ContrastText from "../../Styled/ContrastText";
+import Gradient from "../../Styled/Gradient";
 import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useEffect, useState } from "react";
 import SideBarButton from "./SideBarButton";
@@ -47,18 +48,6 @@ const SidebarContent = styled.div`
   }
 `;
 
-const Logo = styled.div`
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 5px;
-  text-align: center;
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    font-size: 1.75em;
-    padding-top: 50px;
-    padding-left: 20px;
-  }
-`;
-
 const BarsIcon = styled.i`
   position: fixed;
   verticle-align: middle;
@@ -70,13 +59,6 @@ const BarsIcon = styled.i`
   &::before {
     vertical-align: middle;
   }
-`;
-
-const Library = styled.div`
-  border-left: ${(p): string => p.theme.textContrastLight} 2px solid;
-  width: 100%;
-  margin-top: 5px;
-  margin-left: 36px;
 `;
 
 const MinimizeButton = styled.div`
@@ -110,10 +92,10 @@ const ArrowIcon = styled.div`
 `;
 
 interface SidebarProps {
-  libraryDirs: string[];
+  children: React.ReactNode;
 }
 
-const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
+const Sidebar: FC<SidebarProps> = ({ children }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const width = useWindowWidth({ wait: 10 });
 
@@ -131,64 +113,21 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
 
   return (
     <>
-      <NoSSR>
-        <SidebarWapper isCollapsed={isCollapsed}>
-          {width <= screenSizes.tabletScreenSize ? (
-            <BarsIcon
-              onClick={handleIsCollapsedChange}
-              className="bx bx-menu bx-lg"
-            />
-          ) : (
-            <MinimizeButton>
-              <ArrowIconContainer>
-                <ArrowIcon onClick={handleIsCollapsedChange} />
-              </ArrowIconContainer>
-            </MinimizeButton>
-          )}
-          <SidebarContent>
-            {!isCollapsed && (
-              <>
-                <Logo>
-                  <Gradient type="text">
-                    <h1>BLU</h1>
-                  </Gradient>
-                  <h1>JAY</h1>
-                </Logo>
-                <SideBarButton
-                  title={"Home"}
-                  icon={"bx bx-home-alt-2 bx-sm"}
-                  url={""}
-                />
-
-                <SideBarButton
-                  title={"Favorites"}
-                  icon={"bx bx-heart bx-sm"}
-                  url={"favorites"}
-                />
-
-                <SideBarButton
-                  title={"All Videos"}
-                  icon={"bx bx-list-ul bx-sm"}
-                  url={"all"}
-                />
-
-                <SideBarButton
-                  title={"Library"}
-                  icon={"bx bx-folder bx-sm"}
-                  url={"library"}
-                />
-                <Library>
-                  <ContrastText type={"light"}>
-                    {libraryDirs.map((dir, i) => {
-                      return <CategoryButton key={i} category={dir} />;
-                    })}
-                  </ContrastText>
-                </Library>
-              </>
-            )}
-          </SidebarContent>
-        </SidebarWapper>
-      </NoSSR>
+      <SidebarWapper isCollapsed={isCollapsed}>
+        {width <= screenSizes.tabletScreenSize ? (
+          <BarsIcon
+            onClick={handleIsCollapsedChange}
+            className="bx bx-menu bx-lg"
+          />
+        ) : (
+          <MinimizeButton>
+            <ArrowIconContainer>
+              <ArrowIcon onClick={handleIsCollapsedChange} />
+            </ArrowIconContainer>
+          </MinimizeButton>
+        )}
+        <SidebarContent>{!isCollapsed && <>{children}</>}</SidebarContent>
+      </SidebarWapper>
     </>
   );
 };

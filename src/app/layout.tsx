@@ -1,4 +1,8 @@
 import { createGlobalStyle } from "styled-components";
+import Head from "@client/app/head";
+import Layout from "@client/components/Common/Layout/Layout";
+import Providers from "./providers";
+import React, { FC, ReactNode } from "react";
 
 const GlobalStyle = createGlobalStyle`
 html {
@@ -63,4 +67,22 @@ input, textarea, select {
 }
 `;
 
-export default GlobalStyle;
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+const RootLayout: FC<RootLayoutProps> = ({ children }) => {
+  return (
+    <html>
+      <Head />
+      {/* <body>
+        <Providers>
+          <GlobalStyle />
+          <Layout>{children}</Layout>
+        </Providers>
+      </body> */}
+    </html>
+  );
+};
+
+export default RootLayout;

@@ -1,3 +1,4 @@
+"use client";
 import { debounce } from "lodash";
 import { screenSizes } from "@client/utils/theme";
 import React, { FC, useRef } from "react";
