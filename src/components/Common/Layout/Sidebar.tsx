@@ -110,10 +110,10 @@ const ArrowIcon = styled.div`
 `;
 
 interface SidebarProps {
-  libraryDirs: string[];
+  categories: string[];
 }
 
-const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
+const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const width = useWindowWidth({ wait: 10 });
 
@@ -179,7 +179,7 @@ const Sidebar: FC<SidebarProps> = ({ libraryDirs }: SidebarProps) => {
                 />
                 <Library>
                   <ContrastText type={"light"}>
-                    {libraryDirs.map((dir, i) => {
+                    {categories.map((dir, i) => {
                       return <CategoryButton key={i} category={dir} />;
                     })}
                   </ContrastText>

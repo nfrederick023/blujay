@@ -1,39 +1,20 @@
 import { randomBytes, scryptSync } from "crypto";
 
 import { AuthStatus } from "../../src/utils/types";
-import { GetServerSidePropsContext, NextApiRequest, NextPageContext, PreviewData } from "next";
-import { IncomingMessage } from "http";
-import { ParsedUrlQuery } from "querystring";
 import { getUserPassword } from "./config";
 
-type RequestCookes = IncomingMessage & {
-  cookies: Partial<{
-    [key: string]: string;
-  }>;
-};
-
-const getAuthStatus = async (ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData> | NextPageContext): Promise<AuthStatus> => {
-
-  const hasAuthToken = !!(ctx.req as NextApiRequest | undefined)?.cookies.authToken;
-  const isAuthTokenValid = await isTokenValid((ctx.req as RequestCookes).cookies.authToken);
-
-  if (hasAuthToken && !isAuthTokenValid && ctx.res) {
-    ctx.res.setHeader("Set-Cookie", "authToken=; Max-Age=0");
-    ctx.res.setHeader("Location", "/login");
-  }
-
-  if (isAuthTokenValid)
+const getAuthStatus = (token: string | undefined): AuthStatus => {
+  if (isTokenValid(token))
     return AuthStatus.authenticated;
-
   return AuthStatus.notAuthenticated;
 };
 
-export const isTokenValid = async (authToken: string | undefined): Promise<boolean> => {
-  return await checkHashedPassword("default", authToken ?? "");
+export const isTokenValid = (authToken: string | undefined): boolean => {
+  return checkHashedPassword("default", authToken ?? "");
 };
 
-export const checkHashedPassword = async (user: string, hashedPassword: string): Promise<boolean> => {
-  const configPassword = await getUserPassword();
+export const checkHashedPassword = (user: string, hashedPassword: string): boolean => {
+  const configPassword = getUserPassword();
 
   if (!configPassword) {
     return false;

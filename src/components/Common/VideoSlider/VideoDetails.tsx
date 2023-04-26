@@ -10,7 +10,7 @@ const VideoDetailsWrapper = styled.div`
 `;
 
 const PlaceHolder = styled.div`
-  width: inherit;
+  width: 100%;
 `;
 
 const PlaceHolderImage = styled.div`
@@ -50,8 +50,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const [loaded, setLoaded] = useState(false);
   const [ref, setRef] = useState<HTMLDivElement | null>();
   const [width, setwidth] = useState(0);
-  const imageHeight =
-    (width / config.thumbnailSettings.width) * config.thumbnailSettings.height;
+  const imageHeight = (width / 1920) * 1080;
 
   useEffect((): (() => void) => {
     const observer = new ResizeObserver((entries) => {
@@ -61,31 +60,41 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
     return () => ref && observer.unobserve(ref);
   }, [ref]);
 
+  const getWidth = (): number => {
+    console.log(((ref?.offsetWidth || 0) / 1920) * 1080);
+    return ((ref?.offsetWidth || 0) / 1920) * 1080;
+  };
+
   return (
-    <VideoDetailsWrapper>
+    <VideoDetailsWrapper ref={setRef}>
       {video ? (
         <>
-          <PlaceHolder ref={setRef} />
+          {width ? (
+            <>
+              <Thumbnail
+                loaded={loaded}
+                imageHeight={getWidth()}
+                src={"/api/thumb/" + encodeURIComponent(video.id)}
+                onLoad={(): void => {
+                  setLoaded(true);
+                }}
+              />
+              <PlaceHolderImage height={imageHeight} loaded={loaded} />
 
-          <Thumbnail
-            loaded={loaded}
-            imageHeight={imageHeight}
-            src={"/api/thumb/" + encodeURIComponent(video.id)}
-            onLoad={(): void => {
-              setLoaded(true);
-            }}
-          />
-          <PlaceHolderImage height={imageHeight} loaded={loaded} />
-
-          <VideoNameWrapper>
-            <h5>{video.name}</h5>
-          </VideoNameWrapper>
-          <ContrastText type={"regular"}>
-            <h6>
-              {video.category.length ? video.category : "All Videos"} ·{" "}
-              <TimeAgo date={video.created} />
-            </h6>
-          </ContrastText>
+              <VideoNameWrapper>
+                <h5>{video.name}</h5>
+              </VideoNameWrapper>
+              <ContrastText type={"regular"}>
+                <h6>
+                  {video.category.length ? video.category : "All Videos"} ·{" "}
+                  <TimeAgo date={video.created} />
+                </h6>
+              </ContrastText>
+              <PlaceHolder />
+            </>
+          ) : (
+            <></>
+          )}
         </>
       ) : (
         <PlaceHolder />

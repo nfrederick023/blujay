@@ -79,41 +79,29 @@ type ViewTypes = "List View" | "Grid View";
 interface VideoSliderProps {
   sort?: SortType;
   order?: OrderType;
+  videos: Video[];
   sliderType: SliderType;
   header: string;
 }
 
 interface GetVideosRequest {
-  page: number;
-  size: number;
   sort: SortType;
   order: OrderType;
-  query: string;
   queryField: QueryField[];
 }
 
 const VideoSlider: FC<VideoSliderProps> = ({
   sort,
   order,
+  videos,
   sliderType,
   header,
 }: VideoSliderProps) => {
   const [sortType, setSortType] = useState<SortType>(sort || "Alphabetical");
   const [orderType, setOrderType] = useState<OrderType>(order || "Ascending");
   const [isGridView, setIsGridView] = useState<boolean>(true);
-  const [videos, setVideos] = useState<Video[]>([]);
   const [displayedPosition, setDisplayedPosition] = useState(0);
   const [position, setPosition] = useState(0);
-
-  const getVideos = async (): Promise<void> => {
-    if (typeof window !== "undefined") {
-      const res = await fetch("/api/videoList", {
-        headers: { "Content-Type": "application/json" },
-        method: "GET",
-      });
-      setVideos(await res.json());
-    }
-  };
 
   const handleSortChange = (newSort: string): void => {
     setSortType(newSort as SortType);
@@ -163,10 +151,6 @@ const VideoSlider: FC<VideoSliderProps> = ({
 
   const sortedVideos: Video[] = sortVideos([...videos], sortType, orderType);
 
-  useEffect(() => {
-    getVideos();
-  }, []);
-
   return (
     <>
       <Header>
@@ -201,7 +185,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
                 <Select
                   options={sortOptions}
                   onChange={handleSortChange}
-                  value={[orderType]}
+                  value={[sortType + " " + orderType]}
                 />
               </SortSelect>
               <TypeSelect>

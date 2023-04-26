@@ -1,45 +1,36 @@
 import { AppProps } from "next/app";
-import { AuthProvider } from "../components/Common/Providers/AuthProvider";
-import { AuthStatus, CookieTypes, PublicConfig } from "../utils/types";
-import { ConfigProvider } from "@client/components/Common/Providers/ConfigProvider";
+import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement } from "react";
-import { Request } from "express";
 import { ThemeProvider } from "styled-components";
 import { darkTheme, lightTheme } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
-import {
-  getDirListOfLibrarySubfolders,
-  getThumnailSettings,
-} from "@server/utils/config";
-import { listVideos } from "@server/utils/listVideos";
+import { getVideoList } from "@server/utils/config";
 import App from "next/app";
 import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
 import Layout from "../components/Common/Layout/Layout";
 import React from "react";
+import cookies from "next-cookies";
 import getAuthStatus from "../../server/utils/auth";
-import getConfig from "next/config";
-const { publicRuntimeConfig } = getConfig();
 
 type NextAppComponentType = typeof App;
 interface ExtendedAppProps extends AppProps {
-  appCookies: { [key: string]: string | boolean | number };
   authStatus: AuthStatus;
-  libraryDirs: string[];
-  publicConfig: PublicConfig;
+  videos: Video[];
+  theme: BluJayTheme;
 }
 
 const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   Component,
   pageProps,
-  appCookies,
   authStatus,
-  libraryDirs,
-  publicConfig,
+  theme,
+  videos,
 }: ExtendedAppProps): ReactElement => {
   // assign default values to cookies if not set
-  const cookies = new Cookies(appCookies);
 
+  // get all cookies and set default if none
+  const _cookies = new Cookies();
   const allCookieTypes: CookieTypes[] = [
     "authToken",
     "isDarkMode",
@@ -48,30 +39,28 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   ];
 
   allCookieTypes.forEach((cookieType) => {
-    if (!cookies.get(cookieType))
-      cookies.set(
+    if (!_cookies.get(cookieType))
+      _cookies.set(
         cookieType,
         getCookieDefault(cookieType),
         getCookieSetOptions()
       );
   });
 
-  const theme = cookies.get("isDarkMode") === "true" ? darkTheme : lightTheme;
+  const categories = [...new Set(videos.map((video) => video.category))].filter(
+    (category) => category
+  );
 
   return (
     <>
-      <title>{publicRuntimeConfig.pageTitle}</title>
-      <CookiesProvider cookies={cookies}>
-        <AuthProvider authStatus={authStatus}>
-          <ConfigProvider publicConfig={publicConfig}>
-            <ThemeProvider theme={theme}>
-              <GlobalStyle />
-              <Layout libraryDirs={libraryDirs}>
-                <Component {...pageProps} />
-              </Layout>
-            </ThemeProvider>
-          </ConfigProvider>
-        </AuthProvider>
+      <title>title</title>
+      <CookiesProvider cookies={_cookies}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <Layout categories={categories}>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
       </CookiesProvider>
     </>
   );
@@ -79,30 +68,26 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
 
 MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
   const { ctx } = initialProps;
+  const videos = getVideoList();
 
-  // cast as request to pull out cookies
-  const request = ctx.req as Request | undefined;
-  let authStatus = AuthStatus.notAuthenticated;
-  let libraryDirs: string[] = [];
-  authStatus = await getAuthStatus(initialProps.ctx);
-  libraryDirs = await getDirListOfLibrarySubfolders();
+  // auth stuff
+  const authToken = cookies(ctx)?.authToken;
+  const authStatus = getAuthStatus(authToken);
+  const theme = cookies(ctx)?.isDarkMode === "true" ? darkTheme : lightTheme;
 
-  const thumbnailSettings = await getThumnailSettings();
+  // if there's a token, the user is not authenticated, and authentication is required
+  // then redirect to login and reset
+  if (authToken && authStatus === AuthStatus.notAuthenticated && ctx.res) {
+    ctx.res.setHeader("Set-Cookie", "authToken=; Max-Age=0");
+    ctx.res.setHeader("Location", "/login");
+  }
 
-  // obviously, DO NOT! pass the full config to the onto MyApp. It contains the password.
-  // so pull out what we want and send that by itself
-
-  const publicConfig: PublicConfig = {
-    thumbnailSettings,
-  };
-
-  // run the default getInitialProps for the main nextjs initialProps
+  // get the remaining app props...
   const appInitialProps = (await App.getInitialProps(initialProps)) as AppProps;
   return {
-    appCookies: request?.cookies ?? [],
     authStatus,
-    libraryDirs,
-    publicConfig,
+    videos,
+    theme,
     ...appInitialProps,
   };
 };

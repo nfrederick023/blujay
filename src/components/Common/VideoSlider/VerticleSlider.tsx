@@ -28,6 +28,15 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
 }: VerticleSliderProps) => {
   const [numberOfRows, setNumberOfRows] = useState(5);
 
+  if ((numberOfRows - 1) * videosPerRow > videos.length) {
+    const rows = Math.ceil(videos.length / videosPerRow);
+    setNumberOfRows(rows);
+  }
+
+  if (numberOfRows * videosPerRow < videos.length && numberOfRows < 5) {
+    setNumberOfRows(5);
+  }
+
   const bottomScrollCallback = (): void => {
     if (numberOfRows * videosPerRow < videos.length) {
       setNumberOfRows(numberOfRows + 3);

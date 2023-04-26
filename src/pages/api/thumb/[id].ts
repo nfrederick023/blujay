@@ -12,7 +12,7 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
 
   const videoId = req.query.id;
 
-  const videoList = await getVideoList();
+  const videoList = getVideoList();
   const video: Video | undefined = videoList.find((video: Video) => { return video.id === videoId; });
 
   if (req.method !== "GET") {
@@ -27,7 +27,7 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
     return;
   }
 
-  if (video.requireAuth && !(await isTokenValid(req.cookies.authToken))) {
+  if (video.requireAuth && !(isTokenValid(req.cookies.authToken))) {
     res.statusCode = 401;
     res.end(JSON.stringify("Unauthorized"));
     return;
@@ -40,7 +40,7 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
   }
 
   res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=${video.name}.jpeg` });
-  fs.createReadStream(`${await getThumbnailsPath()}${video.name}.jpg`).pipe(res);
+  fs.createReadStream(`${getThumbnailsPath()}${video.name}.jpg`).pipe(res);
   return;
 
 

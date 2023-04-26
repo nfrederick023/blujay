@@ -35,15 +35,15 @@ const ContentWrapper = styled.div`
 
 interface LayoutProps {
   children: React.ReactNode;
-  libraryDirs: string[];
+  categories: string[];
 }
 
-const Layout: FC<LayoutProps> = ({ children, libraryDirs }: LayoutProps) => {
+const Layout: FC<LayoutProps> = ({ children, categories }: LayoutProps) => {
   const [searchInput, setSearchInput] = useState("");
 
   return (
     <FlexContainer>
-      <Sidebar libraryDirs={libraryDirs} />
+      <Sidebar categories={categories} />
       <MainContent>
         <HeaderWrapper>
           <HeaderContent>
