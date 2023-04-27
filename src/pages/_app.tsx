@@ -51,6 +51,12 @@ h2 {
   font-weight: 700;
 }
 
+h4 {
+  font-size: 1.6em;
+  font-weight: 575;
+
+}
+
 h5{
   font-size: 1em;
   font-weight: 500;

@@ -1,10 +1,14 @@
 import { Video } from "@client/utils/types";
 import React, { FC, useState } from "react";
 import TimeAgo from "react-timeago";
+import router from "next/router";
 import styled from "styled-components";
 
 const VideoDetailsWrapper = styled.div`
   width: 100%;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const PlaceHolder = styled.div`
@@ -43,8 +47,12 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   // before we know the true height aka prevents some content flash
   const imageHeight = ((ref?.offsetWidth || 0) / 1920) * 1080;
 
+  const navigateToVideo = (): void => {
+    router.push("/watch/" + video?.id);
+  };
+
   return (
-    <VideoDetailsWrapper ref={setRef}>
+    <VideoDetailsWrapper ref={setRef} onClick={navigateToVideo}>
       {video ? (
         <>
           {ref ? (

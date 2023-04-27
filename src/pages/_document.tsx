@@ -23,6 +23,12 @@ class MyDocument extends Document {
           />
           <link
             rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@575"
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+          <link
+            rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500"
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"

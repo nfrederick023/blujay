@@ -12,15 +12,15 @@ ffmpeg.setFfprobePath(ffprobeStatic.path);
 ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
 
 export const listVideos = async (): Promise<Video[]> => {
-  await createVideoListBackup();
+  createVideoListBackup();
 
-  const libraryPath = await getLibraryPath();
+  const libraryPath = getLibraryPath();
   const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv|gif)`);
-  await cleanState(videoFilePaths);
+  cleanState(videoFilePaths);
 
   const videoDetails: Video[] = [];
   for (const filePath of videoFilePaths) {
-    const videoState = await getCreateVideo(filePath);
+    const videoState = getCreateVideo(filePath);
     if (videoState) {
       videoDetails.push(
         videoState
@@ -33,9 +33,9 @@ export const listVideos = async (): Promise<Video[]> => {
 };
 
 const createThumbnails = async (videos: Video[]): Promise<void> => {
-  const folder = await getThumbnailsPath();
+  const folder = getThumbnailsPath();
   const thumbnails = await fse.readdir(folder);
-  const thumbnailSettings = await getThumnailSettings();
+  const thumbnailSettings = getThumnailSettings();
   const size = `${thumbnailSettings.width}x${thumbnailSettings.height}`;
   let oldThumbnails = thumbnails;
 
@@ -62,19 +62,19 @@ const createThumbnails = async (videos: Video[]): Promise<void> => {
 };
 
 // removes any videos in the video list that are not found
-const cleanState = async (videoFilePaths: string[]): Promise<void> => {
-  const videoList = await getVideoList();
-  await setVideoList(videoList.filter(video => videoFilePaths.includes(video.filePath)));
+const cleanState = (videoFilePaths: string[]): void => {
+  const videoList = getVideoList();
+  setVideoList(videoList.filter(video => videoFilePaths.includes(video.filePath)));
 };
 
 // gets a video from videoList, creates one if not found
-const getCreateVideo = async (filePath: string): Promise<Video | null> => {
+const getCreateVideo = (filePath: string): Video | null => {
   const fileName = path.basename(filePath);
   const name = path.parse(fileName).name;
-  const videoStats = await fse.stat(filePath);
-  const videoList = await getVideoList();
+  const videoStats = fse.statSync(filePath);
+  const videoList = getVideoList();
   const category = path.dirname(filePath).split("\\")[3] ?? "";
-  const thumbnailPath = path.join(await getThumbnailsPath() + name + ".jpg");
+  const thumbnailPath = path.join(getThumbnailsPath() + name + ".jpg");
 
   // check if the video already is persisted within the state
   const videoState = videoList.find((video) => { return video.filePath === filePath; });
@@ -96,7 +96,7 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
         category
       };
       newVideoList.push(newVideoState);
-      await setVideoList(newVideoList);
+      setVideoList(newVideoList);
       return newVideoState;
     }
 
@@ -121,6 +121,6 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
   };
   videoList.push(newVideoState);
 
-  await setVideoList(videoList);
+  setVideoList(videoList);
   return newVideoState;
 };

@@ -1,6 +1,6 @@
 import { OrderType, SortType, ViewType } from "@client/utils/types";
 import React, { FC } from "react";
-import Select from "../../shared/Select";
+import Select from "../../shared/select";
 import SliderHeader from "../header";
 import styled from "styled-components";
 
