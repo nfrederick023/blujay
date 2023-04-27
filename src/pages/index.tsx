@@ -1,7 +1,7 @@
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
 import { listVideos } from "@server/utils/listVideos";
-import IndexPage from "@client/components/Pages/Index";
+import IndexPage from "@client/components/pages/index";
 import React from "react";
 
 interface IndexProps {

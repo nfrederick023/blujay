@@ -7,7 +7,8 @@ export const lightTheme: BluJayTheme = {
   textContrast: "#868686",
   textContrastLight: "#8c8c8c",
   highlightLight: "#3c81eb",
-  highlightDark: "#04befe"
+  highlightDark: "#04befe",
+  hightlightSilver: "#afdcff"
 };
 
 export const darkTheme: BluJayTheme = {
@@ -17,7 +18,8 @@ export const darkTheme: BluJayTheme = {
   textContrast: "#868686",
   textContrastLight: "#8c8c8c",
   highlightLight: "#3c81eb",
-  highlightDark: "#04befe"
+  highlightDark: "#04befe",
+  hightlightSilver: "#afdcff",
 };
 
 export const screenSizes: ScreenSizes = {

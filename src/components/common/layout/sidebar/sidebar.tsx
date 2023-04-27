@@ -151,7 +151,9 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
                   <Gradient type="text">
                     <h1>BLU</h1>
                   </Gradient>
-                  <h1>JAY</h1>
+                  <Gradient type="text" color="silver">
+                    <h1>JAY</h1>
+                  </Gradient>
                 </Logo>
                 <SideBarButton
                   title={"Home"}

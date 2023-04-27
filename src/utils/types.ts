@@ -9,6 +9,7 @@ export interface BluJayTheme {
   readonly textContrastLight: string;
   readonly highlightLight: string;
   readonly highlightDark: string;
+  readonly hightlightSilver: string;
 }
 
 export interface ScreenSizes {

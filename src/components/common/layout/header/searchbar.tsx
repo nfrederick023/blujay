@@ -66,11 +66,10 @@ const SearchBar: FC<SearchBarProps> = ({
 
   const debounced = debounce((value) => {
     setSearch(value);
-  }, 1000);
+  }, 500);
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (e.currentTarget.value) debounced(e.currentTarget.value);
-    else setSearch("");
+    debounced(e.currentTarget.value);
   };
 
   return (
@@ -81,7 +80,6 @@ const SearchBar: FC<SearchBarProps> = ({
         id="default-search"
         placeholder="Search"
         autoComplete="off"
-        value={search}
         onInput={handleSearchInput}
       />
     </SearchBarContent>

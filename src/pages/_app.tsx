@@ -9,6 +9,7 @@ import App from "next/app";
 import Header from "@client/components/common/layout/header/header";
 import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
+import VideoSlider from "@client/components/common/video-slider/video-slider";
 import cookies from "next-cookies";
 import getAuthStatus from "../../server/utils/auth";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
@@ -115,6 +116,11 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
     (category) => category
   );
 
+  const searchResults = videos.filter((video) =>
+    video.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  console.log(search);
   return (
     <>
       <title>title</title>
@@ -125,7 +131,15 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
             <Sidebar categories={categories} />
             <ContentWrapper>
               <Header search={search} setSearch={setSearch} />
-              {search ? <>searching...</> : <Component {...pageProps} />}
+              {search ? (
+                <VideoSlider
+                  videos={searchResults}
+                  sliderType={"verticle"}
+                  headerText={"Search Results"}
+                />
+              ) : (
+                <Component {...pageProps} />
+              )}
             </ContentWrapper>
           </LayoutWrapper>
         </ThemeProvider>
