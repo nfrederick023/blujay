@@ -9,6 +9,8 @@ export interface BluJayTheme {
   readonly textContrastLight: string;
   readonly highlightLight: string;
   readonly highlightDark: string;
+  readonly hightlightSilver: string;
+  readonly button: string;
 }
 
 export interface ScreenSizes {
@@ -61,3 +63,29 @@ export interface NextRedirect {
   redirect: Redirect
 }
 
+export interface Thumbnail {
+  height: number,
+  width: number
+}
+
+export interface Config {
+  readonly password: string;
+  readonly privateLibrary: boolean;
+  readonly thumbnailSettings: Thumbnail;
+}
+
+// DO NOT ALLOW SENSITIVE PARAMETERS IN PUBLICCONFIG!!!!! 
+export interface PublicConfig {
+  readonly thumbnailSettings: Thumbnail;
+}
+
+export type CookieTypes = "theaterMode" | "videoVolume" | "isDarkMode" | "authToken"
+export type OrderType = "Ascending" | "Descending";
+export type QueryField = "name" | "filename" | "category" | "description" | "id";
+export type ViewType = "List View" | "Grid View";
+export type SortType =
+  | "Alphabetical"
+  | "Date Updated"
+  | "Date Created"
+  | "File Size"
+  | "View Count";

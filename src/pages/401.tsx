@@ -1,9 +1,9 @@
 import { FC } from "react";
-import NotFoundPage from "@client/components/pages/error/not-found";
 import React from "react";
+import UnauthorizedPage from "@client/components/Pages/Error/Unauthorized";
 
 const NotFound: FC = () => {
-  return <NotFoundPage />;
+  return <UnauthorizedPage />;
 };
 
 export default NotFound;

@@ -5,8 +5,8 @@
 import * as mime from "mime-types";
 
 import { NextApiRequest, NextApiResponse } from "next";
-import { NodeHeaders } from "next/dist/server/web/types";
 
+import { IncomingHttpHeaders } from "http";
 import { Video } from "@client/utils/types";
 import { getVideoList } from "@server/utils/config";
 import { isTokenValid } from "@server/utils/auth";
@@ -27,7 +27,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
 
   if (video) {
 
-    if (video.requireAuth && !(await isTokenValid(req.cookies.authToken))) {
+    if (video.requireAuth && !(isTokenValid(req.cookies.authToken))) {
       res.statusCode = 401;
       res.end(JSON.stringify("Unauthorized"));
       return;
@@ -64,7 +64,7 @@ const serveVideo = (req: NextApiRequest, res: NextApiResponse, videoPath: string
     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
     const chunksize = end - start + 1;
     const file = fs.createReadStream(videoPath, { start, end });
-    const head: NodeHeaders = {
+    const head: IncomingHttpHeaders = {
       "Content-Range": `bytes ${start}-${end}/${fileSize}`,
       "Accept-Ranges": "bytes",
       "Content-Length": chunksize.toString(),
@@ -73,7 +73,7 @@ const serveVideo = (req: NextApiRequest, res: NextApiResponse, videoPath: string
     res.writeHead(206, head);
     file.pipe(res);
   } else {
-    const head: NodeHeaders = {
+    const head: IncomingHttpHeaders = {
       "Content-Length": fileSize.toString(),
       "Content-Type": mime.lookup(videoPath) ? mime.lookup(videoPath).toString() : undefined,
     };

@@ -1,118 +1,108 @@
-import { Video } from "../../src/utils/types";
+import { Config, Thumbnail, Video } from "../../src/utils/types";
+import fs from "fs-extra";
 
-interface Config {
-  password: string;
-  privateLibrary: boolean;
-  thumbnailSize: string;
-}
-
-export const getUserPassword = async (): Promise<string> => {
-  return (await getConfig()).password;
+export const getUserPassword = (): string => {
+  return (getConfig()).password;
 };
 
-export const getPrivateLibrary = async (): Promise<boolean> => {
-  return (await getConfig()).privateLibrary;
+export const getPrivateLibrary = (): boolean => {
+  return (getConfig()).privateLibrary;
 };
 
-export const getThumnailSize = async (): Promise<string> => {
-  return (await getConfig()).thumbnailSize;
+export const getThumnailSettings = (): Thumbnail => {
+  return (getConfig()).thumbnailSettings;
 };
 
-export const getPath = async (): Promise<string> => {
+export const getPath = (): string => {
   const dir = "/blujay" as string | undefined;
   if (dir)
     return checkCreateDir(dir);
   throw ("Required: \"path\" configuration property not found!");
 };
 
-export const getAssetsPath = async (): Promise<string> => {
-  const dir = await getPath() + "/config/";
+export const getAssetsPath = (): string => {
+  const dir = getPath() + "/config/";
   return checkCreateDir(dir);
 };
 
-export const getBackupPath = async (): Promise<string> => {
-  const dir = await getAssetsPath() + "/backups/";
+export const getBackupPath = (): string => {
+  const dir = getAssetsPath() + "/backups/";
   return checkCreateDir(dir);
 };
 
-export const getThumbnailsPath = async (): Promise<string> => {
-  const dir = await getPath() + "/thumbnails/";
+export const getThumbnailsPath = (): string => {
+  const dir = getPath() + "/thumbnails/";
   return checkCreateDir(dir);
 };
 
-export const getLibraryPath = async (): Promise<string> => {
-  const dir = await getPath() + "/library/";
+export const getLibraryPath = (): string => {
+  const dir = getPath() + "/library/";
   return checkCreateDir(dir);
 };
 
-export const getVideoListPath = async (): Promise<string> => {
-  const dir = await getAssetsPath() + "video_list.json";
-  await checkCreateJSON(dir, [{}]);
+export const getVideoListPath = (): string => {
+  const dir = getAssetsPath() + "video_list.json";
+  checkCreateJSON(dir, []);
   return dir;
 };
 
-export const getBackupVideoListPath = async (): Promise<string> => {
-  const dir = await getBackupPath() + "video_list.json";
-  await checkCreateJSON(dir, [{}]);
+export const getBackupVideoListPath = (): string => {
+  const dir = getBackupPath() + "video_list.json";
+  checkCreateJSON(dir, []);
   return dir;
 };
 
-export const getConfigPath = async (): Promise<string> => {
-  const dir = await getAssetsPath() + "config.json";
+export const getConfigPath = (): string => {
+  const dir = getAssetsPath() + "config.json";
 
   const defaultConfig: Config = {
     password: "test",
     privateLibrary: true,
-    thumbnailSize: "1920x1080"
+    thumbnailSettings: {
+      width: 1920,
+      height: 1080,
+    }
   };
 
-  await checkCreateJSON(dir, defaultConfig);
+  checkCreateJSON(dir, defaultConfig);
   return dir;
 };
 
-export const setVideoList = async (list: Video[]): Promise<void> => {
-  const fse = await import("fs-extra");
-  await fse.writeJSON(await getVideoListPath(), list);
+export const setVideoList = (list: Video[]): void => {
+  fs.writeJSONSync(getVideoListPath(), list);
 };
 
-export const getVideoList = async (): Promise<Video[]> => {
-  const fse = await import("fs-extra");
-  return await fse.readJSON(await getVideoListPath()) as Video[];
+export const getVideoList = (): Video[] => {
+  return fs.readJSONSync(getVideoListPath()) as Video[];
 };
 
-export const getConfig = async (): Promise<Config> => {
-  const fse = await import("fs-extra");
-  return await fse.readJSON(await getConfigPath()) as Config;
+export const getConfig = (): Config => {
+  return fs.readJSONSync(getConfigPath()) as Config;
 };
 
-export const createVideoListBackup = async (): Promise<void> => {
-  const fse = await import("fs-extra");
-  const videoList = await getVideoList();
-  await fse.writeJSON(await getBackupVideoListPath(), videoList);
+export const createVideoListBackup = (): void => {
+  const videoList = getVideoList();
+  fs.writeJSONSync(getBackupVideoListPath(), videoList);
 };
 
-export const deleteThumbnail = async (thumbnailName: string): Promise<void> => {
-  const fse = await import("fs-extra");
-  await fse.unlink(await getThumbnailsPath() + thumbnailName);
+export const deleteThumbnail = (thumbnailName: string): void => {
+  fs.unlinkSync(getThumbnailsPath() + thumbnailName);
 };
 
-export const getDirListOfLibrarySubfolders = async (): Promise<string[]> => {
-  const fse = await import("fs-extra");
-  return (await fse.readdir(await getLibraryPath(), { withFileTypes: true }))
+export const getDirListOfLibrarySubfolders = (): string[] => {
+  return (fs.readdirSync(getLibraryPath(), { withFileTypes: true }))
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name);
 };
 
-const checkCreateJSON = async <T>(dir: string, defaultValue: T): Promise<string> => {
-  const fse = await import("fs-extra");
-  if (!fse.existsSync(dir))
-    await fse.writeJSON(dir, defaultValue);
+const checkCreateJSON = <T>(dir: string, defaultValue: T): string => {
+  if (!fs.existsSync(dir))
+    fs.writeJSONSync(dir, defaultValue);
   return dir;
 };
 
-const checkCreateDir = async (dir: string): Promise<string> => {
-  const fse = await import("fs-extra");
-  if (!fse.existsSync(dir) || !await fse.pathExists(dir))
-    await fse.mkdir(dir);
+const checkCreateDir = (dir: string): string => {
+  if (!fs.existsSync(dir) || !fs.pathExistsSync(dir))
+    fs.mkdirSync(dir);
   return dir;
 };
