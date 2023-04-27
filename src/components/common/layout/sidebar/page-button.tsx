@@ -1,10 +1,10 @@
-import ContrastText from "../Styled/ContrastText";
-import Gradient from "../Styled/Gradient";
+import Gradient from "../../shared/gradient";
 import React, { FC } from "react";
 import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
   width: 100%;
+  color: ${(p): string => p.theme.textContrast};
   border-radius: 5px;
   margin-left: 10px;
   line-height: 5px;
@@ -53,10 +53,10 @@ const SideBarButton: FC<SideBarButtonProps> = ({
             </WhiteColor>
           </Gradient>
         ) : (
-          <ContrastText type={"light"}>
+          <span>
             <Icon className={icon} />
             {title}
-          </ContrastText>
+          </span>
         )}
       </ButtonWrapper>
     </>

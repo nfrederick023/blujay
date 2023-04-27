@@ -1,17 +1,81 @@
 import { AppProps } from "next/app";
 import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
-import { ReactElement } from "react";
-import { ThemeProvider } from "styled-components";
+import { ReactElement, useState } from "react";
 import { darkTheme, lightTheme } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { getVideoList } from "@server/utils/config";
 import App from "next/app";
-import GlobalStyle from "@client/components/Common/Styled/GlobalStyle";
-import Layout from "../components/Common/Layout/Layout";
+import Header from "@client/components/common/layout/header/header";
 import React from "react";
+import Sidebar from "@client/components/common/layout/sidebar/sidebar";
 import cookies from "next-cookies";
 import getAuthStatus from "../../server/utils/auth";
+import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+
+const GlobalStyle = createGlobalStyle`
+html {
+  font-family: 'Montserrat';
+  background-color: ${(p): string => p.theme.background};
+  color: ${(p): string => p.theme.text};
+}
+
+// fixes sidebar positioning somehow 
+* {
+   box-sizing: border-box;
+}
+
+// prevents content shift on scrollbar
+body {
+  width: calc(100vw - 15px);
+}
+
+html, body {
+  margin: 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  display: inline;
+  margin: 0px;
+}
+
+h1 {
+  line-height: 75%;
+  font-size: 1.9em;
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 1.7em;
+  font-weight: 700;
+}
+
+h5{
+  font-size: 1em;
+  font-weight: 500;
+}
+
+h6{
+  font-size: 0.83em;
+  font-weight: 500;
+}
+
+input, textarea, select { 
+  font-family:inherit; 
+  font-size: inherit; 
+}
+`;
+
+const LayoutWrapper = styled.div`
+  display: flex;
+`;
+
+const ContentWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  margin: 20px;
+  overflow: hidden;
+`;
 
 type NextAppComponentType = typeof App;
 interface ExtendedAppProps extends AppProps {
@@ -23,12 +87,12 @@ interface ExtendedAppProps extends AppProps {
 const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   Component,
   pageProps,
-  authStatus,
   theme,
   videos,
 }: ExtendedAppProps): ReactElement => {
-  // assign default values to cookies if not set
+  const [search, setSearch] = useState("");
 
+  // assign default values to cookies if not set
   // get all cookies and set default if none
   const _cookies = new Cookies();
   const allCookieTypes: CookieTypes[] = [
@@ -57,9 +121,13 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
       <CookiesProvider cookies={_cookies}>
         <ThemeProvider theme={theme}>
           <GlobalStyle />
-          <Layout categories={categories}>
-            <Component {...pageProps} />
-          </Layout>
+          <LayoutWrapper>
+            <Sidebar categories={categories} />
+            <ContentWrapper>
+              <Header search={search} setSearch={setSearch} />
+              {search ? <>searching...</> : <Component {...pageProps} />}
+            </ContentWrapper>
+          </LayoutWrapper>
         </ThemeProvider>
       </CookiesProvider>
     </>

@@ -3,8 +3,9 @@ import React, { FC } from "react";
 import styled from "styled-components";
 
 const CategoryButtonWrapper = styled.div`
+  color: ${(p): string => p.theme.textContrast};
   padding: 7px;
-  padding-left: 25px;
+  padding-left: 22px;
 
   div {
     transition: 0.1s;

@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const GradientBackground = styled.span`
   background-image: linear-gradient(
-    174deg,
+    10deg,
     ${(p): string => p.theme.highlightLight} 20%,
     ${(p): string => p.theme.highlightDark} 80%
   );
@@ -24,6 +24,7 @@ const GradientText = styled.span`
 `;
 
 type GradientType = "background" | "text";
+type Color = "silver" | "blue";
 
 interface GradientProps {
   children: React.ReactNode;

@@ -81,6 +81,7 @@ const SearchBar: FC<SearchBarProps> = ({
         id="default-search"
         placeholder="Search"
         autoComplete="off"
+        value={search}
         onInput={handleSearchInput}
       />
     </SearchBarContent>

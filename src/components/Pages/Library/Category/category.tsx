@@ -1,7 +1,7 @@
 import { Video } from "@client/utils/types";
 import { useRouter } from "next/router";
 import React, { FC } from "react";
-import VideoSlider from "@client/components/Common/VideoSlider/VideoSlider";
+import VideoSlider from "@client/components/common/video-slider/video-slider";
 
 interface CategoryPageProps {
   videos: Video[];
@@ -22,7 +22,7 @@ const CategoryPage: FC<CategoryPageProps> = ({ videos }: CategoryPageProps) => {
     <VideoSlider
       videos={categoryVideos}
       sliderType={"verticle"}
-      header={cateogryName}
+      headerText={cateogryName}
     />
   );
 };

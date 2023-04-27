@@ -1,11 +1,10 @@
 import { screenSizes } from "@client/utils/theme";
 import { useWindowWidth } from "@react-hook/window-size";
-import CategoryButton from "./CategoryButton";
-import ContrastText from "../Styled/ContrastText";
-import Gradient from "../Styled/Gradient";
+import CategoryButton from "./category-button";
+import Gradient from "../../shared/gradient";
 import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useEffect, useState } from "react";
-import SideBarButton from "./SideBarButton";
+import SideBarButton from "./page-button";
 import styled from "styled-components";
 
 const SidebarWapper = styled.div`
@@ -48,23 +47,23 @@ const SidebarContent = styled.div`
 `;
 
 const Logo = styled.div`
-  width: 100%;
-  padding: 5px;
   margin-bottom: 5px;
   text-align: center;
+  width: 100%;
+  padding: 5px;
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    padding-left: 20px;
     font-size: 1.75em;
     padding-top: 50px;
-    padding-left: 20px;
   }
 `;
 
 const BarsIcon = styled.i`
-  position: fixed;
-  verticle-align: middle;
-  left: 10px;
-  top: -3.5px;
   font-size: 3rem !important;
+  verticle-align: middle;
+  position: fixed;
+  top: -3.5px;
+  left: 10px;
   z-index: 2;
 
   &::before {
@@ -74,9 +73,9 @@ const BarsIcon = styled.i`
 
 const Library = styled.div`
   border-left: ${(p): string => p.theme.textContrastLight} 2px solid;
-  width: 100%;
+  margin-left: 30px;
   margin-top: 5px;
-  margin-left: 36px;
+  width: 100%;
 `;
 
 const MinimizeButton = styled.div`
@@ -178,11 +177,9 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
                   url={"library"}
                 />
                 <Library>
-                  <ContrastText type={"light"}>
-                    {categories.map((dir, i) => {
-                      return <CategoryButton key={i} category={dir} />;
-                    })}
-                  </ContrastText>
+                  {categories.map((dir, i) => {
+                    return <CategoryButton key={i} category={dir} />;
+                  })}
                 </Library>
               </>
             )}

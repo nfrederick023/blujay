@@ -78,14 +78,12 @@ export interface PublicConfig {
 }
 
 export type CookieTypes = "theaterMode" | "videoVolume" | "isDarkMode" | "authToken"
-
-
+export type OrderType = "Ascending" | "Descending";
+export type QueryField = "name" | "filename" | "category" | "description" | "id";
+export type ViewType = "List View" | "Grid View";
 export type SortType =
   | "Alphabetical"
   | "Date Updated"
   | "Date Created"
   | "File Size"
   | "View Count";
-export type OrderType = "Ascending" | "Descending";
-
-export type QueryField = "name" | "filename" | "category" | "description" | "id";

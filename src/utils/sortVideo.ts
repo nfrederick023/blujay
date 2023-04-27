@@ -24,7 +24,7 @@ export const sortVideos = (videos: Video[], sort: SortType, order: OrderType): V
     }
   }
 
-  if (order === "Ascending") sortedVideos.reverse();
+  if (order === "Descending") sortedVideos.reverse();
 
   return sortedVideos;
 };

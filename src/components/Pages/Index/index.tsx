@@ -1,31 +1,33 @@
 import { Video } from "@client/utils/types";
 import React, { FC } from "react";
-import VideoSlider from "@client/components/Common/VideoSlider/VideoSlider";
+import VideoSlider from "@client/components/common/video-slider/video-slider";
 
 interface IndexPageProps {
   videos: Video[];
 }
 
 const IndexPage: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
-  const recentVideos = [...videos].sort((a, b) => b.created - a.created);
-  const favoritedVideos = recentVideos.filter((video) => video.isFavorite);
+  const favoritedVideos = videos.filter((video) => video.isFavorite);
 
   return (
     <>
       <VideoSlider
-        videos={recentVideos}
+        videos={videos}
         sliderType={"horizontal"}
-        header={"Recent Videos"}
+        headerText={"Recent Videos"}
+        intialSort={"Date Created"}
       />
       <VideoSlider
         videos={favoritedVideos}
         sliderType={"horizontal"}
-        header={"Recent Favorites"}
+        headerText={"Recent Favorites"}
+        intialSort={"Date Created"}
       />
       <VideoSlider
         videos={videos}
         sliderType={"verticle"}
-        header={"All Videos"}
+        headerText={"All Videos"}
+        intialSort={"Date Created"}
       />
     </>
   );

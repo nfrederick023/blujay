@@ -1,6 +1,7 @@
 import { Video } from "@client/utils/types";
+import HorizontalSliderHeader from "./horizontal-header";
 import React, { FC, useState } from "react";
-import VideoDetails from "./VideoDetails";
+import VideoDetails from "../details";
 import styled from "styled-components";
 
 const transitionTimeMS = 150;
@@ -40,21 +41,21 @@ type HubroTypes = "pause" | "forward" | "backward";
 interface HorizontalSliderProps {
   videos: Video[];
   videosPerRow: number;
-  position: number;
-  displayedPosition: number;
-  setDisplayedPosition: React.Dispatch<React.SetStateAction<number>>;
+  headerText: string;
 }
 
 const HorizontalSlider: FC<HorizontalSliderProps> = ({
   videos,
-  position,
+  headerText,
   videosPerRow,
-  displayedPosition,
-  setDisplayedPosition,
 }: HorizontalSliderProps) => {
   const [displayedVideos, setDisplayedVideos] = useState<JSX.Element[]>([]);
   const [hubro, setHubro] = useState<HubroTypes>("pause");
+  const [displayedPosition, setDisplayedPosition] = useState(0);
+  const [position, setPosition] = useState(0);
+
   const videoWidth = 100 / videosPerRow;
+  const isMaxOffset = videosPerRow + position >= videos.length;
 
   if (hubro === "pause" && displayedPosition !== position) {
     setHubro(position < displayedPosition ? "backward" : "forward");
@@ -97,12 +98,22 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
       ))
     );
   }
+
   return (
-    <CarouselWrapper>
-      <Carousel videoWidth={videoWidth} hubro={hubro}>
-        {displayedVideos}
-      </Carousel>
-    </CarouselWrapper>
+    <>
+      <HorizontalSliderHeader
+        isMaxOffset={isMaxOffset}
+        displayedPosition={displayedPosition}
+        position={position}
+        setPosition={setPosition}
+        headerText={headerText}
+      />
+      <CarouselWrapper>
+        <Carousel videoWidth={videoWidth} hubro={hubro}>
+          {displayedVideos}
+        </Carousel>
+      </CarouselWrapper>
+    </>
   );
 };
 
