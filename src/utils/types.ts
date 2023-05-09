@@ -1,23 +1,40 @@
 import { IncomingMessage } from "http";
-import { Redirect } from "next";
+import { Redirect } from "next/types";
 
-export interface Video {
-  fileName: string,
-  name: string,
-  size: number,
-  saved: number,
-  created: number,
-  filePath: string,
-  thumbnailPath: string,
-  description: string,
-  requireAuth: boolean,
-  isFavorite: boolean,
-  id: string,
-  mime?: string
+export interface BluJayTheme {
+  readonly background: string;
+  readonly backgroundContrast: string;
+  readonly text: string;
+  readonly textContrast: string;
+  readonly textContrastLight: string;
+  readonly highlightLight: string;
+  readonly highlightDark: string;
+  readonly hightlightSilver: string;
+  readonly button: string;
 }
 
-export interface Props<T> {
-  props: T
+export interface ScreenSizes {
+  readonly largeScreenSize: number;
+  readonly mediumScreenSize: number;
+  readonly smallScreenSize: number;
+  readonly tabletScreenSize: number;
+  readonly mobileScreenSize: number;
+}
+
+export interface Video {
+  readonly fileName: string,
+  readonly name: string,
+  readonly size: number,
+  readonly saved: number,
+  readonly created: number,
+  readonly filePath: string,
+  readonly thumbnailPath: string,
+  readonly category: string,
+  readonly description: string,
+  readonly requireAuth: boolean,
+  readonly isFavorite: boolean,
+  readonly id: string,
+  readonly mime?: string
 }
 
 export enum AuthStatus {
@@ -34,25 +51,41 @@ export enum LinkTypes {
   favoriteLinkNoAuth
 }
 
-export enum SortTypes {
-  created = "created",
-  saved = "saved",
-  name = "name",
-  size = "size"
-}
-
 export interface PropsWithAuth {
-  authStatus: AuthStatus
+  readonly authStatus: AuthStatus
 }
 
 export interface IncomingMessageCookies extends IncomingMessage {
-  cookies: { [key: string]: string | boolean | number };
+  readonly cookies: { [key: string]: string | boolean | number };
 }
 
 export interface NextRedirect {
   redirect: Redirect
 }
 
-export interface AuthResponse extends Response {
-  authToken: string
+export interface Thumbnail {
+  height: number,
+  width: number
 }
+
+export interface Config {
+  readonly password: string;
+  readonly privateLibrary: boolean;
+  readonly thumbnailSettings: Thumbnail;
+}
+
+// DO NOT ALLOW SENSITIVE PARAMETERS IN PUBLICCONFIG!!!!! 
+export interface PublicConfig {
+  readonly thumbnailSettings: Thumbnail;
+}
+
+export type CookieTypes = "theaterMode" | "videoVolume" | "isDarkMode" | "authToken"
+export type OrderType = "Ascending" | "Descending";
+export type QueryField = "name" | "filename" | "category" | "description" | "id";
+export type ViewType = "List View" | "Grid View";
+export type SortType =
+  | "Alphabetical"
+  | "Date Updated"
+  | "Date Created"
+  | "File Size"
+  | "View Count";

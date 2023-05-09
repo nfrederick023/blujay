@@ -1,28 +1,26 @@
-import { createVideoListBackup, deleteThumbnail, getThumbnailsPath, getThumnailSize, getUserPassword, getVideoList, getVideosPath, setVideoList } from "./config";
-import glob from "glob";
-import path from "path";
-import seedrandom from "seedrandom";
-
-import { Video } from "../utils/types";
+import { Video } from "@client/utils/types";
+import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getThumnailSettings, getUserPassword, getVideoList, setVideoList } from "./config";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
 import fse from "fs-extra";
+import glob from "glob-promise";
+import path from "path";
 import pathToFfmpeg from "ffmpeg-static";
+import seedrandom from "seedrandom";
+
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
 
 export const listVideos = async (): Promise<Video[]> => {
-  await createVideoListBackup();
+  createVideoListBackup();
 
-  let videos = glob.sync(`${await getVideosPath()}/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv|json)`);
-
-  // Remove metadata files from the video list
-  videos = videos.filter((videoPath) => !videoPath.endsWith(".json"));
-  await cleanState();
+  const libraryPath = getLibraryPath();
+  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv|gif)`);
+  cleanState(videoFilePaths);
 
   const videoDetails: Video[] = [];
-  for (const filePath of videos) {
-    const videoState = await getCreateVideo(filePath);
+  for (const filePath of videoFilePaths) {
+    const videoState = getCreateVideo(filePath);
     if (videoState) {
       videoDetails.push(
         videoState
@@ -35,21 +33,27 @@ export const listVideos = async (): Promise<Video[]> => {
 };
 
 const createThumbnails = async (videos: Video[]): Promise<void> => {
-  const folder = await getThumbnailsPath();
+  const folder = getThumbnailsPath();
   const thumbnails = await fse.readdir(folder);
-  const size = await getThumnailSize();
+  const thumbnailSettings = getThumnailSettings();
+  const size = `${thumbnailSettings.width}x${thumbnailSettings.height}`;
   let oldThumbnails = thumbnails;
 
   videos.forEach(video => {
     const filename = video.name + ".jpg";
     oldThumbnails = oldThumbnails.filter(thumbnail => !(thumbnail === filename));
     if (!thumbnails.includes(filename)) {
+      let timemarks = ["20%"];
+      if (video.fileName.split(".").pop() === "gif")
+        timemarks = ["0"];
       ffmpeg(video.filePath)
+        .inputOptions("-t 10")
         .screenshots({
           count: 1,
           filename,
           folder,
-          size
+          size,
+          timemarks
         });
     }
   });
@@ -57,42 +61,45 @@ const createThumbnails = async (videos: Video[]): Promise<void> => {
   oldThumbnails.forEach(thumbnail => deleteThumbnail(thumbnail));
 };
 
-// removes any videos not found in state
-const cleanState = async (): Promise<void> => {
-  const videoList = await getVideoList();
-  const files = await fse.readdir(await getVideosPath());
-  await setVideoList(videoList.filter(video => files.includes(video.fileName)));
+// removes any videos in the video list that are not found
+const cleanState = (videoFilePaths: string[]): void => {
+  const videoList = getVideoList();
+  setVideoList(videoList.filter(video => videoFilePaths.includes(video.filePath)));
 };
 
 // gets a video from videoList, creates one if not found
-const getCreateVideo = async (filePath: string): Promise<Video | null> => {
+const getCreateVideo = (filePath: string): Video | null => {
   const fileName = path.basename(filePath);
   const name = path.parse(fileName).name;
-  const videoStats = await fse.stat(filePath);
-  const videoList = await getVideoList();
-  const thumbnailPath = path.join(await getThumbnailsPath() + name + ".jpg");
+  const videoStats = fse.statSync(filePath);
+  const videoList = getVideoList();
+  const category = path.dirname(filePath).split("\\")[3] ?? "";
+  const thumbnailPath = path.join(getThumbnailsPath() + name + ".jpg");
 
   // check if the video already is persisted within the state
-  const videoState = videoList.find((video) => { return video.fileName === fileName; });
+  const videoState = videoList.find((video) => { return video.filePath === filePath; });
 
   if (videoState) {
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.size !== videoStats.size || videoState.saved !== videoStats.mtimeMs || videoState.created !== videoStats.birthtimeMs || videoState.filePath !== filePath || videoState.name !== name) {
+    if (videoState.size !== videoStats.size || videoState.saved !== videoStats.mtime.getTime() || videoState.created !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
         ...videoState,
         size: videoStats.size,
-        saved: videoStats.mtimeMs,
-        created: videoStats.birthtimeMs ? videoStats.birthtimeMs : videoState.created,
+        saved: videoStats.atime.getTime(),
+        created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : videoState.created,
         name,
+        fileName,
         filePath,
         thumbnailPath,
+        category
       };
       newVideoList.push(newVideoState);
-      await setVideoList(newVideoList);
+      setVideoList(newVideoList);
       return newVideoState;
     }
+
     return videoState;
   }
 
@@ -102,17 +109,18 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
     fileName,
     name,
     size: videoStats.size,
-    saved: videoStats.mtimeMs,
-    created: videoStats.birthtimeMs ? videoStats.birthtimeMs : Date.now(),
-    filePath: filePath,
+    saved: videoStats.mtime.getTime(),
+    created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : Date.now(),
+    filePath,
     thumbnailPath,
     description: "",
     requireAuth: false,
     isFavorite: false,
+    category,
     id
   };
   videoList.push(newVideoState);
 
-  await setVideoList(videoList);
+  setVideoList(videoList);
   return newVideoState;
 };

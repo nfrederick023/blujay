@@ -1,89 +1,183 @@
-/*
- * Custom app component, used to redirect if authentication is missing
- */
-
-import "react-toggle/style.css";
-
+import { AppProps } from "next/app";
+import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
-import { NextPage, NextPageContext } from "next";
 import { ReactElement, useState } from "react";
-
-import { AppContext } from "next/app";
-import { Request } from "express";
-import { createGlobalStyle } from "styled-components";
-import Layout from "../components/Layout";
+import { darkTheme, lightTheme } from "@client/utils/theme";
+import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
+import { getVideoList } from "@server/utils/config";
+import App from "next/app";
+import Header from "@client/components/common/layout/header/header";
 import React from "react";
-import getConfig from "next/config";
-
-const { publicRuntimeConfig } = getConfig();
+import Sidebar from "@client/components/common/layout/sidebar/sidebar";
+import VideoSlider from "@client/components/common/video-slider/video-slider";
+import cookies from "next-cookies";
+import getAuthStatus from "../../server/utils/auth";
+import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
-  html {
-    font-family: "Montserrat", sans-serif;
-  }
-
-  body {
-    position: relative;
-    font-family: inherit;
-    min-height: 100vh;
-    box-sizing: border-box;
-    padding-bottom: 33px;
-  }
-
-  .react-toggle {
-   right: 10px;
-  }
-  .react-toggle--checked:hover .react-toggle-track {
-    background-color: #3273dc !important;
-  }
-
-  .react-toggle--checked .react-toggle-track {
-    background-color: #3273dc !important;
-  }
-
-  .react-toggle-thumb {
-    box-shadow: 0px 0px 0px 0px #3273dc !important;
-  }
-`;
-
-interface MyAppProps {
-  allCookies: { [key: string]: string | boolean | number },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Component?: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pageProps?: any
+html {
+  font-family: 'Montserrat';
+  background-color: ${(p): string => p.theme.background};
+  color: ${(p): string => p.theme.text};
 }
 
-const MyApp: NextPage<MyAppProps> = ({ ...props }: MyAppProps): ReactElement => {
-  const cookies = new Cookies(props.allCookies);
+// fixes sidebar positioning somehow 
+* {
+   box-sizing: border-box;
+}
 
-  const [currentPage, setCurrentPage] = useState(0);
+// prevents content shift on scrollbar
+body {
+  width: calc(100vw - 15px);
+}
 
-  const setCookies = (name: string, value: string | boolean | number): void => {
-    cookies.set(name, value, { path: "/", sameSite: "strict", expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)) });
-  };
-  if (typeof props.allCookies?.theaterMode === "undefined") setCookies("theaterMode", false);
-  if (typeof props.allCookies?.videoVolume === "undefined") setCookies("videoVolume", 1);
-  if (typeof props.allCookies?.videosPerPage === "undefined") setCookies("videosPerPage", 20);
-  if (typeof props.allCookies?.isDarkMode === "undefined") setCookies("isDarkMode", true);
-  if (typeof props.allCookies?.authToken === "undefined") setCookies("authToken", "");
+html, body {
+  margin: 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  display: inline;
+  margin: 0px;
+}
+
+h1 {
+  line-height: 75%;
+  font-size: 1.9em;
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 1.7em;
+  font-weight: 700;
+}
+
+h4 {
+  font-size: 1.6em;
+  font-weight: 575;
+
+}
+
+h5{
+  font-size: 1em;
+  font-weight: 500;
+}
+
+h6{
+  font-size: 0.83em;
+  font-weight: 500;
+}
+
+input, textarea, select { 
+  font-family:inherit; 
+  font-size: inherit; 
+}
+`;
+
+const LayoutWrapper = styled.div`
+  display: flex;
+`;
+
+const ContentWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  margin: 20px;
+  overflow: hidden;
+`;
+
+type NextAppComponentType = typeof App;
+interface ExtendedAppProps extends AppProps {
+  authStatus: AuthStatus;
+  videos: Video[];
+  theme: BluJayTheme;
+}
+
+const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
+  Component,
+  pageProps,
+  theme,
+  videos,
+}: ExtendedAppProps): ReactElement => {
+  const [search, setSearch] = useState("");
+
+  // assign default values to cookies if not set
+  // get all cookies and set default if none
+  const _cookies = new Cookies();
+  const allCookieTypes: CookieTypes[] = [
+    "authToken",
+    "isDarkMode",
+    "theaterMode",
+    "videoVolume",
+  ];
+
+  allCookieTypes.forEach((cookieType) => {
+    if (!_cookies.get(cookieType))
+      _cookies.set(
+        cookieType,
+        getCookieDefault(cookieType),
+        getCookieSetOptions()
+      );
+  });
+
+  const categories = [...new Set(videos.map((video) => video.category))].filter(
+    (category) => category
+  );
+
+  const searchResults = videos.filter((video) =>
+    video.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  console.log(search);
   return (
     <>
-      <title>{publicRuntimeConfig.pageTitle}</title>
-      <GlobalStyle />
-      <CookiesProvider cookies={cookies}>
-        <Layout hasAuth={publicRuntimeConfig.hasAuth}>
-          <props.Component {...props.pageProps} currentPage={currentPage} setCurrentPage={setCurrentPage} />
-        </Layout>
+      <title>title</title>
+      <CookiesProvider cookies={_cookies}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <LayoutWrapper>
+            <Sidebar categories={categories} />
+            <ContentWrapper>
+              <Header search={search} setSearch={setSearch} />
+              {search ? (
+                <VideoSlider
+                  videos={searchResults}
+                  sliderType={"verticle"}
+                  headerText={"Search Results"}
+                />
+              ) : (
+                <Component {...pageProps} />
+              )}
+            </ContentWrapper>
+          </LayoutWrapper>
+        </ThemeProvider>
       </CookiesProvider>
     </>
   );
 };
 
-MyApp.getInitialProps = async (ctx: NextPageContext): Promise<MyAppProps> => {
-  const context = ctx as unknown as AppContext;
-  const request = context.ctx.req as Request;
-  return { allCookies: request?.cookies };
+MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
+  const { ctx } = initialProps;
+  const videos = getVideoList();
+
+  // auth stuff
+  const authToken = cookies(ctx)?.authToken;
+  const authStatus = getAuthStatus(authToken);
+  const theme = cookies(ctx)?.isDarkMode === "true" ? darkTheme : lightTheme;
+
+  // if there's a token, the user is not authenticated, and authentication is required
+  // then redirect to login and reset
+  if (authToken && authStatus === AuthStatus.notAuthenticated && ctx.res) {
+    ctx.res.setHeader("Set-Cookie", "authToken=; Max-Age=0");
+    ctx.res.setHeader("Location", "/login");
+  }
+
+  // get the remaining app props...
+  const appInitialProps = (await App.getInitialProps(initialProps)) as AppProps;
+  return {
+    authStatus,
+    videos,
+    theme,
+    ...appInitialProps,
+  };
 };
 
 export default MyApp;
