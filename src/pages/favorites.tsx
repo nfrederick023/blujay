@@ -1,19 +1,19 @@
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
 import { listVideos } from "@server/utils/listVideos";
-import CategoryPage from "@client/components/pages/library/category/category";
+import FavoritesPage from "@client/components/pages/favorites/favorites";
 import React from "react";
 
-interface CategoryProps {
+interface FavoritesProps {
   videos: Video[];
 }
 
-const Category: NextPage<CategoryProps> = ({ videos }: CategoryProps) => {
-  return <CategoryPage videos={videos} />;
+const Favorites: NextPage<FavoritesProps> = ({ videos }: FavoritesProps) => {
+  return <FavoritesPage videos={videos} />;
 };
 
 export const getServerSideProps: GetServerSideProps<
-  CategoryProps
+  FavoritesProps
 > = async () => {
   return {
     props: {
@@ -22,4 +22,4 @@ export const getServerSideProps: GetServerSideProps<
   };
 };
 
-export default Category;
+export default Favorites;

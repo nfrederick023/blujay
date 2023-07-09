@@ -1,5 +1,6 @@
 import Gradient from "../../shared/gradient";
 import React, { FC } from "react";
+import router from "next/router";
 import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
@@ -8,8 +9,13 @@ const ButtonWrapper = styled.div`
   border-radius: 5px;
   margin-left: 10px;
   line-height: 5px;
-
+  transition: 0.1s;
   height: 38px;
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+    cursor: pointer;
+  }
 
   > span {
     border-radius: 12px;
@@ -41,10 +47,12 @@ const SideBarButton: FC<SideBarButtonProps> = ({
   url,
 }: SideBarButtonProps) => {
   const isSelected = window.location.pathname.split("/")[1] === url;
-
+  const navigateToPage = (): void => {
+    router.push("/" + url);
+  };
   return (
     <>
-      <ButtonWrapper>
+      <ButtonWrapper onClick={navigateToPage}>
         {isSelected ? (
           <Gradient type="background">
             <WhiteColor>

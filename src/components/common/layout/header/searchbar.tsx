@@ -23,7 +23,7 @@ const SearchBarContent = styled.div`
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     max-width: 100%;
-    margin-left: 65px;
+    margin-left: 75px;
     margin-right: 20px;
   }
 `;
@@ -50,14 +50,10 @@ const SearchIcon = styled.i`
 `;
 
 interface SearchBarProps {
-  search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const SearchBar: FC<SearchBarProps> = ({
-  search,
-  setSearch,
-}: SearchBarProps) => {
+const SearchBar: FC<SearchBarProps> = ({ setSearch }: SearchBarProps) => {
   const searchInput = useRef<HTMLInputElement>(null);
 
   const handleSearchClick = (): void => {

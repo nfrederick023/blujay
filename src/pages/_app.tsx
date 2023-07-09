@@ -2,7 +2,7 @@ import { AppProps } from "next/app";
 import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement, useState } from "react";
-import { darkTheme, lightTheme } from "@client/utils/theme";
+import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { getVideoList } from "@server/utils/config";
 import App from "next/app";
@@ -27,9 +27,10 @@ html {
 }
 
 // prevents content shift on scrollbar
-body {
+// actually this is probably a bad thing tbh 
+/* body {
   width: calc(100vw - 15px);
-}
+} */
 
 html, body {
   margin: 0px;
@@ -77,11 +78,16 @@ const LayoutWrapper = styled.div`
   display: flex;
 `;
 
-const ContentWrapper = styled.div`
-  height: 100%;
+const CenterContent = styled.div`
+  max-width: ${screenSizes.largeScreenSize}px;
+  margin: auto;
   width: 100%;
-  margin: 20px;
+  height: 100%;
   overflow: hidden;
+`;
+
+const ContentWrapper = styled.div`
+  margin: 20px;
 `;
 
 type NextAppComponentType = typeof App;
@@ -126,7 +132,6 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
     video.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  console.log(search);
   return (
     <>
       <title>title</title>
@@ -135,18 +140,20 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
           <GlobalStyle />
           <LayoutWrapper>
             <Sidebar categories={categories} />
-            <ContentWrapper>
-              <Header search={search} setSearch={setSearch} />
-              {search ? (
-                <VideoSlider
-                  videos={searchResults}
-                  sliderType={"verticle"}
-                  headerText={"Search Results"}
-                />
-              ) : (
-                <Component {...pageProps} />
-              )}
-            </ContentWrapper>
+            <CenterContent>
+              <ContentWrapper>
+                <Header search={search} setSearch={setSearch} />
+                {search ? (
+                  <VideoSlider
+                    videos={searchResults}
+                    sliderType={"verticle"}
+                    headerText={"Search Results"}
+                  />
+                ) : (
+                  <Component {...pageProps} />
+                )}
+              </ContentWrapper>
+            </CenterContent>
           </LayoutWrapper>
         </ThemeProvider>
       </CookiesProvider>

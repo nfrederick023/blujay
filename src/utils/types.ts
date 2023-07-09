@@ -14,10 +14,26 @@ export interface BluJayTheme {
 }
 
 export interface ScreenSizes {
+  /**
+   * 2560 Pixels
+   */
   readonly largeScreenSize: number;
+  /**
+   * 1920 Pixels
+   */
   readonly mediumScreenSize: number;
+  /**
+   * 1280 Pixels
+   */
   readonly smallScreenSize: number;
+  /**
+   * 720 Pixels
+   */
   readonly tabletScreenSize: number;
+
+  /**
+   * 480 Pixels
+   */
   readonly mobileScreenSize: number;
 }
 

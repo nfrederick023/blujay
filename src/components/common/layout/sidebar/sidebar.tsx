@@ -17,6 +17,11 @@ const SidebarWapper = styled.div`
   min-height: 100vh;
   position: sticky;
   z-index: 3;
+  ${(p): string => (p.isCollapsed ? "margin-left: -209px;" : "")}
+
+  @media (min-width: ${screenSizes.largeScreenSize}px) {
+    position: absolute;
+  }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     position: fixed;
@@ -24,10 +29,8 @@ const SidebarWapper = styled.div`
     height: 100%;
 
     ${(p: { isCollapsed: boolean }): string =>
-      p.isCollapsed ? "min-width: 60px; left: -60px;" : ""}
+      p.isCollapsed ? "margin-left: -100%;" : ""}
   }
-
-  ${(p): string => (p.isCollapsed ? "max-width: 48px; min-width: 48px;" : "")}
 `;
 
 const SidebarContent = styled.div`
@@ -39,6 +42,7 @@ const SidebarContent = styled.div`
   flex-wrap: wrap;
   padding-right: 10px;
   padding-top: 20px;
+  margin-left: -2px;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     max-width: 100%;
@@ -51,6 +55,7 @@ const Logo = styled.div`
   text-align: center;
   width: 100%;
   padding: 5px;
+
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     padding-left: 20px;
     font-size: 1.75em;
@@ -91,6 +96,7 @@ const ArrowIconContainer = styled.div`
   right: 0px;
   min-height: inherit;
   width: 20px;
+
   &:hover {
     transition: 0.2s;
     border-right: ${(p): string => p.theme.highlightLight} 1px solid;
@@ -103,6 +109,7 @@ const ArrowIcon = styled.div`
   min-height: inherit;
   right: -10px;
   width: 30px;
+
   &:hover {
     cursor: pointer;
   }
@@ -145,46 +152,42 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
             </MinimizeButton>
           )}
           <SidebarContent>
-            {!isCollapsed && (
-              <>
-                <Logo>
-                  <Gradient type="text">
-                    <h1>BLU</h1>
-                  </Gradient>
-                  <Gradient type="text" color="silver">
-                    <h1>JAY</h1>
-                  </Gradient>
-                </Logo>
-                <SideBarButton
-                  title={"Home"}
-                  icon={"bx bx-home-alt-2 bx-sm"}
-                  url={""}
-                />
+            <Logo>
+              <Gradient type="text">
+                <h1>BLU</h1>
+              </Gradient>
+              <Gradient type="text" color="silver">
+                <h1>JAY</h1>
+              </Gradient>
+            </Logo>
+            <SideBarButton
+              title={"Home"}
+              icon={"bx bx-home-alt-2 bx-sm"}
+              url={""}
+            />
 
-                <SideBarButton
-                  title={"Favorites"}
-                  icon={"bx bx-heart bx-sm"}
-                  url={"favorites"}
-                />
+            <SideBarButton
+              title={"Favorites"}
+              icon={"bx bx-heart bx-sm"}
+              url={"favorites"}
+            />
 
-                <SideBarButton
-                  title={"All Videos"}
-                  icon={"bx bx-list-ul bx-sm"}
-                  url={"all"}
-                />
+            <SideBarButton
+              title={"All Videos"}
+              icon={"bx bx-list-ul bx-sm"}
+              url={"all"}
+            />
 
-                <SideBarButton
-                  title={"Library"}
-                  icon={"bx bx-folder bx-sm"}
-                  url={"library"}
-                />
-                <Library>
-                  {categories.map((dir, i) => {
-                    return <CategoryButton key={i} category={dir} />;
-                  })}
-                </Library>
-              </>
-            )}
+            <SideBarButton
+              title={"Library"}
+              icon={"bx bx-folder bx-sm"}
+              url={"library"}
+            />
+            <Library>
+              {categories.map((dir, i) => {
+                return <CategoryButton key={i} category={dir} />;
+              })}
+            </Library>
           </SidebarContent>
         </SidebarWapper>
       </NoSSR>

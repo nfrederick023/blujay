@@ -12,7 +12,6 @@ import styled from "styled-components";
 const VideoSliderWrapper = styled.div`
   padding: 15px 0px 15px 0px;
   width: auto;
-  max-width: ${screenSizes.largeScreenSize}px;
   min-width: auto;
 `;
 
@@ -38,7 +37,6 @@ const VideoSlider: FC<VideoSliderProps> = ({
   videos,
 }: VideoSliderProps) => {
   const width = useWindowWidth({
-    wait: 10,
     initialWidth: screenSizes.largeScreenSize,
   });
 
