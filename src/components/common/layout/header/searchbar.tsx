@@ -1,7 +1,6 @@
 import { debounce } from "lodash";
 import { screenSizes } from "@client/utils/theme";
 import React, { FC, useRef } from "react";
-import router from "next/router";
 import styled from "styled-components";
 
 const SearchBarContent = styled.div`

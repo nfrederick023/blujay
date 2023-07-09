@@ -19,7 +19,7 @@ const SidebarWapper = styled.div`
   z-index: 3;
   ${(p): string => (p.isCollapsed ? "margin-left: -209px;" : "")}
 
-  @media (min-width: ${screenSizes.largeScreenSize}px) {
+  @media (min-width: ${screenSizes.largeScreenSize + 420}px) {
     position: absolute;
   }
 
