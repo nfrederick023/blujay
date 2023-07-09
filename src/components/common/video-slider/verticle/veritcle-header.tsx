@@ -40,7 +40,8 @@ const sortOptions: SortType[] = [
 interface VeticleSliderHeaderProps {
   handleSortChange: (sort: string) => void;
   handleIsAscendingChange: () => void;
-  handleViewChange: () => void;
+  handleViewChange: (view: string) => void;
+  handleToggleViewChange: () => void;
   headerText: string;
   order: OrderType;
   sort: SortType;
@@ -51,6 +52,7 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
   handleIsAscendingChange,
   handleViewChange,
   handleSortChange,
+  handleToggleViewChange,
   headerText,
   order,
   sort,
@@ -74,7 +76,7 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
         </SortSelect>
         <TypeSelect>
           <SortIcon
-            onClick={handleViewChange}
+            onClick={handleToggleViewChange}
             className={view ? "bx bx-grid-small" : "bx bx-list-ul"}
           />
           <Select

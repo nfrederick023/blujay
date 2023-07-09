@@ -1,0 +1,1 @@
+export const isMediaTypeVideo = (ext: string): boolean => { return !["gif", "jpeg", "png", "jpg"].includes(ext); };

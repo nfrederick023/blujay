@@ -80,7 +80,7 @@ const LayoutWrapper = styled.div`
 
 const CenterContent = styled.div`
   max-width: ${screenSizes.largeScreenSize}px;
-  margin: auto;
+  margin: 0 auto 0 auto;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -168,7 +168,7 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
   // auth stuff
   const authToken = cookies(ctx)?.authToken;
   const authStatus = getAuthStatus(authToken);
-  const theme = cookies(ctx)?.isDarkMode === "true" ? darkTheme : lightTheme;
+  const theme = cookies(ctx).isDarkMode === "false" ? lightTheme : darkTheme;
 
   // if there's a token, the user is not authenticated, and authentication is required
   // then redirect to login and reset

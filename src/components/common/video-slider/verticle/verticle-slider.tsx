@@ -65,9 +65,14 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
     else setOrder("Ascending");
   };
 
-  const handleViewChange = (): void => {
+  const handleToggleViewChange = (): void => {
     if (view === "Grid View") setView("List View");
-    setView("Grid View");
+    else setView("Grid View");
+  };
+
+  const handleViewChange = (newView: string): void => {
+    if (newView === "List View") setView("List View");
+    else setView("Grid View");
   };
 
   const sortedVideos: Video[] = sortVideos([...videos], sort, order);
@@ -77,6 +82,7 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
       <VeticleSliderHeader
         headerText={headerText}
         handleViewChange={handleViewChange}
+        handleToggleViewChange={handleToggleViewChange}
         handleIsAscendingChange={handleIsAscendingChange}
         handleSortChange={handleSortChange}
         sort={sort}

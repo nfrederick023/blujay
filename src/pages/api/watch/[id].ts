@@ -1,14 +1,11 @@
 /*
  * API route for downloading videos by name
  */
-
 import * as mime from "mime-types";
-
 import { NextApiRequest, NextApiResponse } from "next";
-
-import { IncomingHttpHeaders } from "http";
 import { Video } from "@client/utils/types";
 import { getVideoList } from "@server/utils/config";
+import { isMediaTypeVideo } from "@client/utils/checkMediaType";
 import { isTokenValid } from "@server/utils/auth";
 import fs from "fs";
 
@@ -39,7 +36,14 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       return;
     }
 
-    serveVideo(req, res, video.filePath);
+    if (isMediaTypeVideo(video.extentsion)) {
+      serveVideo(req, res, video.filePath);
+    }
+    else {
+      const mimeType = mime.lookup(video.fileName) || "";
+      res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=${video.fileName}` });
+      fs.createReadStream(video.filePath).pipe(res);
+    }
     return;
   }
 
@@ -48,38 +52,29 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
   return;
 };
 
-/*
- * Serves a video using chunks
- *
- * Source: https://betterprogramming.pub/video-stream-with-node-js-and-html5-320b3191a6b6
- */
 const serveVideo = (req: NextApiRequest, res: NextApiResponse, videoPath: string): void => {
-  const stat = fs.statSync(videoPath);
-  const fileSize = stat.size;
   const range = req.headers.range;
-
-  if (range) {
-    const parts = range.replace(/bytes=/, "").split("-");
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-    const chunksize = end - start + 1;
-    const file = fs.createReadStream(videoPath, { start, end });
-    const head: IncomingHttpHeaders = {
-      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunksize.toString(),
-      "Content-Type": mime.lookup(videoPath) ? mime.lookup(videoPath).toString() : undefined,
-    };
-    res.writeHead(206, head);
-    file.pipe(res);
-  } else {
-    const head: IncomingHttpHeaders = {
-      "Content-Length": fileSize.toString(),
-      "Content-Type": mime.lookup(videoPath) ? mime.lookup(videoPath).toString() : undefined,
-    };
-    res.writeHead(200, head);
-    fs.createReadStream(videoPath).pipe(res);
+  if (!range) {
+    res.status(400).send("Requires Range header");
+    return;
   }
+  const videoSize = fs.statSync(videoPath).size;
+  const chunkSize = 1 * 4e6; // 4mbs
+  const start = Number(range.replace(/\D/g, ""));
+  const end = Math.min(start + chunkSize, videoSize - 1);
+  const contentLength = end - start + 1;
+  const headers = {
+    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+    "Accept-Ranges": "bytes",
+    "Content-Length": contentLength,
+    "Content-Type": "video/mp4"
+  };
+  res.writeHead(206, headers);
+  const stream = fs.createReadStream(videoPath, {
+    start,
+    end
+  });
+  stream.pipe(res);
 };
 
 export default getVideoByID;

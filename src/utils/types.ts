@@ -37,6 +37,8 @@ export interface ScreenSizes {
   readonly mobileScreenSize: number;
 }
 
+export type SupportedExtentsions = "mkv" | "mp4" | "webm" | "mov" | "mpeg" | "avi" | "wmv" | "gif" | "jpg" | "png" | "jpeg";
+
 export interface Video {
   readonly fileName: string,
   readonly name: string,
@@ -51,6 +53,7 @@ export interface Video {
   readonly isFavorite: boolean,
   readonly id: string,
   readonly mime?: string
+  readonly extentsion: SupportedExtentsions;
 }
 
 export enum AuthStatus {

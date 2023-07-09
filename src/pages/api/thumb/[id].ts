@@ -2,9 +2,11 @@
  * API route for downloading videos by name
  */
 
+import * as mime from "mime-types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Video } from "@client/utils/types";
 import { getThumbnailsPath, getVideoList } from "@server/utils/config";
+import { isMediaTypeVideo } from "@client/utils/checkMediaType";
 import { isTokenValid } from "@server/utils/auth";
 import fs from "fs";
 
@@ -39,11 +41,15 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
     return;
   }
 
-  res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=${video.name}.jpeg` });
-  fs.createReadStream(`${getThumbnailsPath()}${video.name}.jpg`).pipe(res);
+  if (isMediaTypeVideo(video.extentsion) || video.extentsion === "gif") {
+    res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=${video.name}.jpeg` });
+    fs.createReadStream(`${getThumbnailsPath()}${video.id}.jpg`).pipe(res);
+  } else {
+    const mimeType = mime.lookup(video.fileName) || "";
+    res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=${video.fileName}` });
+    fs.createReadStream(video.filePath).pipe(res);
+  }
   return;
-
-
 });
 
 export default useAuth;

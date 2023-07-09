@@ -30,14 +30,11 @@ const UnselectedBox = styled.div`
   transition: 1s;
   width: 110%;
   padding: 5px;
-  background-color: ${(p): string => p.theme.background};
-  border-left: 3px solid ${(p): string => p.theme.highlightLight};
+  border-radius: 0px 5px 5px 0px;
+  background-color: ${(p): string => p.theme.backgroundContrast};
   z-index: 2;
   left: -20px;
-
-  &:hover {
-    border-left: 3px solid ${(p): string => p.theme.highlightDark};
-  }
+  border-left: 3px solid ${(p): string => p.theme.highlightLight};
 `;
 
 const UnselectedOption = styled.div`

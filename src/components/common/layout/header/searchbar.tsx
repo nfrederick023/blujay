@@ -1,6 +1,12 @@
 import { debounce } from "lodash";
 import { screenSizes } from "@client/utils/theme";
-import React, { FC, useRef } from "react";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useRef,
+} from "react";
 import styled from "styled-components";
 
 const SearchBarContent = styled.div`
@@ -49,7 +55,7 @@ const SearchIcon = styled.i`
 `;
 
 interface SearchBarProps {
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  setSearch: Dispatch<SetStateAction<string>>;
 }
 
 const SearchBar: FC<SearchBarProps> = ({ setSearch }: SearchBarProps) => {
@@ -63,7 +69,7 @@ const SearchBar: FC<SearchBarProps> = ({ setSearch }: SearchBarProps) => {
     setSearch(value);
   }, 100);
 
-  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSearchInput = (e: ChangeEvent<HTMLInputElement>): void => {
     debounced(e.currentTarget.value);
   };
 

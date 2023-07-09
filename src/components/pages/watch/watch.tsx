@@ -1,8 +1,7 @@
 import { Video } from "@client/utils/types";
 import Head from "next/head";
-import React, { FC, useRef } from "react";
+import React, { FC } from "react";
 import TimeAgo from "react-timeago";
-import prettyBytes from "pretty-bytes";
 import styled from "styled-components";
 
 const WatchPageContainer = styled.div`
@@ -68,7 +67,6 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   const thumbSrc = "/api/thumb/" + encodeURIComponent(video.id);
   const fullVideoURL = `${src}${videoSrc}`;
   const fullThumbSrc = `${src}${thumbSrc}`;
-  const videoRef = useRef<HTMLVideoElement>(null);
   const handleVolumeChange = (): void => {};
 
   return (
@@ -107,7 +105,6 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
         controls
         autoPlay
         onVolumeChange={handleVolumeChange}
-        ref={videoRef}
       />
       <VideoName>
         <h4>{video.name}</h4>
