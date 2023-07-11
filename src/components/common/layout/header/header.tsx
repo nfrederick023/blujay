@@ -19,15 +19,14 @@ const HeaderContent = styled.div`
 `;
 
 interface HeaderProps {
-  search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Header: FC<HeaderProps> = ({ search, setSearch }: HeaderProps) => {
+const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
   return (
     <HeaderWrapper>
       <HeaderContent>
-        <SearchBar search={search} setSearch={setSearch} />
+        <SearchBar setSearch={setSearch} />
       </HeaderContent>
     </HeaderWrapper>
   );

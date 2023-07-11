@@ -1,6 +1,5 @@
-import { Body, Get, Param, Put, ValidationPipe, createHandler } from "next-api-decorators";
-import { UpdateVideo } from "./videoList.dto";
-import { getVideoList, updateVideoList } from "./videoList.service";
+import { Get, Param, createHandler } from "next-api-decorators";
+import { getVideoList } from "./videoList.service";
 import type { OrderType, QueryField, SortType, Video } from "@client/utils/types";
 
 class VideoListController {
@@ -15,11 +14,6 @@ class VideoListController {
     @Param("queryField") queryField?: QueryField[]
   ): Promise<Video[]> {
     return await getVideoList(page || 0, size || 5, sort || "Alphabetical", order || "Ascending", query || "", queryField || []);
-  }
-
-  @Put()
-  public async UpdateVideoList(@Body(ValidationPipe) req: UpdateVideo): Promise<Video> {
-    return await updateVideoList(req);
   }
 }
 

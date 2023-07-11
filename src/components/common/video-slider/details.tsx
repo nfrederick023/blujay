@@ -9,6 +9,9 @@ import useResizeObserver from "@react-hook/resize-observer";
 const VideoDetailsWrapper = styled.div`
   position: relative;
   width: 100%;
+`;
+
+const VideoDetailsContainer = styled.div`
   &:hover {
     cursor: pointer;
   }
@@ -57,36 +60,6 @@ const VideoPlayer = styled.video.attrs(thumbnailAttr)`
     opacity: ${(p): string => {
       return p.hasLoaded ? "1" : "0";
     }};
-  }
-
-  &::-webkit-media-controls-fullscreen-button {
-    display: none;
-  }
-  &::-webkit-media-controls-play-button {
-    display: none;
-  }
-  &::-webkit-media-controls-current-time-display {
-    display: none;
-  }
-  &::-webkit-media-controls-time-remaining-display {
-    display: none;
-  }
-  &::-webkit-media-controls-mute-button {
-    display: none;
-  }
-  &::-webkit-media-controls-toggle-closed-captions-button {
-    display: none;
-  }
-  &::-webkit-media-controls-volume-slider {
-    display: none;
-  }
-  &::-webkit-media-controls-panel {
-    // Your styling here
-    background-image: linear-gradient(transparent, transparent);
-  }
-
-  &::-webkit-media-controls-timeline {
-    padding: 8px;
   }
 `;
 
@@ -142,7 +115,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   };
 
   const navigateToVideo = (): void => {
-    router.push("/watch/" + video?.id);
+    if (video) router.push("/watch/" + video?.id);
   };
 
   const triggerHasLoaded = (): void => {
@@ -152,7 +125,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   return (
     <VideoDetailsWrapper ref={ref} onClick={navigateToVideo}>
       {video ? (
-        <>
+        <VideoDetailsContainer>
           {hasHovered && (
             <>
               {isVideo && (
@@ -165,10 +138,6 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
                   onMouseLeave={handleIsHoverFalseChange}
                   src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
                   imageHeight={imageHeight}
-                  controls
-                  controlsList="nofullscreen nodownload noremoteplayback noplaybackrate"
-                  contextMenu={"false"}
-                  disablePictureInPicture={true}
                   autoPlay
                   muted
                   loop
@@ -197,7 +166,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
               <TimeAgo date={video.created} />
             </h6>
           </VideoNameWrapper>
-        </>
+        </VideoDetailsContainer>
       ) : (
         <PlaceHolder />
       )}

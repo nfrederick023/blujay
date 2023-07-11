@@ -13,7 +13,7 @@ export const getCookieSetOptions = (): CookieSetOptions => {
 
 export const getCookieDefault = (name: CookieTypes): boolean | string | number => {
   switch (name) {
-    case "theaterMode":
+    case "isTheaterMode":
       return false;
     case "videoVolume":
       return 1;
@@ -22,4 +22,11 @@ export const getCookieDefault = (name: CookieTypes): boolean | string | number =
     case "authToken":
       return "";
   }
+};
+
+export const booleanify = (value: string | number | undefined): boolean => {
+  if (value === "false" || value === "undefined" || value === "0" || value === "-0") {
+    return false;
+  }
+  return !!value;
 };

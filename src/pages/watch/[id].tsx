@@ -24,9 +24,11 @@ const Watch: NextPage<WatchProps> = ({ video, url, mimeType }: WatchProps) => {
 export const getServerSideProps: GetServerSideProps<WatchProps> = async (
   ctx
 ) => {
-  const video = (await listVideos()).find((video) => {
+  const videoList = await listVideos();
+  const video = videoList.find((video) => {
     return video.id === ctx.query.id;
   });
+
   const protocol = ctx.req?.headers?.["x-forwarded-proto"] || "http";
   const hostname =
     ctx.req?.headers?.["x-forwarded-host"] || ctx.req?.headers["host"];

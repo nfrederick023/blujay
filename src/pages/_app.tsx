@@ -82,7 +82,6 @@ const CenterContent = styled.div`
   max-width: ${screenSizes.largeScreenSize}px;
   margin: 0 auto 0 auto;
   width: 100%;
-  height: 100%;
   overflow: hidden;
 `;
 
@@ -111,7 +110,7 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   const allCookieTypes: CookieTypes[] = [
     "authToken",
     "isDarkMode",
-    "theaterMode",
+    "isTheaterMode",
     "videoVolume",
   ];
 
@@ -142,7 +141,7 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
             <Sidebar categories={categories} />
             <CenterContent>
               <ContentWrapper>
-                <Header search={search} setSearch={setSearch} />
+                <Header setSearch={setSearch} />
                 {search ? (
                   <VideoSlider
                     videos={searchResults}

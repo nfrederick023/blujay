@@ -98,7 +98,6 @@ const getCreateVideo = (filePath: string): Video | null => {
       setVideoList(newVideoList);
       return newVideoState;
     }
-
     return videoState;
   }
 
@@ -118,8 +117,8 @@ const getCreateVideo = (filePath: string): Video | null => {
     category,
     id
   };
-  videoList.push(newVideoState);
 
+  videoList.push(newVideoState);
   setVideoList(videoList);
   return newVideoState;
 };

@@ -1,4 +1,6 @@
+import { booleanify } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/theme";
+import { useCookies } from "react-cookie";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./category-button";
 import Gradient from "../../shared/gradient";
@@ -120,6 +122,7 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
+  const [cookies, setCookie] = useCookies(["isTheaterMode"]);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const width = useWindowWidth({ wait: 10 });
 
@@ -133,6 +136,14 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
 
   const handleIsCollapsedChange = (): void => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  // this function is unused, but it could be added back to line 152 if I decide I want to keep this later
+  const isInTheatreMode = (): boolean => {
+    return (
+      booleanify(cookies.isTheaterMode) &&
+      window.location.href.includes("/watch/")
+    );
   };
 
   return (
