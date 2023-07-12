@@ -1,5 +1,6 @@
 import { Video } from "@client/utils/types";
 import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
+import { isMediaTypeVideo } from "@client/utils/checkMediaType";
 import { screenSizes } from "@client/utils/theme";
 import { updateVideo } from "@client/utils/api";
 import { useCookies } from "react-cookie";
@@ -7,42 +8,53 @@ import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
 import ButtonIcon from "@client/components/common/shared/button-icon";
 import Head from "next/head";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, SyntheticEvent, useEffect, useRef, useState } from "react";
+import React, { FC, SyntheticEvent, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
-import styled, { FlattenSimpleInterpolation, css } from "styled-components";
+import styled from "styled-components";
+import useResizeObserver from "use-resize-observer";
 
 const VideoContainer = styled.div`
+  padding: 0px 40px 0px 40px;
+  max-width: ${(p: { maxWidth: number }): number => p.maxWidth}px;
   margin: auto;
-  width: ${(p: { theatreWidth: number }): number => p.theatreWidth}px;
 `;
 
 const BlackOverlay = styled.div`
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    99% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  animation: fadeIn 0.21s linear 1 forwards;
   position: absolute;
   background: black;
-  height: ${(p: { theatreHeight: number }): number => p.theatreHeight}px;
+  max-height: ${(p: { height: number }): number => p.height}px;
+  min-height: ${(p: { height: number }): number => p.height}px;
   width: 100vw;
   right: 0px;
   z-index: -1;
 `;
 
-//  ${(p: {
-//     isTheatreMode: boolean;
-//     height: number;
-//   }): FlattenSimpleInterpolation | string =>
-//     p.isTheatreMode
-//       ? css`
-//           background: black;
-//           align-items: center;
-//           display: flex;
-//           height: ${p.height}px;
-//           max-height: calc(100vh - 60px - 80px);
-//           width: 100%;
-//         `
-//       : ""}
-
 const VideoPlayer = styled.video`
+  width: ${(p: { maxWidth: number; maxHeight: number }): number => p.maxWidth}px;
+  max-height: ${(p): number => p.maxHeight}px;
   margin: auto;
-  width: ${(p: { theatreWidth: number }): number => p.theatreWidth}px;
+  width: 100%;
+  aspect-ratio: 16/9;
+`;
+
+const Image = styled.img`
+  max-width: ${(p: { maxWidth: number; maxHeight: number }): number => p.maxWidth}px;
+  max-height: ${(p): number => p.maxHeight}px;
+  object-fit: contain;
+  margin: auto;
+  width: 100%;
 `;
 
 const VideoDetails = styled.div`
@@ -55,6 +67,7 @@ const Buttons = styled.span`
 `;
 
 const VideoName = styled.div`
+  margin-top: 5px;
   display: flex;
 `;
 
@@ -69,11 +82,13 @@ interface WatchPageProps {
 
 const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   const [videoDetails, setVideoDetails] = useState(video);
-  const [cookies, setCookie] = useCookies(["isTheaterMode", "videoVolume"]);
+  const [cookies, setCookie] = useCookies(["isTheaterMode", "videoVolume", "isSidebarEnabled"]);
+  const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
+  const ref = useRef<HTMLVideoElement & HTMLImageElement>();
   const windowHeight = useWindowHeight();
   const windowWidth = useWindowWidth();
-  const [vDimensions, setVDimensions] = useState({ height: 1920, width: 1080 });
   const isTheatreMode = booleanify(cookies.isTheaterMode);
+  const isVideo = isMediaTypeVideo(video.extentsion);
 
   const handleVolumeChange = (): void => {};
 
@@ -97,43 +112,48 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
     setCookie("isTheaterMode", !isTheatreMode, getCookieSetOptions());
   };
 
-  const onLoadedMetadata = (videoMeta: SyntheticEvent<HTMLVideoElement, Event>): void => {
-    const videoEl = videoMeta.target as HTMLVideoElement;
-    setVDimensions({ height: videoEl.videoHeight, width: videoEl.videoWidth });
+  let maxHeight = windowHeight - 60 - 90;
+  let maxWidth = windowWidth - 180;
+
+  const expectedWidth = dimensions.width * (maxHeight / dimensions.height);
+  const expectedHeight = dimensions.height * (maxWidth / dimensions.width);
+
+  let actualHeight;
+
+  if (dimensions.width > dimensions.height) {
+    actualHeight = expectedHeight;
+    if (expectedWidth < maxWidth) maxWidth = expectedWidth;
+  } else {
+    actualHeight = maxHeight;
+    if (expectedHeight < maxHeight) maxHeight = expectedHeight;
+  }
+
+  if (maxHeight < 1) maxHeight = 1;
+  if (maxWidth < 1) maxWidth = 1;
+
+  if (!isTheatreMode) maxWidth = screenSizes.smallScreenSize;
+
+  const onLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement, Event>): void => {
+    const videoEl = event.target as HTMLVideoElement;
+    setDimensions({ height: videoEl.videoHeight, width: videoEl.videoWidth });
   };
 
-  // 60 is search, 80 is description
-  // 160 is the padding (80 left 80 right)
-  const leftRightPadding = 100;
+  const onLoad = (event: SyntheticEvent<HTMLImageElement, Event>): void => {
+    const imageEl = event.target as HTMLImageElement;
+    setDimensions({ height: imageEl.naturalHeight, width: imageEl.naturalWidth });
+  };
 
-  // find the max height given the current size of the window
-  const maxHeight = Math.min(
-    windowHeight - 60 - 50,
-    vDimensions.height * ((windowWidth - leftRightPadding) / vDimensions.width)
-  );
-
-  // use the max height to determine what the width should be given the current size of the window
-  const theatreWidth = Math.min(
-    screenSizes.largeScreenSize,
-    vDimensions.width * (maxHeight / vDimensions.height) - leftRightPadding
-  );
-
-  // and now that we've found the width, get the actual height
-  const theatreHeight = vDimensions.height * (theatreWidth / vDimensions.width);
-
-  if (isTheatreMode) {
-  }
+  //if (!isTheatreMode) maxWidth = screenSizes.smallScreenSize;
 
   const _url = new URL(url);
   const src = `${_url.protocol}//${_url.host}`;
   const videoSrc = `/api/watch/${encodeURIComponent(videoDetails.id)}.${videoDetails.extentsion}`;
-
   const thumbSrc = "/api/thumb/" + encodeURIComponent(videoDetails.id);
   const fullVideoURL = `${src}${videoSrc}`;
   const fullThumbSrc = `${src}${thumbSrc}`;
 
   return (
-    <>
+    <div>
       <Head>
         <title>{videoDetails.name + "page title goes here"}</title>
         <StyledMeta property="og:type" value="videoDetails.other" />
@@ -160,17 +180,22 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
         <StyledMeta name="twitter:player" content={url} />
       </Head>
       <NoSSR>
-        {isTheatreMode && <BlackOverlay theatreHeight={theatreHeight} />}
-        <VideoContainer theatreWidth={theatreWidth}>
-          <VideoPlayer
-            id="video"
-            src={videoSrc}
-            theatreWidth={theatreWidth}
-            controls
-            autoPlay
-            onLoadedMetadata={onLoadedMetadata}
-            onVolumeChange={handleVolumeChange}
-          />
+        {isTheatreMode && <BlackOverlay height={actualHeight} />}
+        <VideoContainer maxWidth={maxWidth}>
+          {isVideo ? (
+            <VideoPlayer
+              src={videoSrc}
+              ref={ref}
+              maxWidth={maxWidth}
+              maxHeight={maxHeight}
+              controls
+              autoPlay
+              onLoadedMetadata={onLoadedMetadata}
+              onVolumeChange={handleVolumeChange}
+            />
+          ) : (
+            <Image ref={ref} src={videoSrc} maxWidth={maxWidth} maxHeight={maxHeight} onLoad={onLoad} />
+          )}
           <VideoName>
             <h4>{videoDetails.name}</h4>
             <Buttons>
@@ -218,7 +243,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
           {videoDetails.description && <div className="content">{videoDetails.description}</div>}
         </VideoContainer>
       </NoSSR>
-    </>
+    </div>
   );
 };
 

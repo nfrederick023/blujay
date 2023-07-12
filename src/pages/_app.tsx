@@ -108,29 +108,15 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   // assign default values to cookies if not set
   // get all cookies and set default if none
   const _cookies = new Cookies();
-  const allCookieTypes: CookieTypes[] = [
-    "authToken",
-    "isDarkMode",
-    "isTheaterMode",
-    "videoVolume",
-  ];
+  const allCookieTypes: CookieTypes[] = ["authToken", "isDarkMode", "isTheaterMode", "videoVolume", "isSidebarEnabled"];
 
   allCookieTypes.forEach((cookieType) => {
-    if (!_cookies.get(cookieType))
-      _cookies.set(
-        cookieType,
-        getCookieDefault(cookieType),
-        getCookieSetOptions()
-      );
+    if (!_cookies.get(cookieType)) _cookies.set(cookieType, getCookieDefault(cookieType), getCookieSetOptions());
   });
 
-  const categories = [...new Set(videos.map((video) => video.category))].filter(
-    (category) => category
-  );
+  const categories = [...new Set(videos.map((video) => video.category))].filter((category) => category);
 
-  const searchResults = videos.filter((video) =>
-    video.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const searchResults = videos.filter((video) => video.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <>
@@ -144,11 +130,7 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
               <ContentWrapper>
                 <Header setSearch={setSearch} />
                 {search ? (
-                  <VideoSlider
-                    videos={searchResults}
-                    sliderType={"verticle"}
-                    headerText={"Search Results"}
-                  />
+                  <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />
                 ) : (
                   <Component {...pageProps} />
                 )}

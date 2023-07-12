@@ -13,6 +13,8 @@ export const getCookieSetOptions = (): CookieSetOptions => {
 
 export const getCookieDefault = (name: CookieTypes): boolean | string | number => {
   switch (name) {
+    case "isSidebarEnabled":
+      return true;
     case "isTheaterMode":
       return false;
     case "videoVolume":

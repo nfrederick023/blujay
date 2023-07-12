@@ -74,6 +74,7 @@ const getCreateVideo = (filePath: string): Video | null => {
   const extentsion = fileName.split(".").pop() as SupportedExtentsions;
   const id = parseInt((seedrandom(fileName + getUserPassword())() * 9e7 + 1e7).toString()).toString();
   const thumbnailPath = isMediaTypeVideo(extentsion) || extentsion === "gif" ? path.join(getThumbnailsPath() + id + ".jpg") : filePath;
+
   // check if the video already is persisted within the state
   const videoState = videoList.find((video) => { return video.filePath === filePath; });
 

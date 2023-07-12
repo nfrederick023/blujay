@@ -36,7 +36,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       return;
     }
 
-    if (isMediaTypeVideo(video.extentsion)) {
+    if (isMediaTypeVideo(video.extentsion) && video.extentsion !== "gif") {
       serveVideo(req, res, video.filePath);
     }
     else {

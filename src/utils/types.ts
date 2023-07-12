@@ -98,7 +98,7 @@ export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
 
-export type CookieTypes = "isTheaterMode" | "videoVolume" | "isDarkMode" | "authToken"
+export type CookieTypes = "isTheaterMode" | "videoVolume" | "isDarkMode" | "authToken" | "isSidebarEnabled"
 export type OrderType = "Ascending" | "Descending";
 export type QueryField = "name" | "filename" | "category" | "description" | "id";
 export type ViewType = "List View" | "Grid View";

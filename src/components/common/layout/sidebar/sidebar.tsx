@@ -1,4 +1,4 @@
-import { booleanify } from "@client/utils/cookie";
+import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/theme";
 import { useCookies } from "react-cookie";
 import { useWindowWidth } from "@react-hook/window-size";
@@ -30,8 +30,7 @@ const SidebarWapper = styled.div`
     min-width: 100%;
     height: 100%;
 
-    ${(p: { isCollapsed: boolean }): string =>
-      p.isCollapsed ? "margin-left: -100%;" : ""}
+    ${(p: { isCollapsed: boolean }): string => (p.isCollapsed ? "margin-left: -100%;" : "")}
   }
 `;
 
@@ -122,39 +121,21 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
-  const [cookies, setCookie] = useCookies(["isTheaterMode"]);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [cookies, setCookie] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
   const width = useWindowWidth({ wait: 10 });
-
-  useEffect(() => {
-    if (width <= screenSizes.mobileScreenSize) {
-      setIsCollapsed(true);
-    } else {
-      setIsCollapsed(false);
-    }
-  }, []);
+  const sidebarState = booleanify(cookies.isSidebarEnabled);
+  const isCollapsed = width <= screenSizes.mobileScreenSize ? sidebarState : !sidebarState;
 
   const handleIsCollapsedChange = (): void => {
-    setIsCollapsed(!isCollapsed);
+    setCookie("isSidebarEnabled", !sidebarState, getCookieSetOptions());
   };
-
-  // this function is unused, but it could be added back to line 152 if I decide I want to keep this later
-  // const isInTheatreMode = (): boolean => {
-  //   return (
-  //     booleanify(cookies.isTheaterMode) &&
-  //     window.location.href.includes("/watch/")
-  //   );
-  // };
 
   return (
     <>
       <NoSSR>
         <SidebarWapper isCollapsed={isCollapsed}>
           {width <= screenSizes.tabletScreenSize ? (
-            <BarsIcon
-              onClick={handleIsCollapsedChange}
-              className="bx bx-menu bx-lg"
-            />
+            <BarsIcon onClick={handleIsCollapsedChange} className="bx bx-menu bx-lg" />
           ) : (
             <MinimizeButton>
               <ArrowIconContainer>
@@ -171,29 +152,13 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
                 <h1>JAY</h1>
               </Gradient>
             </Logo>
-            <SideBarButton
-              title={"Home"}
-              icon={"bx bx-home-alt-2 bx-sm"}
-              url={""}
-            />
+            <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} />
 
-            <SideBarButton
-              title={"Favorites"}
-              icon={"bx bx-heart bx-sm"}
-              url={"favorites"}
-            />
+            <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} />
 
-            <SideBarButton
-              title={"All Videos"}
-              icon={"bx bx-list-ul bx-sm"}
-              url={"all"}
-            />
+            <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} />
 
-            <SideBarButton
-              title={"Library"}
-              icon={"bx bx-folder bx-sm"}
-              url={"library"}
-            />
+            <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={"library"} />
             <Library>
               {categories.map((dir, i) => {
                 return <CategoryButton key={i} category={dir} />;
