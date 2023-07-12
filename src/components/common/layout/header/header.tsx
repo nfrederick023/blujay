@@ -16,6 +16,8 @@ const HeaderContent = styled.div`
   width: 100%;
   margin: auto;
   z-index: 2;
+  min-height: 60px;
+  max-height: 60px;
 `;
 
 interface HeaderProps {

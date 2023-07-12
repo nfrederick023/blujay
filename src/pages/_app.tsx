@@ -5,6 +5,7 @@ import { ReactElement, useState } from "react";
 import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { getVideoList } from "@server/utils/config";
+import { useRouter } from "next/router";
 import App from "next/app";
 import Header from "@client/components/common/layout/header/header";
 import React from "react";

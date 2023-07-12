@@ -123,7 +123,7 @@ interface SidebarProps {
 
 const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
   const [cookies, setCookie] = useCookies(["isTheaterMode"]);
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const width = useWindowWidth({ wait: 10 });
 
   useEffect(() => {
@@ -139,12 +139,12 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
   };
 
   // this function is unused, but it could be added back to line 152 if I decide I want to keep this later
-  const isInTheatreMode = (): boolean => {
-    return (
-      booleanify(cookies.isTheaterMode) &&
-      window.location.href.includes("/watch/")
-    );
-  };
+  // const isInTheatreMode = (): boolean => {
+  //   return (
+  //     booleanify(cookies.isTheaterMode) &&
+  //     window.location.href.includes("/watch/")
+  //   );
+  // };
 
   return (
     <>
