@@ -67,7 +67,7 @@ const SearchBar: FC<SearchBarProps> = ({ setSearch }: SearchBarProps) => {
 
   const debounced = debounce((value) => {
     setSearch(value);
-  }, 100);
+  }, 500);
 
   const handleSearchInput = (e: ChangeEvent<HTMLInputElement>): void => {
     debounced(e.currentTarget.value);

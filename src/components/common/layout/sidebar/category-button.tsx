@@ -33,7 +33,7 @@ const CategoryButton: FC<CategoryButtonProps> = ({
   category,
 }: CategoryButtonProps) => {
   const router = useRouter();
-  const categoryURL = ("/library/" + category).toLowerCase();
+  const categoryURL = ("/library/" + encodeURIComponent(category)).toLowerCase();
   const navigateToCategory = (): void => {
     router.push(categoryURL);
   };

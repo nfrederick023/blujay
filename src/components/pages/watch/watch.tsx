@@ -11,12 +11,10 @@ import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, SyntheticEvent, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
 import styled from "styled-components";
-import useResizeObserver from "use-resize-observer";
 
 const VideoContainer = styled.div`
-  padding: 0px 40px 0px 40px;
   max-width: ${(p: { maxWidth: number }): number => p.maxWidth}px;
-  margin: auto;
+  margin:auto;
 `;
 
 const BlackOverlay = styled.div`
@@ -66,9 +64,16 @@ const Buttons = styled.span`
   display: flex;
 `;
 
-const VideoName = styled.div`
+const VideoNameContainer = styled.div`
   margin-top: 5px;
   display: flex;
+`;
+
+
+const VideoName = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,13 +89,14 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   const [videoDetails, setVideoDetails] = useState(video);
   const [cookies, setCookie] = useCookies(["isTheaterMode", "videoVolume", "isSidebarEnabled"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
-  const ref = useRef<HTMLVideoElement & HTMLImageElement>();
+  const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const windowHeight = useWindowHeight();
   const windowWidth = useWindowWidth();
   const isTheatreMode = booleanify(cookies.isTheaterMode);
+  const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const isVideo = isMediaTypeVideo(video.extentsion);
 
-  const handleVolumeChange = (): void => {};
+  const handleVolumeChange = (): void => { };
 
   const handleSetAsFavorite = async (): Promise<void> => {
     const newVideo: Video = { ...videoDetails, isFavorite: !videoDetails.isFavorite };
@@ -112,26 +118,38 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
     setCookie("isTheaterMode", !isTheatreMode, getCookieSetOptions());
   };
 
-  let maxHeight = windowHeight - 60 - 90;
-  let maxWidth = windowWidth - 180;
+  const searchbarSize = 60;
+  const descriptionSize = 60;
+  const sideBarSize = isSidebarEnabled ? 210 : 0;
+  const leftRightPadding = windowWidth < screenSizes.smallScreenSize ? 0 : 80;
+  const marginSize = 40;
+
+  let maxHeight = windowHeight - descriptionSize - searchbarSize - marginSize;
+  let maxWidth = windowWidth - sideBarSize - leftRightPadding - marginSize;
 
   const expectedWidth = dimensions.width * (maxHeight / dimensions.height);
   const expectedHeight = dimensions.height * (maxWidth / dimensions.width);
 
-  let actualHeight;
+  let actualHeight = 0;
+  let actualWidth = 0;
 
+
+  // todo clean up and explain this garbage logic
   if (dimensions.width > dimensions.height) {
-    actualHeight = expectedHeight;
     if (expectedWidth < maxWidth) maxWidth = expectedWidth;
+    actualHeight = dimensions.height * (maxWidth / dimensions.width);
+    actualWidth = maxWidth;
   } else {
-    actualHeight = maxHeight;
     if (expectedHeight < maxHeight) maxHeight = expectedHeight;
+    actualHeight = maxHeight;
+    actualWidth = dimensions.width * (maxHeight / dimensions.height);
+
   }
 
   if (maxHeight < 1) maxHeight = 1;
   if (maxWidth < 1) maxWidth = 1;
 
-  if (!isTheatreMode) maxWidth = screenSizes.smallScreenSize;
+  if (!isTheatreMode) actualWidth = Math.min(windowWidth * 0.8, screenSizes.smallScreenSize, expectedWidth);
 
   const onLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement, Event>): void => {
     const videoEl = event.target as HTMLVideoElement;
@@ -180,24 +198,26 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
         <StyledMeta name="twitter:player" content={url} />
       </Head>
       <NoSSR>
-        {isTheatreMode && <BlackOverlay height={actualHeight} />}
-        <VideoContainer maxWidth={maxWidth}>
+        <BlackOverlay height={isTheatreMode ? actualHeight : 0} />
+        <VideoContainer maxWidth={actualWidth}>
           {isVideo ? (
             <VideoPlayer
               src={videoSrc}
               ref={ref}
-              maxWidth={maxWidth}
-              maxHeight={maxHeight}
+              maxWidth={actualWidth}
+              maxHeight={actualHeight}
               controls
               autoPlay
               onLoadedMetadata={onLoadedMetadata}
               onVolumeChange={handleVolumeChange}
             />
           ) : (
-            <Image ref={ref} src={videoSrc} maxWidth={maxWidth} maxHeight={maxHeight} onLoad={onLoad} />
+            <Image ref={ref} src={videoSrc} maxWidth={actualWidth} maxHeight={actualHeight} onLoad={onLoad} />
           )}
-          <VideoName>
-            <h4>{videoDetails.name}</h4>
+          <VideoNameContainer>
+            <VideoName>
+              <h4>{videoDetails.name}</h4>
+            </VideoName>
             <Buttons>
               <ButtonIcon
                 icon="bx bx-heart"
@@ -234,7 +254,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
                 onClick={handleSetViewMode}
               />
             </Buttons>
-          </VideoName>
+          </VideoNameContainer>
           <VideoDetails>
             <h6>
               {videoDetails.category} · <TimeAgo date={videoDetails.created} />

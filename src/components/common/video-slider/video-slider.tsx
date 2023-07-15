@@ -36,14 +36,14 @@ const VideoSlider: FC<VideoSliderProps> = ({
   headerText,
   videos,
 }: VideoSliderProps) => {
-  const width = useWindowWidth({
-    initialWidth: screenSizes.largeScreenSize,
-  });
+  const width = useWindowWidth();
+  const scrollbarWidth = 20;
 
   let videoWidthPercent = 90;
-  if (width >= screenSizes.tabletScreenSize) videoWidthPercent = 35;
-  if (width >= screenSizes.smallScreenSize) videoWidthPercent = 25;
-  if (width >= screenSizes.mediumScreenSize) videoWidthPercent = 15;
+  // we add the scroll bar here so that that 1080p devices don't switch from 6 to 4 videos per row when scroll bar pops in
+  if (width + scrollbarWidth >= screenSizes.tabletScreenSize) videoWidthPercent = 35;
+  if (width + scrollbarWidth >= screenSizes.smallScreenSize) videoWidthPercent = 25;
+  if (width + scrollbarWidth >= screenSizes.mediumScreenSize) videoWidthPercent = 15;
 
   const videosPerRow = Math.floor(width / (width * (videoWidthPercent / 100)));
 
