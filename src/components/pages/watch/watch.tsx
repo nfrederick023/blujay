@@ -18,18 +18,7 @@ const VideoContainer = styled.div`
 `;
 
 const BlackOverlay = styled.div`
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    99% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  animation: fadeIn 0.21s linear 1 forwards;
+  transition: 0.1s;
   position: absolute;
   background: black;
   max-height: ${(p: { height: number }): number => p.height}px;
@@ -42,7 +31,7 @@ const BlackOverlay = styled.div`
 const VideoPlayer = styled.video`
   width: ${(p: { maxWidth: number; maxHeight: number }): number => p.maxWidth}px;
   max-height: ${(p): number => p.maxHeight}px;
-  margin: auto;
+  transition: 0.1s;
   width: 100%;
   aspect-ratio: 16/9;
 `;
@@ -50,8 +39,8 @@ const VideoPlayer = styled.video`
 const Image = styled.img`
   max-width: ${(p: { maxWidth: number; maxHeight: number }): number => p.maxWidth}px;
   max-height: ${(p): number => p.maxHeight}px;
+  transition: 0.1s;
   object-fit: contain;
-  margin: auto;
   width: 100%;
 `;
 
@@ -74,6 +63,10 @@ const VideoName = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+`;
+
+const Header = styled.div`
+  height: 30px;
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,7 +111,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
     setCookie("isTheaterMode", !isTheatreMode, getCookieSetOptions());
   };
 
-  const searchbarSize = 60;
+  const searchbarSize = 90;
   const descriptionSize = 60;
   const sideBarSize = isSidebarEnabled ? 210 : 0;
   const leftRightPadding = windowWidth < screenSizes.smallScreenSize ? 0 : 80;
@@ -149,7 +142,12 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   if (maxHeight < 1) maxHeight = 1;
   if (maxWidth < 1) maxWidth = 1;
 
-  if (!isTheatreMode) actualWidth = Math.min(windowWidth * 0.8, screenSizes.smallScreenSize, expectedWidth);
+  if (!isTheatreMode && dimensions.width > dimensions.height) actualWidth = Math.min(windowWidth * 0.6, screenSizes.smallScreenSize, actualWidth);
+  if (!isTheatreMode && dimensions.height > dimensions.width) {
+    actualHeight = Math.min(windowHeight * 0.6, screenSizes.smallScreenSize, actualHeight);
+    actualWidth = dimensions.width * (actualHeight / dimensions.height);
+  }
+
 
   const onLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement, Event>): void => {
     const videoEl = event.target as HTMLVideoElement;
@@ -161,7 +159,6 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
     setDimensions({ height: imageEl.naturalHeight, width: imageEl.naturalWidth });
   };
 
-  //if (!isTheatreMode) maxWidth = screenSizes.smallScreenSize;
 
   const _url = new URL(url);
   const src = `${_url.protocol}//${_url.host}`;
@@ -198,8 +195,18 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
         <StyledMeta name="twitter:player" content={url} />
       </Head>
       <NoSSR>
-        <BlackOverlay height={isTheatreMode ? actualHeight : 0} />
+
         <VideoContainer maxWidth={actualWidth}>
+          <Header>
+            <div>
+              back
+
+            </div>
+            <div>
+              next
+            </div>
+          </Header>
+          <BlackOverlay height={isTheatreMode ? actualHeight : 0} />
           {isVideo ? (
             <VideoPlayer
               src={videoSrc}

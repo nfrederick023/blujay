@@ -9,7 +9,8 @@ const SortIcon = styled.i`
   font-size: 1.25rem;
   vertical-align: baseline;
   margin-left: auto;
-  margin-right: 5px;
+  transition: 0.2s;
+  margin-right: 10px;
 
   &:hover {
     color: ${(p): string => p.theme.text};
@@ -19,12 +20,12 @@ const SortIcon = styled.i`
 
 const SortSelect = styled.div`
   display: flex;
-  width: 260px;
+  width: 265px;
 `;
 
 const TypeSelect = styled.div`
   width: 130px;
-  margin-left: 10px;
+  margin-left: 5px;
   display: flex;
 `;
 

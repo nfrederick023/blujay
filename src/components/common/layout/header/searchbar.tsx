@@ -17,10 +17,11 @@ const SearchBarContent = styled.div`
   display: flex;
   min-height: 1.3rem;
   max-width: 35rem;
+  width: 100%;
   margin: auto;
   margin-bottom: 15px;
   margin-top: 13px;
-  padding: 5px;
+  padding: 4px;
 
   &:hover {
     cursor: text;

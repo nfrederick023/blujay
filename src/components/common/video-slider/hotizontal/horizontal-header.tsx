@@ -6,6 +6,7 @@ import styled from "styled-components";
 const ChevronIcon = styled.div`
   color: ${(p): string => p.theme.textContrast};
   font-size: 1.25rem;
+  transition: 0.2s;
   vertical-align: baseline;
   margin-left: auto;
   margin-right: 5px;
@@ -20,7 +21,7 @@ const ChevronIcon = styled.div`
 
   &:hover {
     color: ${(p): string =>
-      p.isEnabled ? p.theme.text : p.theme.textContrast};
+    p.isEnabled ? p.theme.text : p.theme.textContrast};
     cursor: ${(p): string => (p.isEnabled ? "pointer" : "auto")};
   }
 `;

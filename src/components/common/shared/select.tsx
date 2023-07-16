@@ -1,4 +1,5 @@
 import { BluJayTheme } from "@client/utils/types";
+import DropDown from "./drop-down";
 import React, { FC, useState } from "react";
 import styled from "styled-components";
 
@@ -9,44 +10,19 @@ const SelectBoxWrapper = styled.div`
 `;
 
 const SelectBox = styled.div`
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.textContrast};
   display: flex;
   user-select: none;
+  transition: 0.2s;
 
   &:hover {
     color: ${(p): string => p.theme.text};
+    border-bottom: 1px  ${(p): string => p.theme.text} solid;
     cursor: pointer;
   }
 
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
-    p.isFocused ? `${p.theme.text}` : ""};
-`;
-
-const UnselectedBox = styled.div`
-  position: absolute;
-  max-height: 250px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: 1s;
-  width: 110%;
-  padding: 5px;
-  border-radius: 0px 5px 5px 0px;
-  background-color: ${(p): string => p.theme.backgroundContrast};
-  z-index: 2;
-  left: -20px;
-  border-left: 3px solid ${(p): string => p.theme.highlightLight};
-`;
-
-const UnselectedOption = styled.div`
-  padding: 5px;
-  color: ${(p): string => p.theme.textContrast};
-  transition: 0.15s;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-    cursor: pointer;
-    border-radius: 5px;
-  }
+  color: ${(p): string => p.isFocused ? `${p.theme.text}` : ""};
+  border-bottom: ${(p): string => p.isFocused ? "1" : "0"}px ${(p): string => p.theme.text} solid;
 `;
 
 const SelectedBox = styled.div`
@@ -67,7 +43,6 @@ const SelectedOption = styled.div`
 const SelectedIcon = styled.i`
   font-size: 110%;
   padding-top: 1px;
-  margin-right: 3px;
 
   ::before {
     vertical-align: baseline;
@@ -168,7 +143,7 @@ const Select: FC<SelectProps> = ({
     }
   };
 
-  const unselectedOptions = options.filter((option) => !value.includes(option));
+  const unselectedOptions = options.filter((option) => !value.includes(option)).map(option => { return { text: option, action: handleAddOption(option) }; });
 
   return (
     <SelectBoxWrapper>
@@ -214,26 +189,13 @@ const Select: FC<SelectProps> = ({
       </SelectBox>
 
       {isOpen && (
-        <UnselectedBox
+        <div
           tabIndex={0}
           onMouseDown={mouseDown}
           onMouseUp={mouseUp}
-          onBlur={onBlur}
-        >
-          {unselectedOptions.length ? (
-            <>
-              {unselectedOptions.map((option, i) => {
-                return (
-                  <UnselectedOption key={i} onClick={handleAddOption(option)}>
-                    {option}
-                  </UnselectedOption>
-                );
-              })}
-            </>
-          ) : (
-            <UnselectedOption>No Options</UnselectedOption>
-          )}
-        </UnselectedBox>
+          onBlur={onBlur}>
+          <DropDown options={unselectedOptions}></DropDown>
+        </div>
       )}
     </SelectBoxWrapper>
   );
