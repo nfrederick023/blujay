@@ -8,7 +8,7 @@ export const updateVideo = async (updateVideo: UpdateVideo): Promise<void> => {
   const videoToUpdate = VideoList.find(video => video.id === updateVideo.id);
 
   if (!videoToUpdate) {
-    throw VideoNotFoundException;
+    throw new VideoNotFoundException();
   }
 
   const updatedVideoList = VideoList.filter(video => video.id !== videoToUpdate.id);
@@ -18,6 +18,6 @@ export const updateVideo = async (updateVideo: UpdateVideo): Promise<void> => {
   try {
     setVideoList(updatedVideoList);
   } catch (e) {
-    throw UpdateVideoFailedException;
+    throw new UpdateVideoFailedException();
   }
 };

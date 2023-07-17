@@ -1,3 +1,4 @@
+import * as mime from "mime-types";
 import { SupportedExtentsions, Video } from "@client/utils/types";
 import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getUserPassword, getVideoList, setVideoList } from "./config";
 import { isMediaTypeVideo } from "@client/utils/checkMediaType";
@@ -8,6 +9,7 @@ import glob from "glob-promise";
 import path from "path";
 import pathToFfmpeg from "ffmpeg-static";
 import seedrandom from "seedrandom";
+
 
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
@@ -69,6 +71,8 @@ const getCreateVideo = (filePath: string): Video | null => {
   const fileName = path.basename(filePath);
   const name = path.parse(fileName).name;
   const videoStats = fse.statSync(filePath);
+  const mimeType = mime.lookup(fileName) as string;
+
   const videoList = getVideoList();
   const category = path.dirname(filePath).split("\\")[3] ?? "";
   const extentsion = fileName.split(".").pop() as SupportedExtentsions;
@@ -81,13 +85,17 @@ const getCreateVideo = (filePath: string): Video | null => {
   if (videoState) {
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.saved !== videoStats.mtime.getTime() || videoState.created !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category) {
+    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.saved !== videoStats.mtime.getTime() || videoState.created !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
-        ...videoState,
+        description: videoState.description,
+        requireAuth: videoState.requireAuth,
+        isFavorite: videoState.isFavorite,
+        id: videoState.id,
         size: videoStats.size,
         saved: videoStats.mtime.getTime(),
         created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : videoState.created,
+        mimeType,
         name,
         extentsion,
         fileName,
@@ -115,6 +123,7 @@ const getCreateVideo = (filePath: string): Video | null => {
     description: "",
     requireAuth: false,
     isFavorite: false,
+    mimeType,
     category,
     id
   };

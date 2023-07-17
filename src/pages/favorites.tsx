@@ -1,6 +1,6 @@
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
-import { listVideos } from "@server/utils/listVideos";
+import { getProtectedVideoList } from "@server/utils/auth";
 import FavoritesPage from "@client/components/pages/favorites/favorites";
 import React from "react";
 
@@ -12,12 +12,10 @@ const Favorites: NextPage<FavoritesProps> = ({ videos }: FavoritesProps) => {
   return <FavoritesPage videos={videos} />;
 };
 
-export const getServerSideProps: GetServerSideProps<
-  FavoritesProps
-> = async () => {
+export const getServerSideProps: GetServerSideProps<FavoritesProps> = async (ctx) => {
   return {
     props: {
-      videos: (await listVideos()).filter((video) => !video.requireAuth),
+      videos: getProtectedVideoList(ctx),
     },
   };
 };

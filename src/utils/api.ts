@@ -8,3 +8,12 @@ export const updateVideo = async (video: Video): Promise<Response> => {
   });
   return response;
 };
+
+export const login = async (password: string): Promise<Response> => {
+  const response = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  return response;
+};

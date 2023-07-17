@@ -4,9 +4,9 @@
 import * as mime from "mime-types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Video } from "@client/utils/types";
+import { checkHashedPassword } from "@server/utils/auth";
 import { getVideoList } from "@server/utils/config";
 import { isMediaTypeVideo } from "@client/utils/checkMediaType";
-import { isTokenValid } from "@server/utils/auth";
 import fs from "fs";
 
 const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -24,7 +24,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
 
   if (video) {
 
-    if (video.requireAuth && !(isTokenValid(req.cookies.authToken))) {
+    if (video.requireAuth && !(checkHashedPassword(req.cookies.authToken ?? ""))) {
       res.statusCode = 401;
       res.end(JSON.stringify("Unauthorized"));
       return;

@@ -52,7 +52,7 @@ export interface Video {
   readonly requireAuth: boolean,
   readonly isFavorite: boolean,
   readonly id: string,
-  readonly mime?: string
+  readonly mimeType: string
   readonly extentsion: SupportedExtentsions;
 }
 

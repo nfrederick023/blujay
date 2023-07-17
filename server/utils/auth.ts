@@ -1,23 +1,24 @@
+import { GetServerSidePropsContext, PreviewData } from "next";
+import { ParsedUrlQuery } from "querystring";
+import { Video } from "@client/utils/types";
 import { randomBytes, scryptSync } from "crypto";
 
-import { AuthStatus } from "../../src/utils/types";
-import { getUserPassword } from "./config";
+import { getUserPassword, getVideoList } from "./config";
 
-const getAuthStatus = (token: string | undefined): AuthStatus => {
-  if (isTokenValid(token))
-    return AuthStatus.authenticated;
-  return AuthStatus.notAuthenticated;
+export const getProtectedVideoList = (ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>): Video[] => {
+  const videoList = getVideoList();
+  const authToken = ctx.req.cookies?.authToken;
+  const authStatus = checkHashedPassword(authToken ?? "");
+
+  if (authStatus) return videoList;
+  else return videoList.filter((video) => !video.requireAuth);
 };
 
-export const isTokenValid = (authToken: string | undefined): boolean => {
-  return checkHashedPassword("default", authToken ?? "");
-};
-
-export const checkHashedPassword = (user: string, hashedPassword: string): boolean => {
+export const checkHashedPassword = (hashedPassword: string): boolean => {
   const configPassword = getUserPassword();
 
   if (!configPassword) {
-    return false;
+    return true;
   }
 
   const salt = hashedPassword.slice(64);
@@ -29,5 +30,3 @@ export const hashPassword = async (password: string): Promise<string> => {
   const salt = randomBytes(16).toString("hex");
   return scryptSync(password, salt, 32).toString("hex") + salt;
 };
-
-export default getAuthStatus;

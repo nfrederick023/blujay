@@ -1,5 +1,6 @@
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
+import { getProtectedVideoList } from "@server/utils/auth";
 import { listVideos } from "@server/utils/listVideos";
 import IndexPage from "@client/components/pages/index";
 import React from "react";
@@ -12,10 +13,10 @@ const Index: NextPage<IndexProps> = ({ videos }: IndexProps) => {
   return <IndexPage {...{ videos }} />;
 };
 
-export const getServerSideProps: GetServerSideProps<IndexProps> = async () => {
+export const getServerSideProps: GetServerSideProps<IndexProps> = async (ctx) => {
   return {
     props: {
-      videos: (await listVideos()).filter((video) => !video.requireAuth),
+      videos: getProtectedVideoList(ctx),
     },
   };
 };

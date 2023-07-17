@@ -2,9 +2,10 @@ import { AppProps } from "next/app";
 import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement, useState } from "react";
+import { checkHashedPassword } from "@server/utils/auth";
 import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
-import { getVideoList } from "@server/utils/config";
+import { getPrivateLibrary, getVideoList } from "@server/utils/config";
 import { useRouter } from "next/router";
 import App from "next/app";
 import Header from "@client/components/common/layout/header/header";
@@ -12,7 +13,6 @@ import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 import cookies from "next-cookies";
-import getAuthStatus from "../../server/utils/auth";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -92,7 +92,6 @@ const ContentWrapper = styled.div`
 
 type NextAppComponentType = typeof App;
 interface ExtendedAppProps extends AppProps {
-  authStatus: AuthStatus;
   videos: Video[];
   theme: BluJayTheme;
 }
@@ -104,6 +103,7 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   videos,
 }: ExtendedAppProps): ReactElement => {
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
   // assign default values to cookies if not set
   // get all cookies and set default if none
@@ -125,17 +125,23 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
         <ThemeProvider theme={theme}>
           <GlobalStyle />
           <LayoutWrapper>
-            <Sidebar categories={categories} />
-            <CenterContent>
-              <ContentWrapper>
-                <Header setSearch={setSearch} />
-                {search ? (
-                  <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />
-                ) : (
-                  <Component {...pageProps} />
-                )}
-              </ContentWrapper>
-            </CenterContent>
+            {router.pathname.includes("/login") ? (
+              <Component {...pageProps} />
+            ) : (
+              <>
+                <Sidebar categories={categories} />
+                <CenterContent>
+                  <ContentWrapper>
+                    <Header setSearch={setSearch} />
+                    {search ? (
+                      <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />
+                    ) : (
+                      <Component {...pageProps} />
+                    )}
+                  </ContentWrapper>
+                </CenterContent>
+              </>
+            )}
           </LayoutWrapper>
         </ThemeProvider>
       </CookiesProvider>
@@ -149,20 +155,22 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
 
   // auth stuff
   const authToken = cookies(ctx)?.authToken;
-  const authStatus = getAuthStatus(authToken);
-  const theme = cookies(ctx).isDarkMode === "false" ? lightTheme : darkTheme;
+  const authStatus = checkHashedPassword(authToken ?? "");
+  const isPrivateLibrary = getPrivateLibrary();
 
-  // if there's a token, the user is not authenticated, and authentication is required
-  // then redirect to login and reset
-  if (authToken && authStatus === AuthStatus.notAuthenticated && ctx.res) {
-    ctx.res.setHeader("Set-Cookie", "authToken=; Max-Age=0");
-    ctx.res.setHeader("Location", "/login");
+  if (!authStatus && ctx.res) {
+    if (authToken) ctx.res.setHeader("Set-Cookie", "authToken=; path=/;");
+    if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
+      ctx.res.writeHead(302, { Location: "/login" });
+      ctx.res.end();
+    }
   }
+
+  const theme = cookies(ctx).isDarkMode === "false" ? lightTheme : darkTheme;
 
   // get the remaining app props...
   const appInitialProps = (await App.getInitialProps(initialProps)) as AppProps;
   return {
-    authStatus,
     videos,
     theme,
     ...appInitialProps,

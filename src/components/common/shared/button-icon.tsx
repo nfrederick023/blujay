@@ -11,7 +11,6 @@ const Button = styled.div`
   white-space: pre;
   padding: 5px;
   align-content: center;
-  margin-left: 5px;
   min-width: 38px;
   min-height: 38px;
   max-height: 38px;
@@ -92,7 +91,7 @@ const SelectedBox = styled.div`
 `;
 
 interface ButtonIconProps {
-  icon: string;
+  icon?: string;
   selectedIcon?: string;
   textOn?: string;
   textOff?: string;
@@ -160,12 +159,12 @@ const ButtonIcon: FC<ButtonIconProps> = ({
         {_text ? (
           <>
             <FlexBox>
-              <IconWithText className={_icon} />
+              {icon && <IconWithText className={_icon} />}
               <Text maxLength={maxLength}>{_text}</Text>
             </FlexBox>
           </>
         ) : (
-          <i className={_icon} />
+          <>{icon && <i className={_icon} />}</>
         )}
         {hoverText && !isPlaying && isHover && (
           <Wrapper>

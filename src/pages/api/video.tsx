@@ -5,10 +5,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import VideoController from "@server/api/video/video.controller";
 
-const videoListAPI = async (
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<void> => {
+const videoListAPI = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
   await VideoController(req, res);
 };
 

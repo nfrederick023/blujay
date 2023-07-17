@@ -14,7 +14,7 @@ import styled from "styled-components";
 
 const VideoContainer = styled.div`
   max-width: ${(p: { maxWidth: number }): number => p.maxWidth}px;
-  margin:auto;
+  margin: auto;
 `;
 
 const BlackOverlay = styled.div`
@@ -51,13 +51,16 @@ const VideoDetails = styled.div`
 const Buttons = styled.span`
   margin-left: auto;
   display: flex;
+
+  * {
+    margin-left: 5px;
+  }
 `;
 
 const VideoNameContainer = styled.div`
   margin-top: 5px;
   display: flex;
 `;
-
 
 const VideoName = styled.div`
   text-overflow: ellipsis;
@@ -75,10 +78,9 @@ const StyledMeta = styled.meta`` as any;
 interface WatchPageProps {
   video: Video;
   url: string;
-  mimeType: string;
 }
 
-const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
+const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
   const [videoDetails, setVideoDetails] = useState(video);
   const [cookies, setCookie] = useCookies(["isTheaterMode", "videoVolume", "isSidebarEnabled"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
@@ -89,7 +91,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const isVideo = isMediaTypeVideo(video.extentsion);
 
-  const handleVolumeChange = (): void => { };
+  const handleVolumeChange = (): void => {};
 
   const handleSetAsFavorite = async (): Promise<void> => {
     const newVideo: Video = { ...videoDetails, isFavorite: !videoDetails.isFavorite };
@@ -126,7 +128,6 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   let actualHeight = 0;
   let actualWidth = 0;
 
-
   // todo clean up and explain this garbage logic
   if (dimensions.width > dimensions.height) {
     if (expectedWidth < maxWidth) maxWidth = expectedWidth;
@@ -136,18 +137,17 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
     if (expectedHeight < maxHeight) maxHeight = expectedHeight;
     actualHeight = maxHeight;
     actualWidth = dimensions.width * (maxHeight / dimensions.height);
-
   }
 
   if (maxHeight < 1) maxHeight = 1;
   if (maxWidth < 1) maxWidth = 1;
 
-  if (!isTheatreMode && dimensions.width > dimensions.height) actualWidth = Math.min(windowWidth * 0.6, screenSizes.smallScreenSize, actualWidth);
+  if (!isTheatreMode && dimensions.width > dimensions.height)
+    actualWidth = Math.min(windowWidth * 0.6, screenSizes.smallScreenSize, actualWidth);
   if (!isTheatreMode && dimensions.height > dimensions.width) {
     actualHeight = Math.min(windowHeight * 0.6, screenSizes.smallScreenSize, actualHeight);
     actualWidth = dimensions.width * (actualHeight / dimensions.height);
   }
-
 
   const onLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement, Event>): void => {
     const videoEl = event.target as HTMLVideoElement;
@@ -159,7 +159,6 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
     setDimensions({ height: imageEl.naturalHeight, width: imageEl.naturalWidth });
   };
 
-
   const _url = new URL(url);
   const src = `${_url.protocol}//${_url.host}`;
   const videoSrc = `/api/watch/${encodeURIComponent(videoDetails.id)}.${videoDetails.extentsion}`;
@@ -168,7 +167,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
   const fullThumbSrc = `${src}${thumbSrc}`;
 
   return (
-    <div>
+    <>
       <Head>
         <title>{videoDetails.name + "page title goes here"}</title>
         <StyledMeta property="og:type" value="videoDetails.other" />
@@ -184,7 +183,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
         <StyledMeta property="og:video" value={fullVideoURL} />
         <StyledMeta property="og:video:url" value={fullVideoURL} />
         <StyledMeta property="og:video:secure_url" value={fullVideoURL} />
-        <StyledMeta property="og:video:type" content={mimeType.toString()} />
+        <StyledMeta property="og:video:type" content={video.mimeType} />
         <StyledMeta property="og:video:width" content="1280" />
         <StyledMeta property="og:video:height" content="720" />
         <StyledMeta name="twitter:card" content="player" />
@@ -195,17 +194,11 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
         <StyledMeta name="twitter:player" content={url} />
       </Head>
       <NoSSR>
-
         <VideoContainer maxWidth={actualWidth}>
-          <Header>
-            <div>
-              back
-
-            </div>
-            <div>
-              next
-            </div>
-          </Header>
+          {/* <Header>
+            <div>back</div>
+            <div>next</div>
+          </Header> */}
           <BlackOverlay height={isTheatreMode ? actualHeight : 0} />
           {isVideo ? (
             <VideoPlayer
@@ -270,7 +263,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url, mimeType }) => {
           {videoDetails.description && <div className="content">{videoDetails.description}</div>}
         </VideoContainer>
       </NoSSR>
-    </div>
+    </>
   );
 };
 

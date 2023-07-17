@@ -1,4 +1,6 @@
 import { BluJayTheme } from "@client/utils/types";
+import { getCookieSetOptions } from "@client/utils/cookie";
+import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import DropDown from "../../shared/drop-down";
 import React, { FC, useState } from "react";
@@ -20,7 +22,7 @@ const HeaderContent = styled.div`
   min-height: 60px;
   max-height: 60px;
   display: flex;
-  `;
+`;
 
 const CogDropDown = styled.span`
   position: absolute;
@@ -31,12 +33,13 @@ const CogDropDown = styled.span`
 `;
 
 const CogIcon = styled.i`
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
+  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
+    p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
   margin: auto 0px auto 0px;
   font-size: 28px;
   transition: 0.2s;
 
-    &:hover {
+  &:hover {
     color: ${(p): string => p.theme.text};
     cursor: pointer;
   }
@@ -50,6 +53,7 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
   const router = useRouter();
   const [isFocused, setIsFocused] = useState(false);
   const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
+  const [cookies, setCookie] = useCookies(["authToken"]);
 
   const handleClick = (e: React.MouseEvent): void => {
     e.stopPropagation();
@@ -67,17 +71,24 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
     setIsUnselectedFocus(false);
   };
 
-
   const onBlur = (): void => {
-    if (!isUnselectedFocus)
-      setIsFocused(false);
+    if (!isUnselectedFocus) setIsFocused(false);
   };
 
   const navigateToLogin = (): void => {
-    router.push("/");
+    setIsFocused(false);
+    router.push("/login");
   };
 
-  const options = [{ text: "login", action: navigateToLogin }, { text: "login", action: navigateToLogin }, { text: "login", action: navigateToLogin }];
+  const handleLogout = (): void => {
+    setCookie("authToken", "", getCookieSetOptions());
+    setIsFocused(false);
+    router.reload();
+  };
+
+  let options = [{ text: "Login", action: navigateToLogin }];
+
+  if (cookies.authToken) options = [{ text: "Logout", action: handleLogout }];
 
   return (
     <HeaderWrapper>
@@ -85,13 +96,11 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
         <SearchBar setSearch={setSearch} />
         <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
         <div>
-          <CogDropDown onClick={prevent} onMouseDown={mouseDown}
-            onMouseUp={mouseUp}>
+          <CogDropDown onClick={prevent} onMouseDown={mouseDown} onMouseUp={mouseUp}>
             {isFocused && <DropDown options={options}></DropDown>}
           </CogDropDown>
         </div>
       </HeaderContent>
-
     </HeaderWrapper>
   );
 };
