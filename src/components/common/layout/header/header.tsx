@@ -38,6 +38,7 @@ const CogIcon = styled.i`
   margin: auto 0px auto 0px;
   font-size: 28px;
   transition: 0.2s;
+  padding-bottom: 1px;
 
   &:hover {
     color: ${(p): string => p.theme.text};

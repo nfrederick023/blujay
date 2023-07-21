@@ -5,21 +5,21 @@ import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./category-button";
 import Gradient from "../../shared/gradient";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC } from "react";
 import SideBarButton from "./page-button";
 import styled from "styled-components";
 
 const SidebarWapper = styled.div`
   background: ${(p): string => p.theme.backgroundContrast};
 
-  min-width: 210px;
-  max-width: 210px;
+  min-width: 250px;
+  max-width: 250px;
   transition: 0.2s;
   user-select: none;
   min-height: 100vh;
   position: sticky;
   z-index: 3;
-  ${(p): string => (p.isCollapsed ? "margin-left: -209px;" : "")}
+  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")}
 
   @media (min-width: ${screenSizes.largeScreenSize + 420}px) {
     position: absolute;
@@ -41,7 +41,6 @@ const SidebarContent = styled.div`
   display: flex;
   position: fixed;
   flex-wrap: wrap;
-  padding-right: 10px;
   padding-top: 20px;
   margin-left: -2px;
 
@@ -148,9 +147,7 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
               <Gradient type="text">
                 <h1>BLU</h1>
               </Gradient>
-              <Gradient type="text" color="silver">
-                <h1>JAY</h1>
-              </Gradient>
+              <h1>JAY</h1>
             </Logo>
             <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} />
 

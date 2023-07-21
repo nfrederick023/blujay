@@ -35,6 +35,8 @@ html {
 
 html, body {
   margin: 0px;
+  font-size: 1.025em;
+
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -44,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   line-height: 75%;
-  font-size: 1.9em;
+  font-size: 2.25em;
   font-weight: 900;
 }
 

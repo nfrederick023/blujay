@@ -4,24 +4,22 @@ import styled from "styled-components";
 
 const GradientBackground = styled.span`
   background: linear-gradient(
-    50deg,
+    170deg,
     ${(p: { color: Color; theme: BluJayTheme }): string =>
         p.color === "blue" ? p.theme.highlightLight : p.theme.hightlightSilver}
-      0%,
-    ${(p): string => (p.color === "blue" ? p.theme.highlightDark : "white")}
-      100%
+      30%,
+    ${(p): string => (p.color === "blue" ? p.theme.highlightDark : "white")} 70%
   );
   display: block;
 `;
 
 const GradientText = styled.span`
   background: linear-gradient(
-    50deg,
+    170deg,
     ${(p: { color: Color; theme: BluJayTheme }): string =>
         p.color === "blue" ? p.theme.highlightLight : p.theme.hightlightSilver}
-      0%,
-    ${(p): string => (p.color === "blue" ? p.theme.highlightDark : "white")}
-      100%
+      10%,
+    ${(p): string => (p.color === "blue" ? p.theme.highlightDark : "white")} 90%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -39,21 +37,11 @@ interface GradientProps {
   color?: Color;
 }
 
-const Gradient: FC<GradientProps> = ({
-  children,
-  type,
-  color,
-}: GradientProps) => {
+const Gradient: FC<GradientProps> = ({ children, type, color }: GradientProps) => {
   return (
     <>
-      {type === "background" && (
-        <GradientBackground color={color || "blue"}>
-          {children}
-        </GradientBackground>
-      )}
-      {type === "text" && (
-        <GradientText color={color || "blue"}>{children}</GradientText>
-      )}
+      {type === "background" && <GradientBackground color={color || "blue"}>{children}</GradientBackground>}
+      {type === "text" && <GradientText color={color || "blue"}>{children}</GradientText>}
     </>
   );
 };

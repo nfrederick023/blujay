@@ -8,9 +8,11 @@ const ButtonWrapper = styled.div`
   color: ${(p): string => p.theme.textContrast};
   border-radius: 5px;
   margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 15px;
   line-height: 5px;
   transition: 0.1s;
-  height: 38px;
+  height: 40px;
 
   &:hover {
     color: ${(p): string => p.theme.text};
@@ -19,10 +21,10 @@ const ButtonWrapper = styled.div`
 
   > span {
     border-radius: 12px;
-    height: 34px;
     align-items: center;
     display: flex;
     padding-left: 8px;
+    height: inherit;
   }
 `;
 
@@ -41,11 +43,7 @@ interface SideBarButtonProps {
   url: string;
 }
 
-const SideBarButton: FC<SideBarButtonProps> = ({
-  title,
-  icon,
-  url,
-}: SideBarButtonProps) => {
+const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url }: SideBarButtonProps) => {
   const isSelected = window.location.pathname.split("/")[1] === url;
   const navigateToPage = (): void => {
     router.push("/" + url);

@@ -28,11 +28,12 @@ export const getServerSideProps: GetServerSideProps<WatchProps> = async (ctx) =>
   });
 
   // if the user is not authorized to view the video, redirect them
-  if (video?.requireAuth && !isAuthenticated) {
+  if (video?.requireAuth && !isAuthenticated && !ctx.res.writableEnded) {
     ctx.res.writeHead(302, { Location: "/401" });
     ctx.res.end();
   }
 
+  // http://localhost:3000/watch/85818224
   const protocol = ctx.req.headers?.["x-forwarded-proto"] || "http";
   const hostname = ctx.req.headers?.["x-forwarded-host"] || ctx.req?.headers["host"];
   const url = new URL(ctx.req?.url ?? "", `${protocol}://${hostname}`).toString();
