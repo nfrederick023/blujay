@@ -49,11 +49,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
 
   let sortedVideos = [...videos];
   if (intialSort || intialOrder)
-    sortedVideos = sortVideos(
-      sortedVideos,
-      intialSort || "Alphabetical",
-      intialOrder || "Ascending"
-    );
+    sortedVideos = sortVideos(sortedVideos, intialSort || "Alphabetical", intialOrder || "Ascending");
 
   return (
     <>
@@ -69,11 +65,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
           {" "}
           <NoSSR>
             {sliderType === "horizontal" ? (
-              <HorizontalSlider
-                videos={sortedVideos}
-                videosPerRow={videosPerRow}
-                headerText={headerText}
-              />
+              <HorizontalSlider videos={sortedVideos} videosPerRow={videosPerRow} headerText={headerText} />
             ) : (
               <VerticleSlider
                 videos={sortedVideos}

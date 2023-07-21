@@ -17,7 +17,7 @@ class MyDocument extends Document {
           />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700"
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@725"
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
           />
@@ -39,10 +39,7 @@ class MyDocument extends Document {
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
           />
-          <link
-            href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-            rel="stylesheet"
-          />
+          <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
         </Head>
         <body>
           <Main />

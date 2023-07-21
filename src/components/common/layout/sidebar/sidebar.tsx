@@ -41,8 +41,9 @@ const SidebarContent = styled.div`
   display: flex;
   position: fixed;
   flex-wrap: wrap;
-  padding-top: 20px;
+  padding-top: 25px;
   margin-left: -2px;
+  font-weight: 575;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     max-width: 100%;
@@ -51,10 +52,9 @@ const SidebarContent = styled.div`
 `;
 
 const Logo = styled.div`
-  margin-bottom: 5px;
+  margin-bottom: 20px;
   text-align: center;
   width: 100%;
-  padding: 5px;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     padding-left: 20px;
@@ -78,7 +78,7 @@ const BarsIcon = styled.i`
 
 const Library = styled.div`
   border-left: ${(p): string => p.theme.textContrastLight} 2px solid;
-  margin-left: 30px;
+  margin-left: 40px;
   margin-top: 5px;
   width: 100%;
 `;

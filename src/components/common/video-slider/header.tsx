@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const HeaderWrapper = styled.div`
   align-items: baseline;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   display: flex;
 `;
 
@@ -18,10 +18,7 @@ interface SliderHeaderProps {
   children: ReactNode;
 }
 
-const SliderHeader: FC<SliderHeaderProps> = ({
-  children,
-  headerText,
-}: SliderHeaderProps) => {
+const SliderHeader: FC<SliderHeaderProps> = ({ children, headerText }: SliderHeaderProps) => {
   return (
     <HeaderWrapper>
       <Gradient type="text">

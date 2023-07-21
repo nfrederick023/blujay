@@ -35,7 +35,7 @@ html {
 
 html, body {
   margin: 0px;
-  font-size: 1.025em;
+  font-size: 1.03em;
 
 }
 
@@ -46,19 +46,18 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   line-height: 75%;
-  font-size: 2.25em;
+  font-size: 2.20em;
   font-weight: 900;
 }
 
 h2 {
-  font-size: 1.7em;
-  font-weight: 700;
+  font-size: 1.9em;
+  font-weight: 725;
 }
 
 h4 {
   font-size: 1.6em;
   font-weight: 575;
-
 }
 
 h5{
@@ -89,7 +88,7 @@ const CenterContent = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  margin: 0px 20px 20px 20px;
+  margin: 0px 30px 30px 30px;
 `;
 
 type NextAppComponentType = typeof App;

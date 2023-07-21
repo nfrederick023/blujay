@@ -109,9 +109,9 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
 
   const searchbarSize = 90;
   const descriptionSize = 60;
-  const sideBarSize = isSidebarEnabled && windowWidth > screenSizes.smallScreenSize ? 210 : 0;
+  const sideBarSize = isSidebarEnabled && windowWidth > screenSizes.tabletScreenSize ? 250 : 0;
   const leftRightPadding = windowWidth < screenSizes.smallScreenSize ? 0 : 80;
-  const marginSize = 40;
+  const marginSize = 60;
 
   let maxHeight = windowHeight - descriptionSize - searchbarSize - marginSize;
   let maxWidth = windowWidth - sideBarSize - leftRightPadding - marginSize;

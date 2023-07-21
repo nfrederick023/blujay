@@ -5,22 +5,16 @@ import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
   width: 100%;
-  color: ${(p): string => p.theme.textContrast};
-  border-radius: 5px;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: 15px;
+  color: white;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
   line-height: 5px;
   transition: 0.1s;
-  height: 40px;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-    cursor: pointer;
-  }
+  height: 45px;
 
   > span {
-    border-radius: 12px;
+    border-radius: 10px;
     align-items: center;
     display: flex;
     padding-left: 8px;
@@ -33,8 +27,13 @@ const Icon = styled.i`
   vertical-align: middle;
 `;
 
-const WhiteColor = styled.div`
-  color: white;
+const Unselected = styled.span`
+  color: ${(p): string => p.theme.textContrast};
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+    cursor: pointer;
+  }
 `;
 
 interface SideBarButtonProps {
@@ -53,16 +52,14 @@ const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url }: SideBarButt
       <ButtonWrapper onClick={navigateToPage}>
         {isSelected ? (
           <Gradient type="background">
-            <WhiteColor>
-              <Icon className={icon} />
-              {title}
-            </WhiteColor>
-          </Gradient>
-        ) : (
-          <span>
             <Icon className={icon} />
             {title}
-          </span>
+          </Gradient>
+        ) : (
+          <Unselected>
+            <Icon className={icon} />
+            {title}
+          </Unselected>
         )}
       </ButtonWrapper>
     </>

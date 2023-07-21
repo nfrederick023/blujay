@@ -1,12 +1,6 @@
 import { debounce } from "lodash";
 import { screenSizes } from "@client/utils/theme";
-import React, {
-  ChangeEvent,
-  Dispatch,
-  FC,
-  SetStateAction,
-  useRef,
-} from "react";
+import React, { ChangeEvent, Dispatch, FC, SetStateAction, useRef } from "react";
 import styled from "styled-components";
 
 const SearchBarContent = styled.div`
