@@ -137,8 +137,8 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
   if (maxWidth < 1) maxWidth = 1;
 
   if (!isTheatreMode) {
-    actualHeight = windowHeight * ((windowWidth * 0.6) / windowWidth);
-    actualWidth = dimensions.width * (actualHeight / dimensions.height);
+    actualHeight = Math.min(windowHeight * ((windowWidth * 0.6) / windowWidth), windowHeight * 0.75);
+    actualWidth = Math.min(dimensions.width * (actualHeight / dimensions.height), windowWidth * 0.75);
   }
 
   const onLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement, Event>): void => {

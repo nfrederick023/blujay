@@ -24,19 +24,13 @@ const SortSelect = styled.div`
 `;
 
 const TypeSelect = styled.div`
-  width: 130px;
+  width: 140px;
   margin-left: 5px;
   display: flex;
 `;
 
 const viewOptions: ViewType[] = ["Grid View", "List View"];
-const sortOptions: SortType[] = [
-  "Alphabetical",
-  "Date Created",
-  "Date Updated",
-  "File Size",
-  "View Count",
-];
+const sortOptions: SortType[] = ["Alphabetical", "Date Created", "Date Updated", "File Size", "View Count"];
 
 interface VeticleSliderHeaderProps {
   handleSortChange: (sort: string) => void;
@@ -65,26 +59,13 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
         <SortSelect>
           <SortIcon
             onClick={handleIsAscendingChange}
-            className={
-              order === "Ascending" ? "bx bx-sort-up" : "bx bx-sort-down"
-            }
+            className={order === "Ascending" ? "bx bx-sort-up" : "bx bx-sort-down"}
           />
-          <Select
-            options={sortOptions}
-            onChange={handleSortChange}
-            value={[sort + " " + order]}
-          />
+          <Select options={sortOptions} onChange={handleSortChange} value={[sort + " " + order]} />
         </SortSelect>
         <TypeSelect>
-          <SortIcon
-            onClick={handleToggleViewChange}
-            className={view ? "bx bx-grid-small" : "bx bx-list-ul"}
-          />
-          <Select
-            options={viewOptions}
-            onChange={handleViewChange}
-            value={[view]}
-          />
+          <SortIcon onClick={handleToggleViewChange} className={view ? "bx bx-grid-small" : "bx bx-list-ul"} />
+          <Select options={viewOptions} onChange={handleViewChange} value={[view]} />
         </TypeSelect>
       </SliderHeader>
     </>

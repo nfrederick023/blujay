@@ -10,19 +10,19 @@ import SideBarButton from "./page-button";
 import styled from "styled-components";
 
 const SidebarWapper = styled.div`
+  min-height: 100%;
   background: ${(p): string => p.theme.backgroundContrast};
-
   min-width: 250px;
   max-width: 250px;
   transition: 0.2s;
   user-select: none;
-  min-height: 100vh;
   position: sticky;
+  top: 0px;
   z-index: 3;
-  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")}
+  min-height: 100vh;
 
-  @media (min-width: ${screenSizes.largeScreenSize + 420}px) {
-    position: absolute;
+  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")} @media
+    (min-width: ${screenSizes.largeScreenSize + 420}px) {
   }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {

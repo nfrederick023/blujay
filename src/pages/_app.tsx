@@ -84,7 +84,6 @@ const CenterContent = styled.div`
   max-width: ${screenSizes.largeScreenSize}px;
   margin: 0 auto 0 auto;
   width: 100%;
-  overflow: hidden;
 `;
 
 const ContentWrapper = styled.div`

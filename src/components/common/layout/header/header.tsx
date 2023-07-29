@@ -8,27 +8,21 @@ import SearchBar from "./searchbar";
 import styled from "styled-components";
 
 const HeaderWrapper = styled.div`
+  background-color: ${(p): string => p.theme.background};
   height: 60px;
   justify-content: center;
   display: flex;
-`;
-
-const HeaderContent = styled.div`
-  background-color: ${(p): string => p.theme.background};
-  top: 0;
   width: 100%;
-  margin: auto;
+  position: sticky;
+  top: 0; /* required */
   z-index: 2;
-  min-height: 60px;
-  max-height: 60px;
-  display: flex;
 `;
 
 const CogDropDown = styled.span`
   position: absolute;
   width: 250px;
   margin-right: 170px;
-  right: -150px;
+  right: -170px;
   top: 20px;
 `;
 
@@ -93,15 +87,13 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
 
   return (
     <HeaderWrapper>
-      <HeaderContent>
-        <SearchBar setSearch={setSearch} />
-        <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
-        <div>
-          <CogDropDown onClick={prevent} onMouseDown={mouseDown} onMouseUp={mouseUp}>
-            {isFocused && <DropDown options={options}></DropDown>}
-          </CogDropDown>
-        </div>
-      </HeaderContent>
+      <SearchBar setSearch={setSearch} />
+      <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
+      <div>
+        <CogDropDown onClick={prevent} onMouseDown={mouseDown} onMouseUp={mouseUp}>
+          {isFocused && <DropDown options={options}></DropDown>}
+        </CogDropDown>
+      </div>
     </HeaderWrapper>
   );
 };
