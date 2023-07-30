@@ -144,6 +144,8 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
   const fullVideoURL = `${src}${videoSrc}`;
   const fullThumbSrc = `${src}${thumbSrc}`;
 
+  console.log(url);
+
   return (
     <>
       <Head>
@@ -198,7 +200,7 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
             </VideoName>
             <Buttons>
               <FavoriteButton handleResponse={updateVideo} video={video} />
-              <CopyLinkButton link={window.location.href} />
+              <CopyLinkButton link={url} />
               <RequireAuthButton handleResponse={updateVideo} video={video} showText={true} />
               <TheatreModeButton />
             </Buttons>
