@@ -77,7 +77,7 @@ const LoginFailedMessage = styled.div`
 
 const LoginPage: FC = () => {
   const [password, setPassword] = useState("");
-  const [cookies, setCookie] = useCookies(["authToken"]);
+  const [, setCookie] = useCookies(["authToken"]);
   const [hasLoginFailed, setHasLoginFailed] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 

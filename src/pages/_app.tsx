@@ -1,11 +1,12 @@
 import { AppProps } from "next/app";
 import { BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
-import { ReactElement, useState } from "react";
-import { checkHashedPassword } from "@server/utils/auth";
+import { ReactElement, useContext, useState } from "react";
+import { VideoContext } from "@client/components/common/contexts/video-context";
+import { checkHashedPassword, getProtectedVideoList } from "@server/utils/auth";
 import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
-import { getPrivateLibrary, getVideoList } from "@server/utils/config";
+import { getPrivateLibrary } from "@server/utils/config";
 import { useRouter } from "next/router";
 import App from "next/app";
 import Head from "next/head";
@@ -124,9 +125,10 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   Component,
   pageProps,
   theme,
-  videos,
+  videos: _videos,
 }: ExtendedAppProps): ReactElement => {
   const [search, setSearch] = useState("");
+  const [videos, setVideos] = useState(_videos);
   const router = useRouter();
 
   // assign default values to cookies if not set
@@ -139,46 +141,10 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
   });
 
   const categories = [...new Set(videos.map((video) => video.category))].filter((category) => category);
-
   const searchResults = videos.filter((video) => video.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <>
-      <Head>
-        <title>BluJay</title>
-        <link rel="icon" href="/images/favicon.ico" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@725"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@575"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Montserrat"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-      </Head>
       <CookiesProvider cookies={_cookies}>
         <ThemeProvider theme={theme}>
           <GlobalStyle />
@@ -209,10 +175,10 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
 
 MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
   const { ctx } = initialProps;
-  const videos = getVideoList();
 
   // auth stuff
   const authToken = cookies(ctx)?.authToken;
+  const videos = getProtectedVideoList(authToken ?? "");
   const authStatus = checkHashedPassword(authToken ?? "");
   const isPrivateLibrary = getPrivateLibrary();
 

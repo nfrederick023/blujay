@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React, { FC } from "react";
-import router from "next/router";
 import styled from "styled-components";
 
 const CategoryButtonWrapper = styled.div`

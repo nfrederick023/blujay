@@ -6,9 +6,10 @@ import React, { FC } from "react";
 interface RequireAuthButtonProps {
   video: Video;
   handleResponse: (res: Response, newVideo: Video) => unknown;
+  showText: boolean;
 }
 
-const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, handleResponse }: RequireAuthButtonProps) => {
+const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, handleResponse, showText }: RequireAuthButtonProps) => {
   const handleSetVisibility = async (): Promise<void> => {
     const newVideo: Video = { ...video, requireAuth: !video.requireAuth };
     const res = await updateVideo(newVideo);
@@ -24,8 +25,8 @@ const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, handleResponse }
       hoverTextOff="Set as Public"
       confrimTextOn="Public!"
       confrimTextOff="Private!"
-      textOn="Public"
-      textOff="Private"
+      textOn={showText ? "Public" : undefined}
+      textOff={showText ? "Private" : undefined}
       onClick={handleSetVisibility}
     />
   );

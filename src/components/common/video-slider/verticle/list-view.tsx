@@ -1,7 +1,8 @@
 import { Video } from "@client/utils/types";
+import { VideoContext } from "../../contexts/video-context";
 import CopyLinkButton from "../../shared/button-icons/buttons/copyLink";
 import FavoriteButton from "../../shared/button-icons/buttons/favorite";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useContext, useState } from "react";
 import RequireAuthButton from "../../shared/button-icons/buttons/requireAuth";
 import SubredditsSearch from "./search";
 import TimeAgo from "react-timeago";
@@ -65,31 +66,15 @@ const Buttons = styled.span`
   }
 `;
 
-const Icon = styled.div`
-  border: 1px solid ${(p): string => p.theme.button};
-  border-radius: 5px;
-  padding: 6px;
-  transition: all 0.1s ease-in;
-  user-select: none;
-  display: inline-block;
-
-  color: ${(p): string => p.theme.textContrast};
-
-  &:hover {
-    cursor: pointer;
-    border-color: ${(p): string => p.theme.text};
-    color: ${(p): string => p.theme.text};
-  }
-`;
 const resultsPerPageOptions = ["5", "10", "20", "50", "100"];
 
 interface ListViewProps {
   videos: Video[];
 }
 
-const ListView: FC<ListViewProps> = ({ videos: _videos }: ListViewProps) => {
-  const [videos, setVideos] = useState([..._videos]);
+const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
   const [paginatedResults, setPaginatedResults] = useState<Video[]>([]);
+  const setVideos = useContext(VideoContext).setVideos;
 
   const updateVideo = (res: Response, newVideo: Video): void => {
     if (res.ok) setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
@@ -140,7 +125,7 @@ const ListView: FC<ListViewProps> = ({ videos: _videos }: ListViewProps) => {
                   <Buttons>
                     <FavoriteButton handleResponse={updateVideo} video={video} />
                     <CopyLinkButton link={window.location.origin + "/watch/" + video.id} />
-                    <RequireAuthButton handleResponse={updateVideo} video={video} />
+                    <RequireAuthButton handleResponse={updateVideo} video={video} showText={false} />
                   </Buttons>
                 </ListName>
               </SearchResult>

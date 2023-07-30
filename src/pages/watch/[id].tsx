@@ -1,4 +1,3 @@
-import * as mime from "mime-types";
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
 import { checkHashedPassword } from "@server/utils/auth";

@@ -1,14 +1,11 @@
-import { GetServerSidePropsContext, PreviewData } from "next";
-import { ParsedUrlQuery } from "querystring";
 import { Video } from "@client/utils/types";
 import { randomBytes, scryptSync } from "crypto";
 
 import { getUserPassword, getVideoList } from "./config";
 
-export const getProtectedVideoList = (ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>): Video[] => {
+export const getProtectedVideoList = (authToken: string): Video[] => {
   const videoList = getVideoList();
-  const authToken = ctx.req.cookies?.authToken;
-  const authStatus = checkHashedPassword(authToken ?? "");
+  const authStatus = checkHashedPassword(authToken);
 
   if (authStatus) return videoList;
   else return videoList.filter((video) => !video.requireAuth);

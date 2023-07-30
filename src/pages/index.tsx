@@ -1,23 +1,9 @@
-import { GetServerSideProps, NextPage } from "next";
-import { Video } from "@client/utils/types";
-import { getProtectedVideoList } from "@server/utils/auth";
+import { NextPage } from "next";
 import IndexPage from "@client/components/pages/index";
 import React from "react";
 
-interface IndexProps {
-  videos: Video[];
-}
-
-const Index: NextPage<IndexProps> = ({ videos }: IndexProps) => {
-  return <IndexPage {...{ videos }} />;
-};
-
-export const getServerSideProps: GetServerSideProps<IndexProps> = async (ctx) => {
-  return {
-    props: {
-      videos: getProtectedVideoList(ctx),
-    },
-  };
+const Index: NextPage = () => {
+  return <IndexPage />;
 };
 
 export default Index;

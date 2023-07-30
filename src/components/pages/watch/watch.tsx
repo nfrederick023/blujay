@@ -1,11 +1,9 @@
 import { Video } from "@client/utils/types";
-import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
+import { booleanify } from "@client/utils/cookie";
 import { isMediaTypeVideo } from "@client/utils/checkMediaType";
 import { screenSizes } from "@client/utils/theme";
-import { updateVideo } from "@client/utils/api";
 import { useCookies } from "react-cookie";
 import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
-import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
 import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copyLink";
 import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";
 import Head from "next/head";
@@ -80,7 +78,7 @@ interface WatchPageProps {
 
 const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
   const [video, setVideo] = useState(originalVideo);
-  const [cookies, setCookie] = useCookies(["videoVolume", "isSidebarEnabled", "isTheatreMode"]);
+  const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheatreMode"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const windowHeight = useWindowHeight();
@@ -201,7 +199,7 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
             <Buttons>
               <FavoriteButton handleResponse={updateVideo} video={video} />
               <CopyLinkButton link={window.location.href} />
-              <RequireAuthButton handleResponse={updateVideo} video={video} />
+              <RequireAuthButton handleResponse={updateVideo} video={video} showText={true} />
               <TheatreModeButton />
             </Buttons>
           </VideoNameContainer>
