@@ -147,26 +147,28 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
     <>
       <CookiesProvider cookies={_cookies}>
         <ThemeProvider theme={theme}>
-          <GlobalStyle />
-          <LayoutWrapper>
-            {router.pathname.includes("/login") ? (
-              <Component {...pageProps} />
-            ) : (
-              <>
-                <Sidebar categories={categories} />
-                <CenterContent>
-                  <ContentWrapper>
-                    <Header setSearch={setSearch} />
-                    {search ? (
-                      <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />
-                    ) : (
-                      <Component {...pageProps} />
-                    )}
-                  </ContentWrapper>
-                </CenterContent>
-              </>
-            )}
-          </LayoutWrapper>
+          <VideoContext.Provider value={{ videos, setVideos }}>
+            <GlobalStyle />
+            <LayoutWrapper>
+              {router.pathname.includes("/login") ? (
+                <Component {...pageProps} />
+              ) : (
+                <>
+                  <Sidebar categories={categories} />
+                  <CenterContent>
+                    <ContentWrapper>
+                      <Header setSearch={setSearch} />
+                      {search ? (
+                        <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />
+                      ) : (
+                        <Component {...pageProps} />
+                      )}
+                    </ContentWrapper>
+                  </CenterContent>
+                </>
+              )}
+            </LayoutWrapper>
+          </VideoContext.Provider>
         </ThemeProvider>
       </CookiesProvider>
     </>
@@ -177,9 +179,9 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
   const { ctx } = initialProps;
 
   // auth stuff
-  const authToken = cookies(ctx)?.authToken;
-  const videos = getProtectedVideoList(authToken ?? "");
-  const authStatus = checkHashedPassword(authToken ?? "");
+  const authToken = cookies(ctx)?.authToken ?? "";
+  const videos = getProtectedVideoList(authToken);
+  const authStatus = checkHashedPassword(authToken);
   const isPrivateLibrary = getPrivateLibrary();
 
   if (!authStatus && ctx.res) {
