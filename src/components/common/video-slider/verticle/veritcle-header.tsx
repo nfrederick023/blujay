@@ -20,11 +20,11 @@ const SortIcon = styled.i`
 
 const SortSelect = styled.div`
   display: flex;
-  width: 265px;
+  width: 280px;
 `;
 
 const TypeSelect = styled.div`
-  width: 140px;
+  width: 110px;
   margin-left: 5px;
   display: flex;
 `;
@@ -36,7 +36,6 @@ interface VeticleSliderHeaderProps {
   handleSortChange: (sort: string) => void;
   handleIsAscendingChange: () => void;
   handleViewChange: (view: string) => void;
-  handleToggleViewChange: () => void;
   headerText: string;
   order: OrderType;
   sort: SortType;
@@ -47,7 +46,6 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
   handleIsAscendingChange,
   handleViewChange,
   handleSortChange,
-  handleToggleViewChange,
   headerText,
   order,
   sort,
@@ -64,7 +62,6 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
           <Select options={sortOptions} onChange={handleSortChange} value={[sort + " " + order]} />
         </SortSelect>
         <TypeSelect>
-          <SortIcon onClick={handleToggleViewChange} className={view ? "bx bx-grid-small" : "bx bx-list-ul"} />
           <Select options={viewOptions} onChange={handleViewChange} value={[view]} />
         </TypeSelect>
       </SliderHeader>

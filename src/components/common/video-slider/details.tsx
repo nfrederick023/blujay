@@ -1,8 +1,8 @@
 import { Video } from "@client/utils/types";
 import { isMediaTypeVideo } from "@client/utils/checkMediaType";
+import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
-import router from "next/router";
 import styled from "styled-components";
 import useResizeObserver from "@react-hook/resize-observer";
 
@@ -91,10 +91,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const isVideo = isMediaTypeVideo(video?.extentsion || "");
   const isGif = video?.extentsion === "gif";
 
-  React.useLayoutEffect(
-    () => setSize(ref.current?.getBoundingClientRect().width || 0),
-    [ref]
-  );
+  React.useLayoutEffect(() => setSize(ref.current?.getBoundingClientRect().width || 0), [ref]);
 
   useResizeObserver(ref, (entry) => setSize(entry.contentRect.width));
 
@@ -114,62 +111,59 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
     }
   };
 
-  const navigateToVideo = (): void => {
-    if (video) router.push("/watch/" + video?.id);
-  };
-
   const triggerHasLoaded = (): void => {
     if (!hasLoaded) setHasLoaded(true);
   };
 
   return (
-    <VideoDetailsWrapper ref={ref} onClick={navigateToVideo}>
-      {video ? (
-        <VideoDetailsContainer>
-          {hasHovered && (
-            <>
-              {isVideo && (
-                <VideoPlayer
-                  ref={videoRef}
-                  onLoadedData={triggerHasLoaded}
-                  hasLoaded={hasLoaded}
-                  poster={"/api/thumb/" + encodeURIComponent(video.id)}
-                  onMouseEnter={handleIsHoverTrueChange}
-                  onMouseLeave={handleIsHoverFalseChange}
-                  src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
-                  imageHeight={imageHeight}
-                  autoPlay
-                  muted
-                  loop
-                />
-              )}
-              {isGif && (
-                <ImagePlayer
-                  imageHeight={imageHeight}
-                  onMouseEnter={handleIsHoverTrueChange}
-                  onMouseLeave={handleIsHoverFalseChange}
-                  src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
-                />
-              )}
-            </>
-          )}
-          <Thumbnail
-            imageHeight={imageHeight}
-            onMouseEnter={handleIsHoverTrueChange}
-            onMouseLeave={handleIsHoverFalseChange}
-            src={"/api/thumb/" + encodeURIComponent(video.id)}
-          />
-          <VideoNameWrapper>
-            <h5>{video.name}</h5>
-            <h6>
-              {video.category.length ? video.category : "All Videos"} ·{" "}
-              <TimeAgo date={video.created} />
-            </h6>
-          </VideoNameWrapper>
-        </VideoDetailsContainer>
-      ) : (
-        <PlaceHolder />
-      )}
+    <VideoDetailsWrapper ref={ref}>
+      <Link href={"/watch/" + video?.id}>
+        {video ? (
+          <VideoDetailsContainer>
+            {hasHovered && (
+              <>
+                {isVideo && (
+                  <VideoPlayer
+                    ref={videoRef}
+                    onLoadedData={triggerHasLoaded}
+                    hasLoaded={hasLoaded}
+                    poster={"/api/thumb/" + encodeURIComponent(video.id)}
+                    onMouseEnter={handleIsHoverTrueChange}
+                    onMouseLeave={handleIsHoverFalseChange}
+                    src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
+                    imageHeight={imageHeight}
+                    autoPlay
+                    muted
+                    loop
+                  />
+                )}
+                {isGif && (
+                  <ImagePlayer
+                    imageHeight={imageHeight}
+                    onMouseEnter={handleIsHoverTrueChange}
+                    onMouseLeave={handleIsHoverFalseChange}
+                    src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
+                  />
+                )}
+              </>
+            )}
+            <Thumbnail
+              imageHeight={imageHeight}
+              onMouseEnter={handleIsHoverTrueChange}
+              onMouseLeave={handleIsHoverFalseChange}
+              src={"/api/thumb/" + encodeURIComponent(video.id)}
+            />
+            <VideoNameWrapper>
+              <h5>{video.name}</h5>
+              <h6>
+                {video.category.length ? video.category : "All Videos"} · <TimeAgo date={video.created} />
+              </h6>
+            </VideoNameWrapper>
+          </VideoDetailsContainer>
+        ) : (
+          <PlaceHolder />
+        )}
+      </Link>
     </VideoDetailsWrapper>
   );
 };

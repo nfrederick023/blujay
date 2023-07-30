@@ -12,19 +12,12 @@ const CategoryPage: FC<CategoryPageProps> = ({ videos }: CategoryPageProps) => {
   const { category } = router.query;
 
   const categoryVideos = videos.filter((video) => {
-    if (!Array.isArray(category))
-      return video.category.toLowerCase() === category?.toLowerCase();
+    if (!Array.isArray(category)) return video.category.toLowerCase() === category?.toLowerCase();
   });
 
   const cateogryName = categoryVideos[0]?.category ?? category;
 
-  return (
-    <VideoSlider
-      videos={categoryVideos}
-      sliderType={"verticle"}
-      headerText={cateogryName}
-    />
-  );
+  return <VideoSlider videos={categoryVideos} sliderType={"verticle"} headerText={cateogryName} />;
 };
 
 export default CategoryPage;

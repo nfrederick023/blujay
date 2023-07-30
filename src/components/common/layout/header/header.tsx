@@ -1,10 +1,10 @@
 import { BluJayTheme } from "@client/utils/types";
 import { getCookieSetOptions } from "@client/utils/cookie";
 import { useCookies } from "react-cookie";
-import { useRouter } from "next/router";
 import DropDown from "../../shared/drop-down";
 import React, { FC, useState } from "react";
 import SearchBar from "./searchbar";
+import router from "next/router";
 import styled from "styled-components";
 
 const HeaderWrapper = styled.div`
@@ -45,7 +45,6 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
-  const router = useRouter();
   const [isFocused, setIsFocused] = useState(false);
   const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const [cookies, setCookie] = useCookies(["authToken"]);
@@ -75,15 +74,20 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
     router.push("/login");
   };
 
+  const navigateToSetings = (): void => {
+    setIsFocused(false);
+    router.push("/settings");
+  };
+
   const handleLogout = (): void => {
     setCookie("authToken", "", getCookieSetOptions());
     setIsFocused(false);
     router.reload();
   };
 
-  let options = [{ text: "Login", action: navigateToLogin }];
-
-  if (cookies.authToken) options = [{ text: "Logout", action: handleLogout }];
+  const options = [{ text: "Settings", action: navigateToSetings }];
+  if (cookies.authToken) options.push({ text: "Logout", action: handleLogout });
+  else options.push({ text: "Login", action: navigateToLogin });
 
   return (
     <HeaderWrapper>

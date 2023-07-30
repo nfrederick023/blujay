@@ -1,5 +1,6 @@
-import { useRouter } from "next/router";
+import Link from "next/link";
 import React, { FC } from "react";
+import router from "next/router";
 import styled from "styled-components";
 
 const CategoryButtonWrapper = styled.div`
@@ -29,25 +30,18 @@ interface CategoryButtonProps {
   category: string;
 }
 
-const CategoryButton: FC<CategoryButtonProps> = ({
-  category,
-}: CategoryButtonProps) => {
-  const router = useRouter();
+const CategoryButton: FC<CategoryButtonProps> = ({ category }: CategoryButtonProps) => {
   const categoryURL = ("/library/" + encodeURIComponent(category)).toLowerCase();
-  const navigateToCategory = (): void => {
-    router.push(categoryURL);
-  };
+
   const isSelected = categoryURL === window.location.pathname.toLowerCase();
   return (
-    <CategoryButtonWrapper onClick={navigateToCategory}>
-      <CategoryButtonName>
-        {isSelected ? (
-          <SelectedCategory>{category}</SelectedCategory>
-        ) : (
-          <div>{category}</div>
-        )}
-      </CategoryButtonName>
-    </CategoryButtonWrapper>
+    <Link href={categoryURL}>
+      <CategoryButtonWrapper>
+        <CategoryButtonName>
+          {isSelected ? <SelectedCategory>{category}</SelectedCategory> : <div>{category}</div>}
+        </CategoryButtonName>
+      </CategoryButtonWrapper>
+    </Link>
   );
 };
 

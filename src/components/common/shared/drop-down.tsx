@@ -8,11 +8,10 @@ const DropDownBox = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   transition: 1s;
-  width: 110%;
+  width: 100%;
   border-radius: 15px;
   background-color: ${(p): string => p.theme.backgroundContrast};
   z-index: 2;
-  left: -11px;
   top: 30px;
 `;
 
@@ -29,32 +28,32 @@ const Option = styled.div`
 `;
 
 interface DropDownOption {
-    text: string;
-    action: (e: React.MouseEvent) => void;
+  text: string;
+  action: (e: React.MouseEvent) => void;
 }
 
 interface DropDownProps {
-    options: DropDownOption[];
+  options: DropDownOption[];
 }
 
 const DropDown: FC<DropDownProps> = ({ options }: DropDownProps) => {
-    return (
-        <DropDownBox>
-            {options.length ? (
-                <>
-                    {options.map((option, i) => {
-                        return (
-                            <Option key={i} onClick={option.action}>
-                                {option.text}
-                            </Option>
-                        );
-                    })}
-                </>
-            ) : (
-                <Option>No Options</Option>
-            )}
-        </DropDownBox>
-    );
+  return (
+    <DropDownBox>
+      {options.length ? (
+        <>
+          {options.map((option, i) => {
+            return (
+              <Option key={i} onClick={option.action}>
+                {option.text}
+              </Option>
+            );
+          })}
+        </>
+      ) : (
+        <Option>No Options</Option>
+      )}
+    </DropDownBox>
+  );
 };
 
 export default DropDown;

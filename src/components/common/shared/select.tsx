@@ -17,12 +17,10 @@ const SelectBox = styled.div`
 
   &:hover {
     color: ${(p): string => p.theme.text};
-    border-bottom: 1px  ${(p): string => p.theme.text} solid;
     cursor: pointer;
   }
 
-  color: ${(p): string => p.isFocused ? `${p.theme.text}` : ""};
-  border-bottom: ${(p): string => p.isFocused ? "1" : "0"}px ${(p): string => p.theme.text} solid;
+  color: ${(p): string => (p.isFocused ? `${p.theme.text}` : "")};
 `;
 
 const SelectedBox = styled.div`
@@ -32,16 +30,11 @@ const SelectedBox = styled.div`
 `;
 
 const SelectedOption = styled.div`
-  font-size: 85%;
-
   border: ${(p: { isMulti: boolean | undefined; theme: BluJayTheme }): string =>
-    p.isMulti
-      ? `1px solid ${p.theme.textContrast};`
-      : "border: 0px; font-size: 1rem;"};
+    p.isMulti ? `1px solid ${p.theme.textContrast};` : "border: 0px;"};
 `;
 
 const SelectedIcon = styled.i`
-  font-size: 110%;
   padding-top: 1px;
 
   ::before {
@@ -49,13 +42,13 @@ const SelectedIcon = styled.i`
   }
 `;
 
-const RightIcons = styled.i`
+const RightIcons = styled.div`
   text-align: right;
   display: flex;
+  max-height: 20px;
 
   i {
     font-size: 1.25rem;
-    vertical-align: baseline;
   }
 `;
 
@@ -80,14 +73,7 @@ interface SelectProps {
   onChange: (options: SelectOptions) => void;
 }
 
-const Select: FC<SelectProps> = ({
-  options,
-  value,
-  isMulti,
-  isClearable,
-  defaultSelected,
-  onChange,
-}: SelectProps) => {
+const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, defaultSelected, onChange }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const handleAddOption = (option: string) => (e: React.MouseEvent) => {
@@ -105,9 +91,7 @@ const Select: FC<SelectProps> = ({
 
   const handleRemoveOption = (option: string) => (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newOptions = [
-      ...value.filter((selectedOption) => selectedOption !== option),
-    ];
+    const newOptions = [...value.filter((selectedOption) => selectedOption !== option)];
     onChange(newOptions as SelectOptions);
   };
 
@@ -116,11 +100,7 @@ const Select: FC<SelectProps> = ({
     if (isMulti) {
       onChange([] as string[] as SelectOptions);
     } else {
-      onChange(
-        defaultSelected
-          ? (defaultSelected as SelectOptions)
-          : ("Select..." as SelectOptions)
-      );
+      onChange(defaultSelected ? (defaultSelected as SelectOptions) : ("Select..." as SelectOptions));
     }
   };
 
@@ -143,7 +123,11 @@ const Select: FC<SelectProps> = ({
     }
   };
 
-  const unselectedOptions = options.filter((option) => !value.includes(option)).map(option => { return { text: option, action: handleAddOption(option) }; });
+  const unselectedOptions = options
+    .filter((option) => !value.includes(option))
+    .map((option) => {
+      return { text: option, action: handleAddOption(option) };
+    });
 
   return (
     <SelectBoxWrapper>
@@ -163,10 +147,7 @@ const Select: FC<SelectProps> = ({
                   <SelectedOption key={i} isMulti={isMulti}>
                     {selectedOption}
                     {isMulti && (
-                      <SelectedIcon
-                        className="bx bx-x"
-                        onClick={handleRemoveOption(selectedOption)}
-                      ></SelectedIcon>
+                      <SelectedIcon className="bx bx-x" onClick={handleRemoveOption(selectedOption)}></SelectedIcon>
                     )}
                   </SelectedOption>
                 );
@@ -189,11 +170,7 @@ const Select: FC<SelectProps> = ({
       </SelectBox>
 
       {isOpen && (
-        <div
-          tabIndex={0}
-          onMouseDown={mouseDown}
-          onMouseUp={mouseUp}
-          onBlur={onBlur}>
+        <div tabIndex={0} onMouseDown={mouseDown} onMouseUp={mouseUp} onBlur={onBlur}>
           <DropDown options={unselectedOptions}></DropDown>
         </div>
       )}

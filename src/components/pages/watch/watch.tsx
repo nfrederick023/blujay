@@ -5,10 +5,14 @@ import { screenSizes } from "@client/utils/theme";
 import { updateVideo } from "@client/utils/api";
 import { useCookies } from "react-cookie";
 import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
-import ButtonIcon from "@client/components/common/shared/button-icon";
+import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
+import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copyLink";
+import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";
 import Head from "next/head";
 import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, SyntheticEvent, useRef, useState } from "react";
+import RequireAuthButton from "@client/components/common/shared/button-icons/buttons/requireAuth";
+import TheatreModeButton from "@client/components/common/shared/button-icons/buttons/theatreMode";
 import TimeAgo from "react-timeago";
 import styled from "styled-components";
 
@@ -74,37 +78,21 @@ interface WatchPageProps {
   url: string;
 }
 
-const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
-  const [videoDetails, setVideoDetails] = useState(video);
-  const [cookies, setCookie] = useCookies(["isTheaterMode", "videoVolume", "isSidebarEnabled"]);
+const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
+  const [video, setVideo] = useState(originalVideo);
+  const [cookies, setCookie] = useCookies(["videoVolume", "isSidebarEnabled", "isTheatreMode"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const windowHeight = useWindowHeight();
   const windowWidth = useWindowWidth();
-  const isTheatreMode = booleanify(cookies.isTheaterMode);
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
-  const isVideo = isMediaTypeVideo(video.extentsion);
+  const isVideo = isMediaTypeVideo(originalVideo.extentsion);
+  const isTheatreMode = booleanify(cookies.isTheatreMode);
 
   const handleVolumeChange = (): void => {};
 
-  const handleSetAsFavorite = async (): Promise<void> => {
-    const newVideo: Video = { ...videoDetails, isFavorite: !videoDetails.isFavorite };
-    const res = await updateVideo(newVideo);
-    if (res.ok) setVideoDetails(newVideo);
-  };
-
-  const handleCopyLink = (): void => {
-    navigator.clipboard.writeText(window.location.href);
-  };
-
-  const handleSetVisibility = async (): Promise<void> => {
-    const newVideo: Video = { ...videoDetails, requireAuth: !videoDetails.requireAuth };
-    const res = await updateVideo(newVideo);
-    if (res.ok) setVideoDetails(newVideo);
-  };
-
-  const handleSetViewMode = (): void => {
-    setCookie("isTheaterMode", !isTheatreMode, getCookieSetOptions());
+  const updateVideo = (res: Response, newVideo: Video): void => {
+    if (res.ok) setVideo(newVideo);
   };
 
   const searchbarSize = 90;
@@ -153,19 +141,19 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
 
   const _url = new URL(url);
   const src = `${_url.protocol}//${_url.host}`;
-  const videoSrc = `/api/watch/${encodeURIComponent(videoDetails.id)}.${videoDetails.extentsion}`;
-  const thumbSrc = "/api/thumb/" + encodeURIComponent(videoDetails.id);
+  const videoSrc = `/api/watch/${encodeURIComponent(video.id)}.${video.extentsion}`;
+  const thumbSrc = "/api/thumb/" + encodeURIComponent(video.id);
   const fullVideoURL = `${src}${videoSrc}`;
   const fullThumbSrc = `${src}${thumbSrc}`;
 
   return (
     <>
       <Head>
-        <title>{videoDetails.name + "page title goes here"}</title>
+        <title>{video.name + "page title goes here"}</title>
         <StyledMeta property="og:type" value="videoDetails.other" />
         <StyledMeta property="og:site_name" value={"page title goes here"} />
         <StyledMeta property="og:url" value={url} />
-        <StyledMeta property="og:title" value={videoDetails.name} />
+        <StyledMeta property="og:title" value={video.name} />
         <StyledMeta property="og:image" content={fullThumbSrc} />
         <StyledMeta property="og:image:secure_url" content={fullThumbSrc} />
         <StyledMeta property="og:image:type" content="image/jpeg" />
@@ -175,7 +163,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
         <StyledMeta property="og:video" value={fullVideoURL} />
         <StyledMeta property="og:video:url" value={fullVideoURL} />
         <StyledMeta property="og:video:secure_url" value={fullVideoURL} />
-        <StyledMeta property="og:video:type" content={video.mimeType} />
+        <StyledMeta property="og:video:type" content={originalVideo.mimeType} />
         <StyledMeta property="og:video:width" content="1280" />
         <StyledMeta property="og:video:height" content="720" />
         <StyledMeta name="twitter:card" content="player" />
@@ -208,51 +196,21 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
           )}
           <VideoNameContainer>
             <VideoName>
-              <h4>{videoDetails.name}</h4>
+              <h4>{video.name}</h4>
             </VideoName>
             <Buttons>
-              <ButtonIcon
-                icon="bx bx-heart"
-                selectedIcon="bx bxs-heart"
-                onClick={handleSetAsFavorite}
-                isSelected={videoDetails.isFavorite}
-                hoverTextOn="Remove as Favorite"
-                hoverTextOff="Add as Favorite"
-                confrimTextOn="Added!"
-                confrimTextOff="Removed!"
-              />
-              <ButtonIcon icon="bx bx-link" onClick={handleCopyLink} hoverTextOn="Copy Link" confrimTextOn="Copied!" />
-              <ButtonIcon
-                isSelected={!videoDetails.requireAuth}
-                selectedIcon="bx bx-globe"
-                icon="bx bx-lock-alt"
-                hoverTextOn="Set as Private"
-                hoverTextOff="Set as Public"
-                confrimTextOn="Public!"
-                confrimTextOff="Private!"
-                textOn="Public"
-                textOff="Private"
-                onClick={handleSetVisibility}
-              />
-              <ButtonIcon
-                icon="bx bx-movie"
-                selectedIcon="bx bx-movie"
-                textOn="Theatre Mode"
-                isSelected={isTheatreMode}
-                hoverTextOn="Close Theatre Mode"
-                hoverTextOff="Open Theatre Mode"
-                confrimTextOn="Opened!"
-                confrimTextOff="Closed!"
-                onClick={handleSetViewMode}
-              />
+              <FavoriteButton handleResponse={updateVideo} video={video} />
+              <CopyLinkButton link={window.location.href} />
+              <RequireAuthButton handleResponse={updateVideo} video={video} />
+              <TheatreModeButton />
             </Buttons>
           </VideoNameContainer>
           <VideoDetails>
             <h6>
-              {videoDetails.category} · <TimeAgo date={videoDetails.created} />
+              {video.category} · <TimeAgo date={video.created} />
             </h6>
           </VideoDetails>
-          {videoDetails.description && <div className="content">{videoDetails.description}</div>}
+          {video.description && <div className="content">{video.description}</div>}
         </VideoContainer>
       </NoSSR>
     </>

@@ -2,11 +2,11 @@ import { getCookieSetOptions } from "@client/utils/cookie";
 import { login } from "@client/utils/api";
 import { screenSizes } from "@client/utils/theme";
 import { useCookies } from "react-cookie";
-import { useRouter } from "next/router";
-import ButtonIcon from "@client/components/common/shared/button-icon";
+import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
 import Gradient from "@client/components/common/shared/gradient";
 import React, { FC, useState } from "react";
 import TextField from "@client/components/common/shared/text-field";
+import router from "next/router";
 import styled from "styled-components";
 
 const LoginPageContainer = styled.div`
@@ -52,7 +52,7 @@ const CheckboxLabel = styled.label`
   transtion: 0.2s;
   h6 {
     position: relative;
-    bottom: 1.1px;
+    bottom: 1px;
   }
 
   &:hover {
@@ -80,7 +80,6 @@ const LoginPage: FC = () => {
   const [cookies, setCookie] = useCookies(["authToken"]);
   const [hasLoginFailed, setHasLoginFailed] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const router = useRouter();
 
   const onPasswordChange = (password: string): void => {
     setPassword(password);

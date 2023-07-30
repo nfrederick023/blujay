@@ -31,8 +31,9 @@ const Button = styled.div`
 
   i {
     margin: auto;
+    margin-top: 1px;
+    margin-right: 3px;
     font-size: 1.1em !important;
-    vertical-align: bottom;
   }
 `;
 

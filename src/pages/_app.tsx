@@ -1,5 +1,5 @@
 import { AppProps } from "next/app";
-import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
+import { BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { ReactElement, useState } from "react";
 import { checkHashedPassword } from "@server/utils/auth";
@@ -8,6 +8,7 @@ import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { getPrivateLibrary, getVideoList } from "@server/utils/config";
 import { useRouter } from "next/router";
 import App from "next/app";
+import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
 import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
@@ -21,6 +22,29 @@ html {
   background-color: ${(p): string => p.theme.background};
   color: ${(p): string => p.theme.text};
 }
+
+body {
+  overflow-y: scroll;
+
+
+&::-webkit-scrollbar
+{
+	width: 8px;
+	background-color: rgba(0,0,0,0.0);
+}
+
+&::-webkit-scrollbar-thumb
+{
+	border-radius: 8px;
+	background-color: ${(p): string => p.theme.textContrast};
+}
+}
+
+a:hover, a:visited, a:link, a:active
+{
+    text-decoration: none; color: unset;
+}
+
 
 // fixes sidebar positioning somehow 
 * {
@@ -120,7 +144,41 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
 
   return (
     <>
-      <title>title</title>
+      <Head>
+        <title>BluJay</title>
+        <link rel="icon" href="/images/favicon.ico" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@725"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@575"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Montserrat"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+      </Head>
       <CookiesProvider cookies={_cookies}>
         <ThemeProvider theme={theme}>
           <GlobalStyle />

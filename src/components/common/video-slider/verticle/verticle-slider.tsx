@@ -1,6 +1,7 @@
 import { OrderType, SortType, Video, ViewType } from "@client/utils/types";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useBottomScrollListener } from "react-bottom-scroll-listener";
+import ListView from "./list-view";
 import React, { FC, useState } from "react";
 import VeticleSliderHeader from "./veritcle-header";
 import VideoDetails from "../details";
@@ -65,11 +66,6 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
     else setOrder("Ascending");
   };
 
-  const handleToggleViewChange = (): void => {
-    if (view === "Grid View") setView("List View");
-    else setView("Grid View");
-  };
-
   const handleViewChange = (newView: string): void => {
     if (newView === "List View") setView("List View");
     else setView("Grid View");
@@ -82,25 +78,28 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
       <VeticleSliderHeader
         headerText={headerText}
         handleViewChange={handleViewChange}
-        handleToggleViewChange={handleToggleViewChange}
         handleIsAscendingChange={handleIsAscendingChange}
         handleSortChange={handleSortChange}
         sort={sort}
         order={order}
         view={view}
       />
-      <VerticleSliderWrapper>
-        {[...Array(numberOfRows)].map((undef, i) => (
-          <VideoRow key={i}>
-            {[...new Array(videosPerRow)].map((undef, j) => (
-              <VideoDetails
-                key={sortedVideos[i * videosPerRow + j]?.id || j}
-                video={sortedVideos[i * videosPerRow + j]}
-              />
-            ))}
-          </VideoRow>
-        ))}
-      </VerticleSliderWrapper>
+      {view === "Grid View" ? (
+        <VerticleSliderWrapper>
+          {[...Array(numberOfRows)].map((undef, i) => (
+            <VideoRow key={i}>
+              {[...new Array(videosPerRow)].map((undef, j) => (
+                <VideoDetails
+                  key={sortedVideos[i * videosPerRow + j]?.id || j}
+                  video={sortedVideos[i * videosPerRow + j]}
+                />
+              ))}
+            </VideoRow>
+          ))}
+        </VerticleSliderWrapper>
+      ) : (
+        <ListView videos={sortedVideos} />
+      )}
     </>
   );
 };
