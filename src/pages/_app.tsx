@@ -1,11 +1,11 @@
 import { AppProps } from "next/app";
 import { BluJayTheme, CookieTypes, Video } from "../utils/types";
-import { Cookies, CookiesProvider } from "react-cookie";
-import { ReactElement, useState } from "react";
+import { Cookies, CookiesProvider, useCookies } from "react-cookie";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { VideoContext } from "@client/components/common/contexts/video-context";
+import { booleanify, getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { checkHashedPassword, getProtectedVideoList } from "@server/utils/auth";
 import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
-import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { getPrivateLibrary } from "@server/utils/config";
 import { useRouter } from "next/router";
 import App from "next/app";
@@ -14,7 +14,7 @@ import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 import cookies from "next-cookies";
-import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import styled, { ThemeContext, ThemeProvider, createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
 html {
@@ -122,21 +122,12 @@ const ContentWrapper = styled.div`
   margin: 0px 30px 30px 30px;
 `;
 
-type NextAppComponentType = typeof App;
-interface ExtendedAppProps extends AppProps {
-  videos: Video[];
-  theme: BluJayTheme;
-}
-
-const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
-  Component,
-  pageProps,
-  theme,
-  videos: _videos,
-}: ExtendedAppProps): ReactElement => {
-  const [search, setSearch] = useState("");
-  const [videos, setVideos] = useState(_videos);
+const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   const router = useRouter();
+  const [search, setSearch] = useState("");
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [cookies] = useCookies(["isDarkMode"]);
+  const [theme, setTheme] = useState<BluJayTheme>(darkTheme);
 
   // assign default values to cookies if not set
   // get all cookies and set default if none
@@ -149,6 +140,10 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
 
   const categories = [...new Set(videos.map((video) => video.category))].filter((category) => category);
   const searchResults = videos.filter((video) => video.name.toLowerCase().includes(search.toLowerCase()));
+
+  useEffect(() => {
+    setTheme(cookies.isDarkMode === "false" ? lightTheme : darkTheme);
+  }, []);
 
   return (
     <>
@@ -180,40 +175,6 @@ const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
       </CookiesProvider>
     </>
   );
-};
-
-MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
-  const { ctx } = initialProps;
-
-  // auth stuff
-  const authToken = cookies(ctx)?.authToken ?? "";
-  let videos: Video[] = [];
-  let authStatus = false;
-  let isPrivateLibrary = true;
-
-  if (typeof window === "undefined") {
-    videos = getProtectedVideoList(authToken);
-    authStatus = checkHashedPassword(authToken);
-    isPrivateLibrary = getPrivateLibrary();
-  }
-
-  if (!authStatus && ctx.res) {
-    if (authToken) ctx.res.setHeader("Set-Cookie", "authToken=; path=/;");
-    if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
-      ctx.res.writeHead(302, { Location: "/login" });
-      ctx.res.end();
-    }
-  }
-
-  const theme = cookies(ctx).isDarkMode === "false" ? lightTheme : darkTheme;
-
-  // get the remaining app props...
-  const appInitialProps = (await App.getInitialProps(initialProps)) as AppProps;
-  return {
-    videos,
-    theme,
-    ...appInitialProps,
-  };
 };
 
 export default MyApp;

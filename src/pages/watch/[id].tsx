@@ -1,6 +1,6 @@
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
-import { checkHashedPassword } from "@server/utils/auth";
+import { authGuard, checkHashedPassword } from "@server/utils/auth";
 import { listVideos } from "@server/utils/listVideos";
 import React from "react";
 import WatchPage from "@client/components/pages/watch/watch";
@@ -20,17 +20,10 @@ const Watch: NextPage<WatchProps> = ({ video, url }: WatchProps) => {
   return <WatchPage video={video} url={url}></WatchPage>;
 };
 
-export const getServerSideProps: GetServerSideProps<WatchProps> = async (ctx) => {
-  const isAuthenticated = checkHashedPassword(ctx.req.cookies?.authToken ?? "");
+export const getServerSideProps: GetServerSideProps<WatchProps> = authGuard(async (ctx) => {
   const video = (await listVideos()).find((video) => {
     return video.id === ctx.query.id;
   });
-
-  // if the user is not authorized to view the video, redirect them
-  if (video?.requireAuth && !isAuthenticated && !ctx.res.writableEnded) {
-    ctx.res.writeHead(302, { Location: "/401" });
-    ctx.res.end();
-  }
 
   // http://localhost:3000/watch/85818224
   const protocol = ctx.req.headers?.["x-forwarded-proto"] || "http";
@@ -39,6 +32,6 @@ export const getServerSideProps: GetServerSideProps<WatchProps> = async (ctx) =>
 
   // if no auth required
   return { props: { video, url } };
-};
+});
 
 export default Watch;

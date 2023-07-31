@@ -1,11 +1,14 @@
+import { Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
-import React, { FC, useContext } from "react";
+import React, { FC, useContext, useEffect } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 
-const IndexPage: FC = () => {
-  const videos = useContext(VideoContext).videos;
-  const favoritedVideos = videos.filter((video) => video.isFavorite);
+interface IndexPageProps {
+  videos: Video[];
+}
 
+const IndexPage: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
+  const favoritedVideos = videos.filter((video) => video.isFavorite);
   return (
     <>
       <VideoSlider videos={videos} sliderType={"horizontal"} headerText={"Recent Videos"} intialSort={"Date Created"} />

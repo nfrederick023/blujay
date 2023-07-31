@@ -1,10 +1,12 @@
-import { VideoContext } from "@client/components/common/contexts/video-context";
-import React, { FC, useContext } from "react";
+import { Video } from "@client/utils/types";
+import React, { FC } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 
-const AllPage: FC = () => {
-  const videos = useContext(VideoContext).videos;
+interface AllPageProps {
+  videos: Video[];
+}
 
+const AllPage: FC<AllPageProps> = ({ videos }: AllPageProps) => {
   return <VideoSlider videos={videos} sliderType={"verticle"} headerText={"All Videos"} />;
 };
 
