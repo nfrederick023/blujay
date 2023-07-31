@@ -31,7 +31,7 @@ const SelectedBox = styled.div`
 
 const SelectedOption = styled.div`
   border: ${(p: { isMulti: boolean | undefined; theme: BluJayTheme }): string =>
-    p.isMulti ? `1px solid ${p.theme.textContrast};` : "border: 0px;"};
+    p.isMulti ? `1px solid ${p.theme.textContrast};` : "0px solid"};
 `;
 
 const SelectedIcon = styled.i`

@@ -22,7 +22,7 @@ const PageButton = styled.div`
   transition: 0.2s;
   &:hover {
     cursor: pointer;
-    border: 1px solid ${(p): string => p.theme.text};
+    border: 1px solid ${(p): string => p.theme.highlightDark};
     color: ${(p): string => p.theme.text};
   }
   ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>

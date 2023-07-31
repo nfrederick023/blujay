@@ -1,7 +1,7 @@
 import { AppProps } from "next/app";
 import { BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
-import { ReactElement, useContext, useState } from "react";
+import { ReactElement, useState } from "react";
 import { VideoContext } from "@client/components/common/contexts/video-context";
 import { checkHashedPassword, getProtectedVideoList } from "@server/utils/auth";
 import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
@@ -9,7 +9,6 @@ import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { getPrivateLibrary } from "@server/utils/config";
 import { useRouter } from "next/router";
 import App from "next/app";
-import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
 import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
@@ -26,19 +25,27 @@ html {
 
 body {
   overflow-y: scroll;
+  overflow-x: hidden;
 
+  &::-webkit-scrollbar
+  {
+    width: 8px;
+    background-color: rgba(0,0,0,0.0);
+  }
 
-&::-webkit-scrollbar
-{
-	width: 8px;
-	background-color: rgba(0,0,0,0.0);
-}
+  &::-webkit-scrollbar-thumb
+  {
+    border-radius: 8px;
+    background-color: ${(p): string => p.theme.textContrast};
+  }
 
-&::-webkit-scrollbar-thumb
-{
-	border-radius: 8px;
-	background-color: ${(p): string => p.theme.textContrast};
-}
+    @media (max-width: ${screenSizes.tabletScreenSize}px) {
+     &::-webkit-scrollbar
+      {
+        width: 0px;
+        background-color: rgba(0,0,0,0.0);
+      }
+  }
 }
 
 a:hover, a:visited, a:link, a:active
@@ -180,9 +187,15 @@ MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
 
   // auth stuff
   const authToken = cookies(ctx)?.authToken ?? "";
-  const videos = getProtectedVideoList(authToken);
-  const authStatus = checkHashedPassword(authToken);
-  const isPrivateLibrary = getPrivateLibrary();
+  let videos: Video[] = [];
+  let authStatus = false;
+  let isPrivateLibrary = true;
+
+  if (typeof window === "undefined") {
+    videos = getProtectedVideoList(authToken);
+    authStatus = checkHashedPassword(authToken);
+    isPrivateLibrary = getPrivateLibrary();
+  }
 
   if (!authStatus && ctx.res) {
     if (authToken) ctx.res.setHeader("Set-Cookie", "authToken=; path=/;");

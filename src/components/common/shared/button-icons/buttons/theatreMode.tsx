@@ -4,19 +4,19 @@ import ButtonIcon from "../button-icon";
 import React, { FC } from "react";
 
 const TheatreModeButton: FC = () => {
-  const [cookies, setCookie] = useCookies(["isTheaterMode", "videoVolume", "isSidebarEnabled"]);
-  const isTheatreMode = booleanify(cookies.isTheaterMode);
+  const [cookies, setCookie] = useCookies(["isTheaterMode"]);
+  const isTheaterMode = booleanify(cookies.isTheaterMode);
 
   const handleSetViewMode = (): void => {
-    setCookie("isTheaterMode", !isTheatreMode, getCookieSetOptions());
+    setCookie("isTheaterMode", !isTheaterMode, getCookieSetOptions());
   };
 
   return (
     <ButtonIcon
       icon="bx bx-movie"
       selectedIcon="bx bx-movie"
-      textOn="Theatre Mode"
-      isSelected={isTheatreMode}
+      textOn="Theater Mode"
+      isSelected={isTheaterMode}
       hoverTextOn="Close Theatre Mode"
       hoverTextOff="Open Theatre Mode"
       confrimTextOn="Opened!"

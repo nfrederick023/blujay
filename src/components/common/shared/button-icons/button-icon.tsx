@@ -1,5 +1,5 @@
 import { BluJayTheme } from "@client/utils/types";
-import React, { FC, MouseEvent, useState } from "react";
+import React, { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Button = styled.div`
@@ -9,8 +9,8 @@ const Button = styled.div`
   border-radius: 8px;
   display: grid;
   white-space: pre;
-  padding: 5px;
   align-content: center;
+  cursor: pointer;
   min-width: 38px;
   min-height: 38px;
   max-height: 38px;
@@ -22,7 +22,6 @@ const Button = styled.div`
     border: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
         p.isSelected ? p.theme.hightlightSilver : p.theme.highlightDark}
       2px solid;
-    cursor: pointer;
   }
 
   h6 {
@@ -32,7 +31,7 @@ const Button = styled.div`
   i {
     margin: auto;
     margin-top: 1px;
-    margin-right: 3px;
+    padding-right: 1px;
     font-size: 1.1em !important;
   }
 `;
@@ -48,10 +47,11 @@ const IconWithText = styled.i`
 const Wrapper = styled.div`
   width: 0px;
   height: 0px;
+  right: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "-3px" : "0px")};
   position: relative;
   display: grid;
-  justify-content: center;
-  justify-self: center;
+  justify-content: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
+  justify-self: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
 `;
 
 const FlexBox = styled.div`
@@ -61,14 +61,16 @@ const FlexBox = styled.div`
 
 const Box = styled.div`
   animation: fadein 0.5s;
+  right: 1px;
+
   white-space: nowrap;
-  margin-top: 20px;
+  margin-top: 19px;
   background: ${(p): string => p.theme.button};
   padding: 10px;
   border-radius: 8px;
 `;
 
-const SelectedBox = styled.div`
+const SelectedBox = styled(Box)`
   @keyframes fadeInOut {
     0% {
       opacity: 0;
@@ -84,11 +86,6 @@ const SelectedBox = styled.div`
     }
   }
   animation: fadeInOut 0.75s linear 1 forwards;
-  white-space: nowrap;
-  margin-top: 20px;
-  background: ${(p): string => p.theme.button};
-  padding: 10px;
-  border-radius: 8px;
 `;
 
 interface ButtonIconProps {
@@ -117,7 +114,9 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   onClick,
 }: ButtonIconProps) => {
   const [isHover, setIsHover] = useState(false);
+  const [isOffscreen, setIsOffscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const hoverEl = useRef<HTMLDivElement>(null);
 
   const handleMouseEnter = (): void => {
     setIsHover(true);
@@ -125,6 +124,17 @@ const ButtonIcon: FC<ButtonIconProps> = ({
 
   const handleMouseLeave = (): void => {
     setIsHover(false);
+  };
+
+  const isElOffscreen = (): boolean => {
+    let isOffscreen = false;
+    if (hoverEl?.current) {
+      const marginSize = 30;
+      const rect = hoverEl.current.getBoundingClientRect();
+      const viewWidth = Math.max(document.documentElement.clientWidth, window.innerWidth);
+      isOffscreen = rect.x + rect.width >= viewWidth - marginSize;
+    }
+    return isOffscreen;
   };
 
   const handleClick = (e: MouseEvent): void => {
@@ -149,6 +159,10 @@ const ButtonIcon: FC<ButtonIconProps> = ({
 
   const maxLength = Math.max(textOn?.length || 0, textOff?.length || 0) - 1;
 
+  useEffect((): void => {
+    setIsOffscreen(isElOffscreen());
+  }, [isHover]);
+
   return (
     <>
       <Button
@@ -168,12 +182,12 @@ const ButtonIcon: FC<ButtonIconProps> = ({
           <>{icon && <i className={_icon} />}</>
         )}
         {hoverText && !isPlaying && isHover && (
-          <Wrapper>
-            <Box>{hoverText}</Box>
+          <Wrapper isOffscreen={isOffscreen}>
+            <Box ref={hoverEl}>{hoverText}</Box>
           </Wrapper>
         )}
         {confirmText && isPlaying && (
-          <Wrapper>
+          <Wrapper isOffscreen={isOffscreen}>
             <SelectedBox>{confirmText}</SelectedBox>
           </Wrapper>
         )}

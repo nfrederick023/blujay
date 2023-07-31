@@ -6,6 +6,7 @@ import React, { FC, useContext, useState } from "react";
 import RequireAuthButton from "../../shared/button-icons/buttons/requireAuth";
 import SubredditsSearch from "./search";
 import TimeAgo from "react-timeago";
+import prettyBytes from "pretty-bytes";
 import styled from "styled-components";
 const SearchResult = styled.div`
   display: flex;
@@ -25,13 +26,11 @@ const FlexWrapper = styled.div`
 `;
 
 const ListItem = styled.div`
-  padding: auto;
   min-height: 48px;
   max-height: 48px;
   align-content: center;
   display: flex;
   flex-wrap: wrap;
-  padding: 10px;
   width: 100%;
   border-bottom: 1px solid ${(p): string => p.theme.textContrast};
 `;
@@ -57,7 +56,11 @@ const Icons = styled.div`
   margin-left: auto;
 `;
 
-const Buttons = styled.span`
+const Test = styled.div`
+  margin: auto 0px auto 0px;
+`;
+
+const Buttons = styled.div`
   margin-left: auto;
   display: flex;
 
@@ -117,11 +120,9 @@ const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
                 <ListOptions>
                   <TimeAgo date={video.saved} />
                 </ListOptions>
-                <ListSize>
-                  <div>Size</div>
-                </ListSize>
+                <ListSize>{prettyBytes(video.size)}</ListSize>
                 <ListName>
-                  {video.name}
+                  <Test>{video.name}</Test>
                   <Buttons>
                     <FavoriteButton handleResponse={updateVideo} video={video} />
                     <CopyLinkButton link={window.location.origin + "/watch/" + video.id} />

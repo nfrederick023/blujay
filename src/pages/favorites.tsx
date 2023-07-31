@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+
 import FavoritesPage from "@client/components/pages/favorites/favorites";
 import React from "react";
 

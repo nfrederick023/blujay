@@ -82,6 +82,8 @@ const getCreateVideo = (filePath: string): Video | null => {
   // check if the video already is persisted within the state
   const videoState = videoList.find((video) => { return video.filePath === filePath; });
 
+  console.log(videoState);
+
   if (videoState) {
 
     // reindex if any of the following values don't match for whatever reason

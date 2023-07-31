@@ -78,14 +78,14 @@ interface WatchPageProps {
 
 const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
   const [video, setVideo] = useState(originalVideo);
-  const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheatreMode"]);
+  const [cookies, setCookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const windowHeight = useWindowHeight();
   const windowWidth = useWindowWidth();
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const isVideo = isMediaTypeVideo(originalVideo.extentsion);
-  const isTheatreMode = booleanify(cookies.isTheatreMode);
+  const isTheatreMode = booleanify(cookies.isTheaterMode);
 
   const handleVolumeChange = (): void => {};
 
@@ -143,8 +143,6 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
   const thumbSrc = "/api/thumb/" + encodeURIComponent(video.id);
   const fullVideoURL = `${src}${videoSrc}`;
   const fullThumbSrc = `${src}${thumbSrc}`;
-
-  console.log(url);
 
   return (
     <>

@@ -94,7 +94,8 @@ const LoginPage: FC = () => {
     const res = await login(password);
     if (res.ok) {
       setCookie("authToken", await res.text(), getCookieSetOptions());
-      router.push("/");
+      router.replace("/");
+      router.reload();
     } else setHasLoginFailed(true);
   };
 
