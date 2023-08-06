@@ -6,7 +6,6 @@ const HeaderWrapper = styled.div`
   align-items: baseline;
   margin-bottom: 15px;
   display: flex;
-  width: 100%;
 `;
 
 const HeaderIconsWrapper = styled.div`

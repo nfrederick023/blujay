@@ -26,6 +26,10 @@ const CogDropDown = styled.span`
   top: 20px;
 `;
 
+const CogContainer = styled.div`
+  width: 0px;
+`;
+
 const CogIcon = styled.i`
   color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
     p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
@@ -92,7 +96,9 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
   return (
     <HeaderWrapper>
       <SearchBar setSearch={setSearch} />
-      <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
+      <CogContainer>
+        <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
+      </CogContainer>
       <div>
         <CogDropDown onClick={prevent} onMouseDown={mouseDown} onMouseUp={mouseUp}>
           {isFocused && <DropDown options={options}></DropDown>}
