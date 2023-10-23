@@ -13,11 +13,16 @@ export const getThumnailSettings = (): Thumbnail => {
   return (getConfig()).thumbnailSettings;
 };
 
-export const getPath = (): string => {
-  const dir = "/blujay" as string | undefined;
+export const getDataPath = (): string => {
+  const dir = "/data" as string | undefined;
   if (dir)
     return checkCreateDir(dir);
   throw ("Required: \"path\" configuration property not found!");
+};
+
+export const getPath = (): string => {
+  const dir = getDataPath() + "/blujay/";
+  return checkCreateDir(dir);
 };
 
 export const getAssetsPath = (): string => {

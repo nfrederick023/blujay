@@ -1,6 +1,5 @@
 import { Video } from "@client/utils/types";
-import { VideoContext } from "@client/components/common/contexts/video-context";
-import React, { FC, useContext, useEffect } from "react";
+import React, { FC } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 
 interface IndexPageProps {

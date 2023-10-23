@@ -19,8 +19,8 @@ export const getCookieDefault = (name: CookieTypes): boolean | string | number =
       return false;
     case "videoVolume":
       return 1;
-    case "isDarkMode":
-      return true;
+    // case "isDarkMode":
+    //   return true;
     case "authToken":
       return "";
   }

@@ -1,5 +1,10 @@
+import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
+import { screenSizes } from "@client/utils/theme";
+import { useCookies } from "react-cookie";
+import { useRouter } from "next/router";
+import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import styled from "styled-components";
 
 const CategoryButtonWrapper = styled.div`
@@ -31,6 +36,15 @@ interface CategoryButtonProps {
 
 const CategoryButton: FC<CategoryButtonProps> = ({ category }: CategoryButtonProps) => {
   const categoryURL = ("/library/" + encodeURIComponent(category)).toLowerCase();
+  const [, setCookie] = useCookies();
+  const width = useWindowWidth();
+
+  const location = useRouter();
+  useEffect(() => {
+    if (width < screenSizes.tabletScreenSize) {
+      setCookie("isSidebarEnabled", "true", getCookieSetOptions());
+    }
+  }, [location]);
 
   const isSelected = categoryURL === window.location.pathname.toLowerCase();
   return (

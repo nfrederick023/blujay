@@ -10,13 +10,9 @@ import VerticleSlider from "./verticle/verticle-slider";
 import styled from "styled-components";
 
 const VideoSliderWrapper = styled.div`
-  padding: 15px 0px 15px 0px;
+  padding: 0px 0px 15px 0px;
   width: auto;
   min-width: auto;
-`;
-
-const NoVideosWrapper = styled.div`
-  min-width: 100vw;
 `;
 
 type SliderType = "verticle" | "horizontal";
@@ -36,7 +32,7 @@ const VideoSlider: FC<VideoSliderProps> = ({
   headerText,
   videos,
 }: VideoSliderProps) => {
-  const width = useWindowWidth();
+  const width = useWindowWidth({ wait: 10 });
   const scrollbarWidth = 20;
 
   let videoWidthPercent = 90;
@@ -58,11 +54,10 @@ const VideoSlider: FC<VideoSliderProps> = ({
           <SliderHeader headerText={headerText}>
             <></>
           </SliderHeader>
-          <NoVideosWrapper>No Videos Found</NoVideosWrapper>
+          <div>No Videos Found</div>
         </>
       ) : (
         <VideoSliderWrapper>
-          {" "}
           <NoSSR>
             {sliderType === "horizontal" ? (
               <HorizontalSlider videos={sortedVideos} videosPerRow={videosPerRow} headerText={headerText} />

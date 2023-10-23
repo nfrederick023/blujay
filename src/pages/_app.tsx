@@ -1,21 +1,16 @@
 import { AppProps } from "next/app";
 import { BluJayTheme, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider, useCookies } from "react-cookie";
-import { ReactElement, useContext, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { VideoContext } from "@client/components/common/contexts/video-context";
-import { booleanify, getCookieDefault, getCookieSetOptions } from "../utils/cookie";
-import { checkHashedPassword, getProtectedVideoList } from "@server/utils/auth";
 import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
-import { getPrivateLibrary } from "@server/utils/config";
+import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
-import App from "next/app";
 import Header from "@client/components/common/layout/header/header";
 import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
-import cookies from "next-cookies";
-import styled, { ThemeContext, ThemeProvider, createGlobalStyle } from "styled-components";
-
+import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
 html {
   font-family: 'Montserrat';
@@ -77,8 +72,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  line-height: 75%;
-  font-size: 2.20em;
+  line-height: 100%;
+  font-size: 1.9em;
   font-weight: 900;
 }
 
@@ -119,7 +114,7 @@ const CenterContent = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  margin: 0px 30px 30px 30px;
+  margin: 10px 30px 30px 30px;
 `;
 
 const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
@@ -128,11 +123,12 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [cookies] = useCookies(["isDarkMode"]);
   const [theme, setTheme] = useState<BluJayTheme>(darkTheme);
+  const location = useRouter();
 
   // assign default values to cookies if not set
   // get all cookies and set default if none
   const _cookies = new Cookies();
-  const allCookieTypes: CookieTypes[] = ["authToken", "isDarkMode", "isTheaterMode", "videoVolume", "isSidebarEnabled"];
+  const allCookieTypes: CookieTypes[] = ["authToken", "isTheaterMode", "videoVolume", "isSidebarEnabled"];
 
   allCookieTypes.forEach((cookieType) => {
     if (!_cookies.get(cookieType)) _cookies.set(cookieType, getCookieDefault(cookieType), getCookieSetOptions());
@@ -144,6 +140,12 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   useEffect(() => {
     setTheme(cookies.isDarkMode === "false" ? lightTheme : darkTheme);
   }, []);
+
+  useEffect(() => {
+    if (search) {
+      setSearch("");
+    }
+  }, [location]);
 
   return (
     <>
@@ -158,8 +160,8 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
                 <>
                   <Sidebar categories={categories} />
                   <CenterContent>
+                    <Header setSearch={setSearch} />
                     <ContentWrapper>
-                      <Header setSearch={setSearch} />
                       {search ? (
                         <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />
                       ) : (

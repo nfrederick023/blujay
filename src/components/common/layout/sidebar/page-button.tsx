@@ -1,20 +1,24 @@
+import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
+import { screenSizes } from "@client/utils/theme";
+import { useCookies } from "react-cookie";
+import { useRouter } from "next/router";
+import { useWindowWidth } from "@react-hook/window-size";
 import Gradient from "../../shared/gradient";
 import Link from "next/link";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
   width: 100%;
   color: white;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-right: 40px;
   margin-bottom: 5px;
   line-height: 5px;
   transition: 0.1s;
 
   span {
-    min-height: 45px;
-    max-height: 45px;
+    min-height: 40px;
+    max-height: 40px;
     border-radius: 10px;
     align-items: center;
     display: flex;
@@ -25,7 +29,6 @@ const ButtonWrapper = styled.div`
 
 const Icon = styled.i`
   padding-right: 10px;
-  vertical-align: middle;
 `;
 
 const Unselected = styled.span`
@@ -45,6 +48,15 @@ interface SideBarButtonProps {
 
 const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url }: SideBarButtonProps) => {
   const isSelected = window.location.pathname.split("/")[1] === url;
+  const [, setCookie] = useCookies();
+  const width = useWindowWidth();
+  const location = useRouter();
+
+  useEffect(() => {
+    if (width < screenSizes.tabletScreenSize) {
+      setCookie("isSidebarEnabled", "true", getCookieSetOptions());
+    }
+  }, [location]);
 
   return (
     <>

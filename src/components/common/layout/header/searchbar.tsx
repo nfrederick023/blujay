@@ -10,7 +10,7 @@ const SearchBarContent = styled.div`
   text-align: center;
   display: flex;
   min-height: 1.3rem;
-  max-width: 35rem;
+  max-width: 750px;
   width: 100%;
   margin: auto;
   margin-bottom: 15px;
@@ -21,10 +21,15 @@ const SearchBarContent = styled.div`
     cursor: text;
   }
 
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+  @media (max-width: ${screenSizes.smallScreenSize}px) {
+    margin-left: 225px;
+    margin-right: 70px;
     max-width: 100%;
-    margin-left: 75px;
-    margin-right: 20px;
+  }
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    margin-left: 70px;
+    margin-right: 70px;
   }
 `;
 

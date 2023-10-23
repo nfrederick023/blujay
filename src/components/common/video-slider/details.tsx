@@ -35,9 +35,9 @@ const Thumbnail = styled.img.attrs(thumbnailAttr)`
 
 const ImagePlayer = styled.img.attrs(thumbnailAttr)`
   position: absolute;
-  width: 100%;
   object-fit: cover;
   border-radius: 15px;
+  width: 100%;
 
   opacity: 0;
   transition: opacity 0.1s ease-in-out;
@@ -53,14 +53,11 @@ const VideoPlayer = styled.video.attrs(thumbnailAttr)`
   border-radius: 15px;
   object-fit: cover;
 
-  opacity: 0;
   transition: opacity 0.1s ease-in-out;
 
-  &:hover {
-    opacity: ${(p): string => {
-      return p.hasLoaded ? "1" : "0";
-    }};
-  }
+  opacity: ${(p): string => {
+    return p.isPlaying ? "1" : "0";
+  }};
 `;
 
 const VideoNameWrapper = styled.div`
@@ -85,72 +82,68 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [size, setSize] = useState(0);
-  const [hasHovered, setHasHovered] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const imageHeight = (size / 1920) * 1080;
   const isVideo = isMediaTypeVideo(video?.extentsion || "");
   const isGif = video?.extentsion === "gif";
 
   React.useLayoutEffect(() => setSize(ref.current?.getBoundingClientRect().width || 0), [ref]);
 
-  useResizeObserver(ref, (entry) => setSize(entry.contentRect.width));
+  useResizeObserver(ref, (entry) => {
+    if (size !== entry.contentRect.width) {
+      setSize(entry.contentRect.width);
+    }
+  });
 
-  const handleIsHoverTrueChange = (): void => {
-    if (!hasHovered) setHasHovered(true);
-    if (videoRef.current && videoRef.current.paused) videoRef.current.play();
-  };
-
-  const handleIsHoverFalseChange = (): void => {
+  const handleIsHoverTrueChange = async (): Promise<void> => {
+    setIsHovering(true);
     if (videoRef.current) {
-      const isPlaying =
-        videoRef.current.currentTime > 0 &&
-        !videoRef.current.paused &&
-        !videoRef.current.ended &&
-        videoRef.current.readyState > videoRef.current.HAVE_CURRENT_DATA;
-      if (isPlaying) videoRef.current.pause();
+      await videoRef.current.play();
+      setIsPlaying(true);
     }
   };
 
-  const triggerHasLoaded = (): void => {
-    if (!hasLoaded) setHasLoaded(true);
+  const handleIsHoverFalseChange = (): void => {
+    setIsHovering(false);
   };
+
+  if (!isHovering && isPlaying) {
+    videoRef.current?.pause();
+  }
 
   return (
     <VideoDetailsWrapper ref={ref}>
       <Link href={"/watch/" + video?.id}>
         {video ? (
           <VideoDetailsContainer>
-            {hasHovered && (
-              <>
-                {isVideo && (
-                  <VideoPlayer
-                    ref={videoRef}
-                    onLoadedData={triggerHasLoaded}
-                    hasLoaded={hasLoaded}
-                    poster={"/api/thumb/" + encodeURIComponent(video.id)}
-                    onMouseEnter={handleIsHoverTrueChange}
-                    onMouseLeave={handleIsHoverFalseChange}
-                    src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
-                    imageHeight={imageHeight}
-                    autoPlay
-                    muted
-                    loop
-                  />
-                )}
-                {isGif && (
-                  <ImagePlayer
-                    imageHeight={imageHeight}
-                    onMouseEnter={handleIsHoverTrueChange}
-                    onMouseLeave={handleIsHoverFalseChange}
-                    src={"/api/watch/" + encodeURIComponent(video.id) + ".mp4"}
-                  />
-                )}
-              </>
+            {isVideo && (
+              <VideoPlayer
+                ref={videoRef}
+                poster={"/api/thumb/" + encodeURIComponent(video.id)}
+                onMouseEnter={handleIsHoverTrueChange}
+                onMouseLeave={handleIsHoverFalseChange}
+                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion}
+                disablePictureInPicture
+                imageHeight={imageHeight}
+                isPlaying={isHovering}
+                preload={"none"}
+                type={"video/mp4"}
+                muted
+                loop
+              />
+            )}
+            {isGif && (
+              <ImagePlayer
+                imageHeight={imageHeight}
+                onMouseEnter={handleIsHoverTrueChange}
+                onMouseLeave={handleIsHoverFalseChange}
+                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion}
+              />
             )}
             <Thumbnail
               imageHeight={imageHeight}
               onMouseEnter={handleIsHoverTrueChange}
-              onMouseLeave={handleIsHoverFalseChange}
               src={"/api/thumb/" + encodeURIComponent(video.id)}
             />
             <VideoNameWrapper>

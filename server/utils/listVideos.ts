@@ -74,10 +74,13 @@ const getCreateVideo = (filePath: string): Video | null => {
   const mimeType = mime.lookup(fileName) as string;
 
   const videoList = getVideoList();
-  const category = path.dirname(filePath).split("\\")[3] ?? "";
+  let category = path.dirname(filePath).split("\\").pop() ?? "";
   const extentsion = fileName.split(".").pop() as SupportedExtentsions;
   const id = parseInt((seedrandom(fileName + getUserPassword())() * 9e7 + 1e7).toString()).toString();
   const thumbnailPath = isMediaTypeVideo(extentsion) || extentsion === "gif" ? path.join(getThumbnailsPath() + id + ".jpg") : filePath;
+
+  if (category === "library")
+    category = "";
 
   // check if the video already is persisted within the state
   const videoState = videoList.find((video) => { return video.filePath === filePath; });

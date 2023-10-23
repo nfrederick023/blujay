@@ -22,21 +22,25 @@ const CogDropDown = styled.span`
   position: absolute;
   width: 250px;
   margin-right: 170px;
-  right: -170px;
+  right: -140px;
   top: 20px;
 `;
 
 const CogContainer = styled.div`
-  width: 0px;
+  position: fixed;
+  display: flex;
+  height: 58px;
+  right: 30px;
 `;
 
 const CogIcon = styled.i`
+  margin: auto;
+
   color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
     p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
   margin: auto 0px auto 0px;
   font-size: 28px;
   transition: 0.2s;
-  padding-bottom: 1px;
 
   &:hover {
     color: ${(p): string => p.theme.text};

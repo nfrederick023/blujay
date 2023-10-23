@@ -4,8 +4,8 @@ import CopyLinkButton from "../../shared/button-icons/buttons/copyLink";
 import FavoriteButton from "../../shared/button-icons/buttons/favorite";
 import React, { FC, useContext, useState } from "react";
 import RequireAuthButton from "../../shared/button-icons/buttons/requireAuth";
-import SubredditsSearch from "./search";
 import TimeAgo from "react-timeago";
+import VideoSearch from "./video-search";
 import prettyBytes from "pretty-bytes";
 import styled from "styled-components";
 const SearchResult = styled.div`
@@ -85,7 +85,7 @@ const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
 
   return (
     <>
-      <SubredditsSearch
+      <VideoSearch
         paginatedResults={paginatedResults}
         setPaginatedResults={setPaginatedResults}
         videos={videos}
@@ -95,7 +95,7 @@ const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
       <SearchHeaderWrapper>
         <FlexWrapper>
           <ListOptions>
-            <div>Created</div>
+            <div>Updated</div>
           </ListOptions>
           <ListOptions>
             <div>Uploaded</div>

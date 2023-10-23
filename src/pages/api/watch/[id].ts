@@ -37,7 +37,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
     }
 
     if (isMediaTypeVideo(video.extentsion) && video.extentsion !== "gif") {
-      serveVideo(req, res, video.filePath);
+      serveVideo(req, res, video);
     }
     else {
       const mimeType = mime.lookup(video.fileName) || "";
@@ -52,13 +52,13 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
   return;
 };
 
-const serveVideo = (req: NextApiRequest, res: NextApiResponse, videoPath: string): void => {
+const serveVideo = (req: NextApiRequest, res: NextApiResponse, video: Video): void => {
   const range = req.headers.range;
   if (!range) {
     res.status(400).send("Requires Range header");
     return;
   }
-  const videoSize = fs.statSync(videoPath).size;
+  const videoSize = fs.statSync(video.filePath).size;
   const chunkSize = 1 * 4e6; // 4mbs
   const start = Number(range.replace(/\D/g, ""));
   const end = Math.min(start + chunkSize, videoSize - 1);
@@ -67,10 +67,10 @@ const serveVideo = (req: NextApiRequest, res: NextApiResponse, videoPath: string
     "Content-Range": `bytes ${start}-${end}/${videoSize}`,
     "Accept-Ranges": "bytes",
     "Content-Length": contentLength,
-    "Content-Type": "video/mp4"
+    "Content-Type": video.mimeType
   };
   res.writeHead(206, headers);
-  const stream = fs.createReadStream(videoPath, {
+  const stream = fs.createReadStream(video.filePath, {
     start,
     end
   });

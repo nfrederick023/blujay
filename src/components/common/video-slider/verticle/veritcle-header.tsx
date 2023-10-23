@@ -1,4 +1,5 @@
 import { OrderType, SortType, ViewType } from "@client/utils/types";
+import { screenSizes } from "@client/utils/theme";
 import React, { FC } from "react";
 import Select from "../../shared/select";
 import SliderHeader from "../header";
@@ -21,12 +22,20 @@ const SortIcon = styled.i`
 const SortSelect = styled.div`
   display: flex;
   width: 280px;
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    margin-top: 10px;
+  }
 `;
 
 const TypeSelect = styled.div`
   width: 110px;
-  margin-left: 5px;
+  margin-left: 15px;
   display: flex;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    margin-left: 0px;
+    margin-top: 10px;
+  }
 `;
 
 const viewOptions: ViewType[] = ["Grid View", "List View"];

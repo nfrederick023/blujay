@@ -78,16 +78,18 @@ interface WatchPageProps {
 
 const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
   const [video, setVideo] = useState(originalVideo);
-  const [cookies, setCookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
+  const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const windowHeight = useWindowHeight();
-  const windowWidth = useWindowWidth();
+  const windowWidth = useWindowWidth({ wait: 10 });
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const isVideo = isMediaTypeVideo(originalVideo.extentsion);
   const isTheatreMode = booleanify(cookies.isTheaterMode);
 
-  const handleVolumeChange = (): void => {};
+  const handleVolumeChange = (): void => {
+    //
+  };
 
   const updateVideo = (res: Response, newVideo: Video): void => {
     if (res.ok) setVideo(newVideo);

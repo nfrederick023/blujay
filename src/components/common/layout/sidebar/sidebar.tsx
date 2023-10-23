@@ -1,9 +1,9 @@
-import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
+import { booleanify } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/theme";
 import { useCookies } from "react-cookie";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./category-button";
-import Gradient from "../../shared/gradient";
+import Logo from "./logo";
 import NoSSR from "@mpth/react-no-ssr";
 import React, { FC } from "react";
 import SideBarButton from "./page-button";
@@ -14,15 +14,17 @@ const SidebarWapper = styled.div`
   background: ${(p): string => p.theme.backgroundContrast};
   min-width: 250px;
   max-width: 250px;
-  transition: 0.2s;
+  transition: 0.1s ease-in-out;
   user-select: none;
   position: sticky;
   top: 0px;
-  z-index: 3;
+  z-index: 4;
   min-height: 100vh;
 
-  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")} @media
-    (min-width: ${screenSizes.largeScreenSize + 420}px) {
+  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")};
+
+  @media (max-width: ${screenSizes.smallScreenSize}px) {
+    position: fixed;
   }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
@@ -37,42 +39,15 @@ const SidebarWapper = styled.div`
 const SidebarContent = styled.div`
   max-width: inherit;
   min-width: inherit;
-  justify-content: center;
   display: flex;
   position: fixed;
   flex-wrap: wrap;
-  padding-top: 25px;
-  margin-left: -2px;
+  margin-left: 20px;
   font-weight: 575;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     max-width: 100%;
     width: 100%;
-  }
-`;
-
-const Logo = styled.div`
-  margin-bottom: 20px;
-  text-align: center;
-  width: 100%;
-
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    padding-left: 20px;
-    font-size: 1.75em;
-    padding-top: 50px;
-  }
-`;
-
-const BarsIcon = styled.i`
-  font-size: 3rem !important;
-  verticle-align: middle;
-  position: fixed;
-  top: -3.5px;
-  left: 10px;
-  z-index: 2;
-
-  &::before {
-    vertical-align: middle;
   }
 `;
 
@@ -83,36 +58,11 @@ const Library = styled.div`
   width: 100%;
 `;
 
-const MinimizeButton = styled.div`
-  position: absolute;
-  min-width: inherit;
-  min-height: 100%;
-  z-index: -1;
-`;
-
-const ArrowIconContainer = styled.div`
-  border-right: ${(p): string => p.theme.backgroundContrast} 1px solid;
-  position: absolute;
-  right: 0px;
-  min-height: inherit;
-  width: 20px;
-
-  &:hover {
-    transition: 0.2s;
-    border-right: ${(p): string => p.theme.highlightLight} 1px solid;
-    cursor: pointer;
-  }
-`;
-
-const ArrowIcon = styled.div`
-  position: absolute;
-  min-height: inherit;
-  right: -10px;
-  width: 30px;
-
-  &:hover {
-    cursor: pointer;
-  }
+const LogoBackdrop = styled.div`
+  position: fixed;
+  left: 20px;
+  top: 0px;
+  z-index: 3;
 `;
 
 interface SidebarProps {
@@ -120,35 +70,20 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
-  const [cookies, setCookie] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
+  const [cookies] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
   const width = useWindowWidth({ wait: 10 });
   const sidebarState = booleanify(cookies.isSidebarEnabled);
   const isCollapsed = width <= screenSizes.mobileScreenSize ? sidebarState : !sidebarState;
 
-  const handleIsCollapsedChange = (): void => {
-    setCookie("isSidebarEnabled", !sidebarState, getCookieSetOptions());
-  };
-
   return (
     <>
       <NoSSR>
+        <LogoBackdrop>
+          <Logo onlyShowMenu={width < screenSizes.tabletScreenSize} />
+        </LogoBackdrop>
         <SidebarWapper isCollapsed={isCollapsed}>
-          {width <= screenSizes.tabletScreenSize ? (
-            <BarsIcon onClick={handleIsCollapsedChange} className="bx bx-menu bx-lg" />
-          ) : (
-            <MinimizeButton>
-              <ArrowIconContainer>
-                <ArrowIcon onClick={handleIsCollapsedChange} />
-              </ArrowIconContainer>
-            </MinimizeButton>
-          )}
           <SidebarContent>
-            <Logo>
-              <Gradient type="text">
-                <h1>BLU</h1>
-              </Gradient>
-              <h1>JAY</h1>
-            </Logo>
+            <Logo />
             <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} />
 
             <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} />

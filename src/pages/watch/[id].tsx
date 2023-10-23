@@ -1,6 +1,6 @@
 import { GetServerSideProps, NextPage } from "next";
 import { Video } from "@client/utils/types";
-import { authGuard, checkHashedPassword } from "@server/utils/auth";
+import { authGuard } from "@server/utils/auth";
 import { listVideos } from "@server/utils/listVideos";
 import React from "react";
 import WatchPage from "@client/components/pages/watch/watch";

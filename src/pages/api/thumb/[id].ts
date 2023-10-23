@@ -42,11 +42,11 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
   }
 
   if (isMediaTypeVideo(video.extentsion) || video.extentsion === "gif") {
-    res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=${video.name}.jpeg` });
+    res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=UTF-8 ${video.id}.jpeg` });
     fs.createReadStream(`${getThumbnailsPath()}${video.id}.jpg`).pipe(res);
   } else {
     const mimeType = mime.lookup(video.fileName) || "";
-    res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=${video.fileName}` });
+    res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=UTF-8 ${video.fileName}` });
     fs.createReadStream(video.filePath).pipe(res);
   }
   return;

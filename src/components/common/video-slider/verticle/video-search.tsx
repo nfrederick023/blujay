@@ -19,15 +19,14 @@ const PageButton = styled.div`
   margin-right: 3px;
   align-content: center;
   user-select: none;
-  transition: 0.2s;
   &:hover {
     cursor: pointer;
-    border: 1px solid ${(p): string => p.theme.highlightDark};
+    border: 2px solid ${(p): string => p.theme.highlightDark};
     color: ${(p): string => p.theme.text};
   }
   ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
     p.isSelected
-      ? `border: 1px solid ${p.theme.highlightDark}; color: ${p.theme.text}; background-color: ${p.theme.highlightDark}`
+      ? `border: 2px solid ${p.theme.highlightDark}; color: ${p.theme.text}; background-color: ${p.theme.highlightDark}`
       : ""};
 `;
 
@@ -37,7 +36,7 @@ const ResultsPerPageWrapper = styled.div`
   margin-left: auto;
   align-content: center;
   height: 38px;
-  padding-left: 5px;
+  padding-left: 10px;
   padding-right: 5px;
   display: flex;
   padding: auto;
@@ -46,7 +45,7 @@ const ResultsPerPageWrapper = styled.div`
   border-radius: 5px;
 `;
 
-interface SubredditSearchProps {
+interface VideoSearchProps {
   videos: Video[];
   paginatedResults: Video[];
   resultsPerPageOptions: string[];
@@ -55,14 +54,14 @@ interface SubredditSearchProps {
   paginationFilter?: (result: Video) => boolean;
 }
 
-const SubredditsSearch: FC<SubredditSearchProps> = ({
+const VideoSearch: FC<VideoSearchProps> = ({
   videos,
   paginatedResults,
   resultsPerPageOptions,
   intialResultsPerPage,
   setPaginatedResults,
   paginationFilter,
-}: SubredditSearchProps) => {
+}: VideoSearchProps) => {
   const [resultsPerPage, setResultsPerPage] = useState(Number(intialResultsPerPage));
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -123,4 +122,4 @@ const SubredditsSearch: FC<SubredditSearchProps> = ({
   );
 };
 
-export default SubredditsSearch;
+export default VideoSearch;
