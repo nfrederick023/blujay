@@ -115,7 +115,7 @@ const CenterContent = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  margin: 10px 30px 30px 30px;
+  margin: 10px 20px 30px 20px;
 `;
 
 const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {

@@ -47,7 +47,8 @@ const SearchBarInput = styled.input`
 const SearchIcon = styled.i`
   font-size: 1.1rem !important;
   margin-left: 5px;
-  padding-top: 3.5px;
+  margin-right: 5px;
+  padding-top: 2px;
 
   &::before {
     vertical-align: top;

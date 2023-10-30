@@ -6,7 +6,7 @@ import styled from "styled-components";
 const ButtonWrapper = styled.div`
   width: 100%;
   color: white;
-  margin-right: 20px;
+  margin-right: 13px;
   margin-bottom: 5px;
   line-height: 5px;
   transition: 0.1s;

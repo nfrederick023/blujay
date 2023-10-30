@@ -10,7 +10,6 @@ const LogoContainer = styled.div`
   user-select: none;
   display: flex;
   height: 60px;
-  padding-right: 16px;
   ${(p: { onlyShowMenu: boolean }): string => (p.onlyShowMenu ? "width: 32px;" : "width: 210px;")}
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
@@ -23,12 +22,13 @@ const LogoWrapper = styled.div`
 `;
 
 const Icon = styled.i`
-  padding-top: 9px;
+  padding-top: 10px;
   padding-right: 48px;
-  padding-left: 3px;
 
   &:before {
-    margin-top: 2.2px;
+    margin-top: 1px;
+    margin-left: -5px;
+    left: 20px;
     position: fixed;
   }
 

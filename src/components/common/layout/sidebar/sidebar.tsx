@@ -7,11 +7,10 @@ import CategoryButton from "./category-button";
 import Logo from "./logo";
 import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useEffect, useState } from "react";
-import SideBarButton from "./page-button";
+import SideBarButton from "./sidebar-button";
 import styled from "styled-components";
 
 const SidebarWapper = styled.div`
-  min-height: 100%;
   background: ${(p): string => p.theme.backgroundContrast};
   min-width: 250px;
   max-width: 250px;
@@ -21,7 +20,7 @@ const SidebarWapper = styled.div`
   z-index: 4;
   min-height: 100vh;
 
-  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")};
+  ${(p): string => (p.isCollapsed ? "margin-left: -250px;" : "")};
 
   @media (max-width: ${screenSizes.smallScreenSize}px) {
     position: fixed;
@@ -37,13 +36,32 @@ const SidebarWapper = styled.div`
   }
 `;
 
+const SidebarBackdrop = styled.div`
+  min-width: 45px;
+  max-width: 40px;
+  user-select: none;
+  position: sticky;
+  top: 0px;
+  z-index: 3;
+  min-height: 100vh;
+  margin-left: 10px;
+`;
+
+const SidebarBackdropContent = styled.div`
+  display: flex;
+  position: fixed;
+  flex-wrap: wrap;
+  margin-left: 10px;
+  top: 67px;
+`;
+
 const SidebarContent = styled.div`
   max-width: 230px;
   min-width: 230px;
   display: flex;
   position: fixed;
   flex-wrap: wrap;
-  margin-left: 20px;
+  margin-left: 13px;
   font-weight: 575;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
@@ -61,9 +79,22 @@ const Library = styled.div`
 
 const LogoBackdrop = styled.div`
   position: fixed;
-  left: 20px;
+  left: 13px;
   top: 0px;
-  z-index: 3;
+  z-index: 4;
+`;
+
+const Icon = styled.i`
+  width: 100%;
+  height: 45px;
+  padding-left: 1px;
+
+  color: ${(p): string => p.theme.textContrast};
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+    cursor: pointer;
+  }
 `;
 
 interface SidebarProps {
@@ -117,6 +148,18 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
             </Library>
           </SidebarContent>
         </SidebarWapper>
+        {sidebarState ? (
+          <SidebarBackdrop>
+            <SidebarBackdropContent>
+              <Icon className={"bx bx-home-alt-2 bx-sm"} />
+              <Icon className={"bx bx-heart bx-sm"} />
+              <Icon className={"bx bx-list-ul bx-sm"} />
+              <Icon className={"bx bx-folder bx-sm"} />
+            </SidebarBackdropContent>
+          </SidebarBackdrop>
+        ) : (
+          <></>
+        )}
       </NoSSR>
     </>
   );
