@@ -16,12 +16,10 @@ const ChevronIcon = styled.div`
     cursor: pointer;
   }
 
-  opacity: ${(p: { isEnabled: boolean; theme: BluJayTheme }): number =>
-    p.isEnabled ? 1 : 0.5};
+  opacity: ${(p: { isEnabled: boolean; theme: BluJayTheme }): number => (p.isEnabled ? 1 : 0.5)};
 
   &:hover {
-    color: ${(p): string =>
-    p.isEnabled ? p.theme.text : p.theme.textContrast};
+    color: ${(p): string => (p.isEnabled ? p.theme.text : p.theme.textContrast)};
     cursor: ${(p): string => (p.isEnabled ? "pointer" : "auto")};
   }
 `;
@@ -42,8 +40,7 @@ const HorizontalSliderHeader: FC<HorizontalSliderHeaderProps> = ({
   position,
 }: HorizontalSliderHeaderProps) => {
   const handleIncrementOffset = (): void => {
-    if (!isMaxOffset && displayedPosition === position)
-      setPosition(position + 1);
+    if (!isMaxOffset && displayedPosition === position) setPosition(position + 1);
   };
 
   const handleDecrementOffset = (): void => {
@@ -51,17 +48,9 @@ const HorizontalSliderHeader: FC<HorizontalSliderHeaderProps> = ({
   };
 
   return (
-    <SliderHeader headerText={headerText}>
-      <ChevronIcon
-        className={"bx bx-chevron-left"}
-        isEnabled={!!position}
-        onClick={handleDecrementOffset}
-      />
-      <ChevronIcon
-        className={"bx bx-chevron-right"}
-        isEnabled={!isMaxOffset}
-        onClick={handleIncrementOffset}
-      />
+    <SliderHeader headerText={headerText} sliderType="horizontal">
+      <ChevronIcon className={"bx bx-chevron-left"} isEnabled={!!position} onClick={handleDecrementOffset} />
+      <ChevronIcon className={"bx bx-chevron-right"} isEnabled={!isMaxOffset} onClick={handleIncrementOffset} />
     </SliderHeader>
   );
 };

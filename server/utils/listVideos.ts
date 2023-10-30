@@ -72,6 +72,7 @@ const getCreateVideo = (filePath: string): Video | null => {
   const name = path.parse(fileName).name;
   const videoStats = fse.statSync(filePath);
   const mimeType = mime.lookup(fileName) as string;
+  const views = 0;
 
   const videoList = getVideoList();
   let category = path.dirname(filePath).split("\\").pop() ?? "";
@@ -88,7 +89,7 @@ const getCreateVideo = (filePath: string): Video | null => {
   if (videoState) {
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.saved !== videoStats.mtime.getTime() || videoState.created !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category) {
+    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category || videoState.views === undefined) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
         description: videoState.description,
@@ -96,15 +97,16 @@ const getCreateVideo = (filePath: string): Video | null => {
         isFavorite: videoState.isFavorite,
         id: videoState.id,
         size: videoStats.size,
-        saved: videoStats.mtime.getTime(),
-        created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : videoState.created,
+        uploaded: videoStats.mtime.getTime(),
+        updated: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : videoState.updated,
         mimeType,
         name,
         extentsion,
         fileName,
         filePath,
         thumbnailPath,
-        category
+        category,
+        views
       };
       newVideoList.push(newVideoState);
       setVideoList(newVideoList);
@@ -118,8 +120,8 @@ const getCreateVideo = (filePath: string): Video | null => {
     fileName,
     name,
     size: videoStats.size,
-    saved: videoStats.mtime.getTime(),
-    created: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : Date.now(),
+    uploaded: videoStats.mtime.getTime(),
+    updated: videoStats.birthtime.getTime() ? videoStats.birthtime.getTime() : Date.now(),
     extentsion,
     filePath,
     thumbnailPath,
@@ -128,7 +130,8 @@ const getCreateVideo = (filePath: string): Video | null => {
     isFavorite: false,
     mimeType,
     category,
-    id
+    id,
+    views
   };
 
   videoList.push(newVideoState);

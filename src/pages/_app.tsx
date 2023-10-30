@@ -7,6 +7,7 @@ import { darkTheme, lightTheme, screenSizes } from "@client/utils/theme";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
 import Header from "@client/components/common/layout/header/header";
+import LoadBar from "@client/components/common/layout/loadbar";
 import React from "react";
 import Sidebar from "@client/components/common/layout/sidebar/sidebar";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
@@ -120,6 +121,7 @@ const ContentWrapper = styled.div`
 const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [isLoading, setIsLoding] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
   const [cookies] = useCookies(["isDarkMode"]);
   const [theme, setTheme] = useState<BluJayTheme>(darkTheme);
@@ -139,6 +141,19 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
 
   useEffect(() => {
     setTheme(cookies.isDarkMode === "false" ? lightTheme : darkTheme);
+
+    location.events.on("routeChangeStart", (url: string): void => {
+      setIsLoding(true);
+    });
+
+    location.events.on("routeChangeComplete", (url: string): void => {
+      setIsLoding(false);
+    });
+    // // If the component is unmounted, unsubscribe
+    // // from the event with the `off` method:
+    // return () => {
+    //   location.events.off("routeChangeStart", handleRouteChange);
+    // };
   }, []);
 
   useEffect(() => {
@@ -158,6 +173,7 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
                 <Component {...pageProps} />
               ) : (
                 <>
+                  <LoadBar isLoading={isLoading} />
                   <Sidebar categories={categories} />
                   <CenterContent>
                     <Header setSearch={setSearch} />

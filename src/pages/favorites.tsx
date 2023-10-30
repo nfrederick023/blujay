@@ -6,13 +6,13 @@ import FavoritesPage from "@client/components/pages/favorites/favorites";
 import React, { useContext, useEffect } from "react";
 
 interface FavoritesProps {
-  videos: Video[];
+  serverVideos: Video[];
 }
 
-const Favorites: NextPage<FavoritesProps> = ({ videos }: FavoritesProps) => {
-  const videoContext = useContext(VideoContext);
+const Favorites: NextPage<FavoritesProps> = ({ serverVideos }: FavoritesProps) => {
+  const { videos, setVideos } = useContext(VideoContext);
   useEffect(() => {
-    videoContext.setVideos(videos);
+    setVideos(serverVideos);
   }, []);
   return <FavoritesPage videos={videos} />;
 };
@@ -20,7 +20,7 @@ const Favorites: NextPage<FavoritesProps> = ({ videos }: FavoritesProps) => {
 export const getServerSideProps: GetServerSideProps<FavoritesProps> = authGuard(async (ctx) => {
   return {
     props: {
-      videos: await getProtectedVideoList(ctx),
+      serverVideos: await getProtectedVideoList(ctx),
     },
   };
 });

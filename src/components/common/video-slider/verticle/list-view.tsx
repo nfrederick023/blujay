@@ -8,10 +8,15 @@ import TimeAgo from "react-timeago";
 import VideoSearch from "./video-search";
 import prettyBytes from "pretty-bytes";
 import styled from "styled-components";
+
 const SearchResult = styled.div`
   display: flex;
   align-items: center;
   div {
+  }
+  &:hover {
+    background-color: ${(p): string => p.theme.backgroundContrast};
+    cursor: pointer;
   }
 `;
 
@@ -35,16 +40,30 @@ const ListItem = styled.div`
   border-bottom: 1px solid ${(p): string => p.theme.textContrast};
 `;
 
-const ListOptions = styled(ListItem)`
-  width: 10%;
+const ListName = styled(ListItem)`
+  padding-left: 5px;
+  width: 25%;
+  min-width: 250px;
+`;
+
+const ListUploaded = styled(ListItem)`
+  width: 150px;
+  min-width: 150px;
+`;
+
+const ListUpdated = styled(ListItem)`
+  width: 150px;
+  min-width: 150px;
 `;
 
 const ListSize = styled(ListItem)`
-  width: 5%;
+  width: 100px;
+  min-width: 100px;
 `;
 
-const ListName = styled(ListItem)`
-  width: 75%;
+const ListOptions = styled(ListItem)`
+  width: 60%;
+  padding-right: 5px;
 `;
 
 const NoSearchResults = styled.div`
@@ -57,7 +76,10 @@ const Icons = styled.div`
 `;
 
 const Test = styled.div`
-  margin: auto 0px auto 0px;
+  margin: auto 10px auto 0px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-wrap: nowrap;
 `;
 
 const Buttons = styled.div`
@@ -77,7 +99,7 @@ interface ListViewProps {
 
 const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
   const [paginatedResults, setPaginatedResults] = useState<Video[]>([]);
-  const setVideos = useContext(VideoContext).setVideos;
+  const { setVideos } = useContext(VideoContext);
 
   const updateVideo = (res: Response, newVideo: Video): void => {
     if (res.ok) setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
@@ -94,19 +116,22 @@ const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
       />
       <SearchHeaderWrapper>
         <FlexWrapper>
-          <ListOptions>
-            <div>Updated</div>
-          </ListOptions>
-          <ListOptions>
+          <ListName>
+            <div>Name</div>
+          </ListName>
+          <ListUploaded>
             <div>Uploaded</div>
-          </ListOptions>
+          </ListUploaded>
+          <ListUpdated>
+            <div>Updated</div>
+          </ListUpdated>
           <ListSize>
             <div>Size</div>
           </ListSize>
-          <ListName>
-            <div>Name</div>
+          <ListOptions>
+            <div>Views</div>
             <Icons>Options</Icons>
-          </ListName>
+          </ListOptions>
         </FlexWrapper>
       </SearchHeaderWrapper>
       {paginatedResults.length ? (
@@ -114,21 +139,24 @@ const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
           {paginatedResults.map((video, i) => {
             return (
               <SearchResult key={i}>
-                <ListOptions>
-                  <TimeAgo date={video.created} />
-                </ListOptions>
-                <ListOptions>
-                  <TimeAgo date={video.saved} />
-                </ListOptions>
-                <ListSize>{prettyBytes(video.size)}</ListSize>
                 <ListName>
                   <Test>{video.name}</Test>
+                </ListName>
+                <ListUploaded>
+                  <TimeAgo date={video.uploaded} />
+                </ListUploaded>
+                <ListUpdated>
+                  <TimeAgo date={video.updated} />
+                </ListUpdated>
+                <ListSize>{prettyBytes(video.size)}</ListSize>
+                <ListOptions>
+                  <Test>{video.views}</Test>
                   <Buttons>
                     <FavoriteButton handleResponse={updateVideo} video={video} />
                     <CopyLinkButton link={window.location.origin + "/watch/" + video.id} />
                     <RequireAuthButton handleResponse={updateVideo} video={video} showText={false} />
                   </Buttons>
-                </ListName>
+                </ListOptions>
               </SearchResult>
             );
           })}

@@ -2,6 +2,7 @@ import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/theme";
 import { useCookies } from "react-cookie";
 import Gradient from "../../shared/gradient";
+import Link from "next/link";
 import React, { FC } from "react";
 import styled from "styled-components";
 
@@ -53,12 +54,12 @@ const Logo: FC<LogoProps> = ({ onlyShowMenu }: LogoProps) => {
       <Icon className={"bx bx-menu bx-md"} onClick={handleIsCollapsedChange} />
       <LogoWrapper>
         {!onlyShowMenu && (
-          <>
+          <Link href={"/"}>
             <Gradient type="text">
               <h1>BLU</h1>
             </Gradient>
             <h1>JAY</h1>
-          </>
+          </Link>
         )}
       </LogoWrapper>
     </LogoContainer>

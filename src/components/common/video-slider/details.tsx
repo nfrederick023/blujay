@@ -149,7 +149,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
             <VideoNameWrapper>
               <h5>{video.name}</h5>
               <h6>
-                {video.category.length ? video.category : "All Videos"} · <TimeAgo date={video.created} />
+                {video.category.length ? video.category : "All Videos"} · <TimeAgo date={video.updated} />
               </h6>
             </VideoNameWrapper>
           </VideoDetailsContainer>

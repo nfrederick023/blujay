@@ -43,8 +43,8 @@ export interface Video {
   readonly fileName: string,
   readonly name: string,
   readonly size: number,
-  readonly saved: number,
-  readonly created: number,
+  readonly uploaded: number,
+  readonly updated: number,
   readonly filePath: string,
   readonly thumbnailPath: string,
   readonly category: string,
@@ -54,6 +54,7 @@ export interface Video {
   readonly id: string,
   readonly mimeType: string
   readonly extentsion: SupportedExtentsions;
+  readonly views: number;
 }
 
 export enum AuthStatus {
@@ -107,6 +108,7 @@ export type ViewType = "List View" | "Grid View";
 export type SortType =
   | "Alphabetical"
   | "Date Updated"
-  | "Date Created"
+  | "Date Uploaded"
   | "File Size"
   | "View Count";
+export type SliderType = "verticle" | "horizontal";

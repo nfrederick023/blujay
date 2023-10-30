@@ -207,7 +207,7 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
           </VideoNameContainer>
           <VideoDetails>
             <h6>
-              {video.category} · <TimeAgo date={video.created} />
+              {video.category} · <TimeAgo date={video.updated} />
             </h6>
           </VideoDetails>
           {video.description && <div className="content">{video.description}</div>}

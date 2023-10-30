@@ -6,13 +6,13 @@ import CategoryPage from "@client/components/pages/library/category/category";
 import React, { useContext, useEffect } from "react";
 
 interface CategoryProps {
-  videos: Video[];
+  serverVideos: Video[];
 }
 
-const Category: NextPage<CategoryProps> = ({ videos }: CategoryProps) => {
-  const videoContext = useContext(VideoContext);
+const Category: NextPage<CategoryProps> = ({ serverVideos }: CategoryProps) => {
+  const { videos, setVideos } = useContext(VideoContext);
   useEffect(() => {
-    videoContext.setVideos(videos);
+    setVideos(serverVideos);
   }, []);
   return <CategoryPage videos={videos} />;
 };
@@ -20,7 +20,7 @@ const Category: NextPage<CategoryProps> = ({ videos }: CategoryProps) => {
 export const getServerSideProps: GetServerSideProps<CategoryProps> = authGuard(async (ctx) => {
   return {
     props: {
-      videos: await getProtectedVideoList(ctx),
+      serverVideos: await getProtectedVideoList(ctx),
     },
   };
 });

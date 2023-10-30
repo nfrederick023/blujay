@@ -1,17 +1,12 @@
-import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/theme";
-import { useCookies } from "react-cookie";
-import { useRouter } from "next/router";
-import { useWindowWidth } from "@react-hook/window-size";
 import Gradient from "../../shared/gradient";
 import Link from "next/link";
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
   width: 100%;
   color: white;
-  margin-right: 40px;
+  margin-right: 20px;
   margin-bottom: 5px;
   line-height: 5px;
   transition: 0.1s;
@@ -44,25 +39,15 @@ interface SideBarButtonProps {
   title: string;
   icon: string;
   url: string;
+  selectedURL: string;
 }
 
-const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url }: SideBarButtonProps) => {
-  const isSelected = window.location.pathname.split("/")[1] === url;
-  const [, setCookie] = useCookies();
-  const width = useWindowWidth();
-  const location = useRouter();
-
-  useEffect(() => {
-    if (width < screenSizes.tabletScreenSize) {
-      setCookie("isSidebarEnabled", "true", getCookieSetOptions());
-    }
-  }, [location]);
-
+const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url, selectedURL }: SideBarButtonProps) => {
   return (
     <>
       <ButtonWrapper>
         <Link href={"/" + url}>
-          {isSelected ? (
+          {selectedURL === url ? (
             <Gradient type="background">
               <Icon className={icon} />
               {title}

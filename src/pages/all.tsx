@@ -6,13 +6,13 @@ import AllPage from "@client/components/pages/all/all";
 import React, { useContext, useEffect } from "react";
 
 interface AllProps {
-  videos: Video[];
+  serverVideos: Video[];
 }
 
-const All: NextPage<AllProps> = ({ videos }: AllProps) => {
-  const videoContext = useContext(VideoContext);
+const All: NextPage<AllProps> = ({ serverVideos }: AllProps) => {
+  const { videos, setVideos } = useContext(VideoContext);
   useEffect(() => {
-    videoContext.setVideos(videos);
+    setVideos(serverVideos);
   }, []);
   return <AllPage videos={videos} />;
 };
@@ -20,7 +20,7 @@ const All: NextPage<AllProps> = ({ videos }: AllProps) => {
 export const getServerSideProps: GetServerSideProps<AllProps> = authGuard(async (ctx) => {
   return {
     props: {
-      videos: await getProtectedVideoList(ctx),
+      serverVideos: await getProtectedVideoList(ctx),
     },
   };
 });

@@ -1,4 +1,4 @@
-import { OrderType, SortType, Video } from "@client/utils/types";
+import { OrderType, SliderType, SortType, Video } from "@client/utils/types";
 import { screenSizes } from "@client/utils/theme";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useWindowWidth } from "@react-hook/window-size";
@@ -14,8 +14,6 @@ const VideoSliderWrapper = styled.div`
   width: auto;
   min-width: auto;
 `;
-
-type SliderType = "verticle" | "horizontal";
 
 interface VideoSliderProps {
   intialOrder?: OrderType;
@@ -51,10 +49,10 @@ const VideoSlider: FC<VideoSliderProps> = ({
     <>
       {!videos.length ? (
         <>
-          <SliderHeader headerText={headerText}>
+          <SliderHeader headerText={headerText} sliderType="horizontal">
             <></>
           </SliderHeader>
-          <div>No Videos Found</div>
+          <VideoSliderWrapper>No Videos Found</VideoSliderWrapper>
         </>
       ) : (
         <VideoSliderWrapper>

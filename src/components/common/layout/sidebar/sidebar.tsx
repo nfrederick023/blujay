@@ -1,11 +1,12 @@
-import { booleanify } from "@client/utils/cookie";
+import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/theme";
 import { useCookies } from "react-cookie";
+import { useRouter } from "next/router";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./category-button";
 import Logo from "./logo";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import SideBarButton from "./page-button";
 import styled from "styled-components";
 
@@ -14,7 +15,6 @@ const SidebarWapper = styled.div`
   background: ${(p): string => p.theme.backgroundContrast};
   min-width: 250px;
   max-width: 250px;
-  transition: 0.1s ease-in-out;
   user-select: none;
   position: sticky;
   top: 0px;
@@ -31,14 +31,15 @@ const SidebarWapper = styled.div`
     position: fixed;
     min-width: 100%;
     height: 100%;
+    transition: 100ms;
 
     ${(p: { isCollapsed: boolean }): string => (p.isCollapsed ? "margin-left: -100%;" : "")}
   }
 `;
 
 const SidebarContent = styled.div`
-  max-width: inherit;
-  min-width: inherit;
+  max-width: 230px;
+  min-width: 230px;
   display: flex;
   position: fixed;
   flex-wrap: wrap;
@@ -71,9 +72,27 @@ interface SidebarProps {
 
 const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
   const [cookies] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
+  const [selectedPath, setSelctedPath] = useState("");
   const width = useWindowWidth({ wait: 10 });
   const sidebarState = booleanify(cookies.isSidebarEnabled);
-  const isCollapsed = width <= screenSizes.mobileScreenSize ? sidebarState : !sidebarState;
+  const [, setCookie] = useCookies();
+  const location = useRouter();
+  const selectedURL = selectedPath.split("/")[1];
+  const selectedCategory = selectedPath.toLowerCase();
+
+  useEffect(() => {
+    if (width < screenSizes.tabletScreenSize) {
+      setCookie("isSidebarEnabled", "true", getCookieSetOptions());
+    }
+  }, [location]);
+
+  useEffect(() => {
+    location.events.on("routeChangeStart", (path: string): void => {
+      setSelctedPath(path);
+    });
+
+    setSelctedPath(window.location.pathname);
+  }, []);
 
   return (
     <>
@@ -81,19 +100,19 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
         <LogoBackdrop>
           <Logo onlyShowMenu={width < screenSizes.tabletScreenSize} />
         </LogoBackdrop>
-        <SidebarWapper isCollapsed={isCollapsed}>
+        <SidebarWapper isCollapsed={sidebarState}>
           <SidebarContent>
             <Logo />
-            <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} />
+            <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} selectedURL={selectedURL} />
 
-            <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} />
+            <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} selectedURL={selectedURL} />
 
-            <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} />
+            <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} selectedURL={selectedURL} />
 
-            <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={"library"} />
+            <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={"library"} selectedURL={selectedURL} />
             <Library>
               {categories.map((dir, i) => {
-                return <CategoryButton key={i} category={dir} />;
+                return <CategoryButton key={i} category={dir} selectedCategory={selectedCategory} />;
               })}
             </Library>
           </SidebarContent>

@@ -6,13 +6,13 @@ import IndexPage from "@client/components/pages/index";
 import React, { useContext, useEffect } from "react";
 
 interface IndexProps {
-  videos: Video[];
+  serverVideos: Video[];
 }
 
-const Index: NextPage<IndexProps> = ({ videos }: IndexProps) => {
-  const videoContext = useContext(VideoContext);
+const Index: NextPage<IndexProps> = ({ serverVideos }: IndexProps) => {
+  const { videos, setVideos } = useContext(VideoContext);
   useEffect(() => {
-    videoContext.setVideos(videos);
+    setVideos(serverVideos);
   }, []);
   return <IndexPage videos={videos} />;
 };
@@ -20,7 +20,7 @@ const Index: NextPage<IndexProps> = ({ videos }: IndexProps) => {
 export const getServerSideProps: GetServerSideProps<IndexProps> = authGuard(async (ctx) => {
   return {
     props: {
-      videos: await getProtectedVideoList(ctx),
+      serverVideos: await getProtectedVideoList(ctx),
     },
   };
 });

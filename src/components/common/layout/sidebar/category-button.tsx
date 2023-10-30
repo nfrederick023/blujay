@@ -1,4 +1,4 @@
-import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
+import { getCookieSetOptions } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/theme";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
@@ -11,10 +11,7 @@ const CategoryButtonWrapper = styled.div`
   color: ${(p): string => p.theme.textContrast};
   padding: 7px;
   padding-left: 22px;
-
-  div {
-    transition: 0.1s;
-  }
+  margin-right: 20px;
 
   &:hover {
     div {
@@ -32,9 +29,10 @@ const SelectedCategory = styled.div`
 
 interface CategoryButtonProps {
   category: string;
+  selectedCategory: string;
 }
 
-const CategoryButton: FC<CategoryButtonProps> = ({ category }: CategoryButtonProps) => {
+const CategoryButton: FC<CategoryButtonProps> = ({ category, selectedCategory }: CategoryButtonProps) => {
   const categoryURL = ("/library/" + encodeURIComponent(category)).toLowerCase();
   const [, setCookie] = useCookies();
   const width = useWindowWidth();
@@ -46,7 +44,7 @@ const CategoryButton: FC<CategoryButtonProps> = ({ category }: CategoryButtonPro
     }
   }, [location]);
 
-  const isSelected = categoryURL === window.location.pathname.toLowerCase();
+  const isSelected = categoryURL === selectedCategory;
   return (
     <Link href={categoryURL}>
       <CategoryButtonWrapper>

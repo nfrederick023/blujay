@@ -8,6 +8,7 @@ import styled from "styled-components";
 const SortIcon = styled.i`
   color: ${(p): string => p.theme.textContrast};
   font-size: 1.25rem;
+  display: flex;
   vertical-align: baseline;
   margin-left: auto;
   transition: 0.2s;
@@ -20,8 +21,10 @@ const SortIcon = styled.i`
 `;
 
 const SortSelect = styled.div`
+  margin-right: 15px;
   display: flex;
-  width: 280px;
+  width: 290px;
+  min-width: 290px;
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     margin-top: 10px;
   }
@@ -29,17 +32,16 @@ const SortSelect = styled.div`
 
 const TypeSelect = styled.div`
   width: 110px;
-  margin-left: 15px;
+  min-width: 110px;
   display: flex;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    margin-left: 0px;
     margin-top: 10px;
   }
 `;
 
 const viewOptions: ViewType[] = ["Grid View", "List View"];
-const sortOptions: SortType[] = ["Alphabetical", "Date Created", "Date Updated", "File Size", "View Count"];
+const sortOptions: SortType[] = ["Alphabetical", "Date Uploaded", "Date Updated", "File Size", "View Count"];
 
 interface VeticleSliderHeaderProps {
   handleSortChange: (sort: string) => void;
@@ -62,7 +64,7 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
 }: VeticleSliderHeaderProps) => {
   return (
     <>
-      <SliderHeader headerText={headerText}>
+      <SliderHeader headerText={headerText} sliderType="verticle">
         <SortSelect>
           <SortIcon
             onClick={handleIsAscendingChange}
