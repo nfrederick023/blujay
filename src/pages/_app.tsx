@@ -118,10 +118,10 @@ const ContentWrapper = styled.div`
 `;
 
 const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
-  const router = useRouter();
   //TODO: move this state call into a component that doesn't rerender EVERYTHING
   const [search, setSearch] = useState("");
-  const location = useRouter();
+  const [files, setFiles] = useState<FileList | null>(null);
+  const router = useRouter();
 
   // assign default values to cookies if not set, get all cookies and set default if none
   const _cookies = new Cookies();
@@ -135,7 +135,7 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
     if (search) {
       setSearch("");
     }
-  }, [location]);
+  }, [router]);
 
   return (
     <CookiesProvider cookies={_cookies}>
@@ -144,7 +144,7 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
         <Head>
           <title>Blujay</title>
         </Head>
-        <GlobalFileUpload>
+        <GlobalFileUpload setFiles={setFiles}>
           <LayoutWrapper className={montserrat.className}>
             {router.pathname.includes("/login") ? (
               <Component {...pageProps} />

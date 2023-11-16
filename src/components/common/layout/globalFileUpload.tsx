@@ -1,17 +1,22 @@
-import { supportedFileExtensions } from "@client/utils/constants";
+import { fileExtensions } from "@client/utils/constants";
+import { uploadVideo } from "@client/utils/api";
 import { useRouter } from "next/router";
-import React, { DragEvent, FC, MouseEvent, ReactNode, useState } from "react";
+import React, { Dispatch, DragEvent, FC, MouseEvent, ReactNode, SetStateAction, useState } from "react";
 import styled from "styled-components";
 
-const FileUploadInput = styled.input``;
+const FileUploadInput = styled.input`
+  display: none;
+`;
 
 export interface GlobalFileUploadProps {
   children: ReactNode;
+  setFiles: Dispatch<SetStateAction<FileList | null>>;
 }
 
-const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUploadProps) => {
+const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children, setFiles }: GlobalFileUploadProps) => {
   const [isDragFile, setIsDragFile] = useState("");
   const router = useRouter();
+
   const stopDefaults = (e: DragEvent | MouseEvent): void => {
     e.stopPropagation();
     e.preventDefault();
@@ -21,17 +26,22 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
     onDragEnter: stopDefaults,
     onDragLeave: stopDefaults,
     onDragOver: stopDefaults,
-    // onClick: stopDefaults,
+    onClick: stopDefaults,
     onDrop: (e: DragEvent): void => {
-      console.log(e);
       stopDefaults(e);
 
       const files = e.dataTransfer.files;
 
       for (const file of files) {
         const ext = file.name.split(".").pop();
-        if (ext && supportedFileExtensions.includes(ext)) {
-          router.push("/upload", { files: files });
+        if (ext && fileExtensions.includes(ext)) {
+          setFiles(files);
+          const formData = new FormData();
+          for (const file of files) {
+            formData.append("file", file);
+          }
+          uploadVideo(formData);
+          router.push("/upload");
         } else {
           //unsupported file type
         }

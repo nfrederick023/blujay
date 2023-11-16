@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from "next";
 import LoginController from "@server/api/login/login.controller";
 

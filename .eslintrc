@@ -27,7 +27,7 @@
     "no-case-declarations": "error",
     "no-class-assign": "error",
     "no-console": [
-      "error",
+      "warn",
       {
         "allow": [
           "warn",

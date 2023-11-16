@@ -1,7 +1,6 @@
 import { Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
 import { booleanify } from "@client/utils/cookie";
-import { getMediaType } from "@client/utils/checkMediaType";
 import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
@@ -84,7 +83,6 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
   const windowHeight = useWindowHeight();
   const windowWidth = useWindowWidth({ wait: 10 });
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
-  const isVideo = getMediaType(video.extentsion);
   const isTheatreMode = booleanify(cookies.isTheaterMode);
   const { updateVideo } = useContext(VideoContext);
 
@@ -181,7 +179,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
             <div>next</div>
           </Header> */}
           <BlackOverlay height={isTheatreMode ? actualHeight : 0} />
-          {isVideo ? (
+          {video.type === "video" ? (
             <VideoPlayer
               src={videoSrc}
               ref={ref}
@@ -208,7 +206,7 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
           </VideoNameContainer>
           <VideoDetails>
             <h6>
-              {video.category} · <TimeAgo date={video.updated} /> · {video.views} views
+              {video.category ? <>{video.category} ·</> : <></>} <TimeAgo date={video.updated} /> · {video.views} views
             </h6>
           </VideoDetails>
           {video.description && <div className="content">{video.description}</div>}

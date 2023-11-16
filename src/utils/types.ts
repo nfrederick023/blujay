@@ -1,6 +1,6 @@
 import { IncomingMessage } from "http";
 import { Redirect } from "next/types";
-import { cookieOptions, sortOptions, supportedFileExtensions, supportedImageExtensions } from "./constants";
+import { cookieOptions, fileExtensions, sortOptions } from "./constants";
 
 export interface BluJayTheme {
   readonly background: string;
@@ -28,8 +28,9 @@ export interface Video {
   readonly isFavorite: boolean,
   readonly id: string,
   readonly mimeType: string
-  readonly extentsion: SupportedExtentsions;
+  readonly extentsion: Extentsions;
   readonly views: number;
+  readonly type: VideoType;
 }
 
 export enum AuthStatus {
@@ -74,10 +75,11 @@ export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
 
-export type SupportedExtentsions = typeof supportedImageExtensions[number] | typeof supportedFileExtensions[number];
+export type Extentsions = typeof fileExtensions[number];
 export type CookieTypes = typeof cookieOptions[number]
 export type SortType = typeof sortOptions[number];
 export type OrderType = "Ascending" | "Descending";
 export type QueryField = "name" | "filename" | "category" | "description" | "id";
 export type ViewType = "List View" | "Grid View";
 export type SliderType = "verticle" | "horizontal";
+export type VideoType = "video" | "image" | "gif";

@@ -81,6 +81,15 @@ export const getVideoList = (): Video[] => {
   return fs.readJSONSync(getVideoListPath()) as Video[];
 };
 
+export const deleteVideo = (path: string): void => {
+  fs.removeSync(path);
+};
+
+export const getVideo = (path: string): Buffer => {
+  return fs.readFileSync(path);
+};
+
+
 export const getConfig = (): Config => {
   return fs.readJSONSync(getConfigPath()) as Config;
 };

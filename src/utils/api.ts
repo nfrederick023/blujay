@@ -1,5 +1,13 @@
 import { Video } from "./types";
 
+export const uploadVideo = async (formdata: FormData): Promise<Response> => {
+  const response = await fetch("/api/video", {
+    method: "POST",
+    body: formdata,
+  });
+  return response;
+};
+
 export const updateVideo = async (video: Video): Promise<Response> => {
   const response = await fetch("/api/video", {
     method: "PUT",

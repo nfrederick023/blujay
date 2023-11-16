@@ -86,7 +86,7 @@ const Sidebar: FC = () => {
     if (width < screenSizes.smallScreenSize) {
       setCookie("isSidebarEnabled", "true", getCookieSetOptions());
     }
-  }, [location]);
+  }, [router]);
 
   useEffect(() => {
     router.events.on("routeChangeStart", (path: string): void => {

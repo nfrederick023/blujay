@@ -6,7 +6,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Video } from "@client/utils/types";
 import { booleanify } from "@client/utils/cookie";
 import { checkHashedPassword } from "@server/utils/auth";
-import { getMediaType } from "@client/utils/checkMediaType";
 import { getVideoList } from "@server/utils/config";
 import { updateVideo } from "@server/api/video/video.service";
 import fs from "fs";
@@ -43,9 +42,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       updateVideo({ id: video.id, views: video.views + 1 });
     }
 
-    const mediaType = getMediaType(video.extentsion);
-
-    if (mediaType === "video") {
+    if (video.type === "video") {
       serveVideo(req, res, video);
     }
 
@@ -68,7 +65,7 @@ const serveVideo = (req: NextApiRequest, res: NextApiResponse, video: Video): vo
     res.status(400).send("Requires Range header");
     return;
   }
-  const videoSize = fs.statSync(video.filePath).size;
+  const videoSize = video.size;
   const chunkSize = 1 * 4e6; // 4mbs
   const start = Number(range.replace(/\D/g, ""));
   const end = Math.min(start + chunkSize, videoSize - 1);

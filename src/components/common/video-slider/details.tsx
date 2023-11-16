@@ -1,5 +1,4 @@
 import { Video } from "@client/utils/types";
-import { getMediaType } from "@client/utils/checkMediaType";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
@@ -85,7 +84,6 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const imageHeight = (size / 1920) * 1080;
-  const mediaType = getMediaType(video?.extentsion || "");
 
   React.useLayoutEffect(() => setSize(ref.current?.getBoundingClientRect().width || 0), [ref]);
 
@@ -116,7 +114,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
       <Link href={"/watch/" + video?.id}>
         {video ? (
           <VideoDetailsContainer>
-            {mediaType === "video" && (
+            {video.type === "video" && (
               <VideoPlayer
                 ref={videoRef}
                 poster={"/api/thumb/" + encodeURIComponent(video.id)}
@@ -132,7 +130,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
                 loop
               />
             )}
-            {mediaType === "gif" && isHovering && (
+            {video.type === "gif" && isHovering && (
               <ImagePlayer
                 imageHeight={imageHeight}
                 onMouseEnter={handleIsHoverTrueChange}

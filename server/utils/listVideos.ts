@@ -1,8 +1,7 @@
 import * as mime from "mime-types";
-import { SupportedExtentsions, Video } from "@client/utils/types";
+import { Extentsions, Video, VideoType } from "@client/utils/types";
 import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getUserPassword, getVideoList, setVideoList } from "./config";
-import { getMediaType } from "@client/utils/checkMediaType";
-import { supportedFileExtensions } from "@client/utils/constants";
+import { fileExtensions, imageExtensions } from "@client/utils/constants";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
 import fse from "fs-extra";
@@ -20,7 +19,7 @@ export const listVideos = async (): Promise<Video[]> => {
   const libraryPath = getLibraryPath();
   // gets the file location of all videos which are supported
   const allFiles = await glob.promise(`${libraryPath}/**/*.*`);
-  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(${supportedFileExtensions.join("|")})`);
+  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(${fileExtensions.join("|")})`);
 
   if (allFiles.length !== videoFilePaths.length) {
     console.warn("Unsupported file extentsions were found in the library and will not be indexed!");
@@ -51,10 +50,9 @@ const createThumbnails = async (videos: Video[]): Promise<void> => {
     const filename = video.id + ".webp";
     oldThumbnails = oldThumbnails.filter(thumbnail => !(thumbnail === filename));
     if (!thumbnails.includes(filename)) {
-      const mediaType = getMediaType(video.extentsion);
-      const timemarks = mediaType === "video" ? ["20%"] : ["0"];
+      const timemarks = video.type === "video" ? ["20%"] : ["0"];
 
-      if (mediaType === "video" || mediaType === "gif") {
+      if (video.type === "video" || video.type === "gif") {
         ffmpeg(video.filePath)
           .inputOptions("-t 10")
           .screenshots({
@@ -74,7 +72,7 @@ const createThumbnails = async (videos: Video[]): Promise<void> => {
   oldThumbnails.forEach(thumbnail => deleteThumbnail(thumbnail));
 };
 
-// removes any videos in the video list that are not found
+// removes any videos in the videoList that are not found
 const cleanState = (videoFilePaths: string[]): void => {
   const videoList = getVideoList();
   setVideoList(videoList.filter(video => videoFilePaths.includes(video.filePath)));
@@ -90,9 +88,18 @@ const getCreateVideo = (filePath: string): Video | null => {
 
   const videoList = getVideoList();
   let category = path.dirname(filePath).split("\\").pop() ?? "";
-  const extentsion = fileName.split(".").pop() as SupportedExtentsions;
+  const extentsion = fileName.split(".").pop() as Extentsions;
   const id = parseInt((seedrandom(fileName + getUserPassword())() * 9e7 + 1e7).toString()).toString();
   const thumbnailPath = path.join(getThumbnailsPath() + id + ".webp");
+  let type: VideoType = "video";
+
+  if (imageExtensions.includes(extentsion)) {
+    type = "image";
+  }
+
+  if (extentsion === "gif") {
+    type = "gif";
+  }
 
   if (category === "library")
     category = "";
@@ -103,7 +110,7 @@ const getCreateVideo = (filePath: string): Video | null => {
   if (videoState) {
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category || videoState.views === undefined) {
+    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category || videoState.views === undefined || videoState.type !== type) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
         description: videoState.description,
@@ -120,7 +127,8 @@ const getCreateVideo = (filePath: string): Video | null => {
         filePath,
         thumbnailPath,
         category,
-        views
+        views,
+        type
       };
       newVideoList.push(newVideoState);
       setVideoList(newVideoList);
@@ -145,7 +153,8 @@ const getCreateVideo = (filePath: string): Video | null => {
     mimeType,
     category,
     id,
-    views
+    views,
+    type
   };
 
   videoList.push(newVideoState);
