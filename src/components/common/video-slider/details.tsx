@@ -1,5 +1,5 @@
 import { Video } from "@client/utils/types";
-import { isMediaTypeVideo } from "@client/utils/checkMediaType";
+import { getMediaType } from "@client/utils/checkMediaType";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
@@ -85,8 +85,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const imageHeight = (size / 1920) * 1080;
-  const isVideo = isMediaTypeVideo(video?.extentsion || "");
-  const isGif = video?.extentsion === "gif";
+  const mediaType = getMediaType(video?.extentsion || "");
 
   React.useLayoutEffect(() => setSize(ref.current?.getBoundingClientRect().width || 0), [ref]);
 
@@ -117,13 +116,13 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
       <Link href={"/watch/" + video?.id}>
         {video ? (
           <VideoDetailsContainer>
-            {isVideo && (
+            {mediaType === "video" && (
               <VideoPlayer
                 ref={videoRef}
                 poster={"/api/thumb/" + encodeURIComponent(video.id)}
                 onMouseEnter={handleIsHoverTrueChange}
                 onMouseLeave={handleIsHoverFalseChange}
-                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion}
+                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
                 disablePictureInPicture
                 imageHeight={imageHeight}
                 isPlaying={isHovering}
@@ -133,12 +132,12 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
                 loop
               />
             )}
-            {isGif && (
+            {mediaType === "gif" && isHovering && (
               <ImagePlayer
                 imageHeight={imageHeight}
                 onMouseEnter={handleIsHoverTrueChange}
                 onMouseLeave={handleIsHoverFalseChange}
-                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion}
+                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
               />
             )}
             <Thumbnail

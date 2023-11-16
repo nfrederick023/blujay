@@ -1,5 +1,6 @@
 import { IncomingMessage } from "http";
 import { Redirect } from "next/types";
+import { cookieOptions, sortOptions, supportedFileExtensions, supportedImageExtensions } from "./constants";
 
 export interface BluJayTheme {
   readonly background: string;
@@ -12,32 +13,6 @@ export interface BluJayTheme {
   readonly hightlightSilver: string;
   readonly button: string;
 }
-
-export interface ScreenSizes {
-  /**
-   * 2560 Pixels
-   */
-  readonly largeScreenSize: number;
-  /**
-   * 1920 Pixels
-   */
-  readonly mediumScreenSize: number;
-  /**
-   * 1280 Pixels
-   */
-  readonly smallScreenSize: number;
-  /**
-   * 720 Pixels
-   */
-  readonly tabletScreenSize: number;
-
-  /**
-   * 480 Pixels
-   */
-  readonly mobileScreenSize: number;
-}
-
-export type SupportedExtentsions = "mkv" | "mp4" | "webm" | "mov" | "mpeg" | "avi" | "wmv" | "gif" | "jpg" | "png" | "jpeg";
 
 export interface Video {
   readonly fileName: string,
@@ -80,7 +55,7 @@ export interface IncomingMessageCookies extends IncomingMessage {
 }
 
 export interface NextRedirect {
-  redirect: Redirect
+  readonly redirect: Redirect
 }
 
 export interface Thumbnail {
@@ -99,16 +74,10 @@ export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
 
-
-// re-add "isDarkMode" for darkmode implementation
-export type CookieTypes = "isTheaterMode" | "videoVolume" | "authToken" | "isSidebarEnabled"
+export type SupportedExtentsions = typeof supportedImageExtensions[number] | typeof supportedFileExtensions[number];
+export type CookieTypes = typeof cookieOptions[number]
+export type SortType = typeof sortOptions[number];
 export type OrderType = "Ascending" | "Descending";
 export type QueryField = "name" | "filename" | "category" | "description" | "id";
 export type ViewType = "List View" | "Grid View";
-export type SortType =
-  | "Alphabetical"
-  | "Date Updated"
-  | "Date Uploaded"
-  | "File Size"
-  | "View Count";
 export type SliderType = "verticle" | "horizontal";

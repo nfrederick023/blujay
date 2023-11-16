@@ -1,5 +1,5 @@
 import { getCookieSetOptions } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import { useWindowWidth } from "@react-hook/window-size";
@@ -36,13 +36,13 @@ const CategoryButton: FC<CategoryButtonProps> = ({ category, selectedCategory }:
   const categoryURL = ("/library/" + encodeURIComponent(category)).toLowerCase();
   const [, setCookie] = useCookies();
   const width = useWindowWidth();
+  const router = useRouter();
 
-  const location = useRouter();
   useEffect(() => {
     if (width < screenSizes.tabletScreenSize) {
       setCookie("isSidebarEnabled", "true", getCookieSetOptions());
     }
-  }, [location]);
+  }, [router]);
 
   const isSelected = categoryURL === selectedCategory;
   return (

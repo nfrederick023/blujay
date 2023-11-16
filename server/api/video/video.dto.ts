@@ -16,6 +16,9 @@ export class UpdateVideo {
   @IsOptional()
   isFavorite?: boolean;
 
+  @IsOptional()
+  views?: number;
+
   @IsNotEmpty()
   id: string;
 }

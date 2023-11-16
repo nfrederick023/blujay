@@ -1,5 +1,5 @@
 import { SliderType } from "@client/utils/types";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import Gradient from "../shared/gradient";
 import React, { FC, ReactNode } from "react";
 import styled from "styled-components";

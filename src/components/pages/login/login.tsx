@@ -1,11 +1,12 @@
 import { getCookieSetOptions } from "@client/utils/cookie";
 import { login } from "@client/utils/api";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
 import Gradient from "@client/components/common/shared/gradient";
-import React, { FC, useState } from "react";
+import React, { FC, MouseEvent, useState } from "react";
 import TextField from "@client/components/common/shared/text-field";
+import ToggleIcon from "@client/components/common/shared/toggle-icon";
 import router from "next/router";
 import styled from "styled-components";
 
@@ -42,7 +43,7 @@ const BlujayText = styled.span`
 `;
 
 const Checkbox = styled.input`
-  vertical-align: text-bottom;
+  margin-right: 10px;
   accent-color: ${(p): string => p.theme.highlightLight};
 `;
 
@@ -50,10 +51,8 @@ const CheckboxLabel = styled.label`
   color: ${(p): string => p.theme.textContrast};
   user-select: none;
   transtion: 0.2s;
-  h6 {
-    position: relative;
-    bottom: 1px;
-  }
+  display: flex;
+  margin: auto 0px auto 0px;
 
   &:hover {
     cursor: pointer;
@@ -73,6 +72,7 @@ const LoginButton = styled.span`
 
 const LoginFailedMessage = styled.div`
   min-height: 20px;
+  margin-bottom: 5px;
 `;
 
 const LoginPage: FC = () => {
@@ -80,12 +80,18 @@ const LoginPage: FC = () => {
   const [, setCookie] = useCookies(["authToken"]);
   const [hasLoginFailed, setHasLoginFailed] = useState(false);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [isRememberMe, setIsRememberMe] = useState(true);
+
+  const onIsRememberMe = (): void => {
+    setIsRememberMe(!isRememberMe);
+  };
 
   const onPasswordChange = (password: string): void => {
     setPassword(password);
   };
 
-  const onIsPasswordShownChange = (): void => {
+  const onIsPasswordShownChange = (e: MouseEvent): void => {
+    e.stopPropagation();
     setIsPasswordShown(!isPasswordShown);
   };
 
@@ -93,9 +99,8 @@ const LoginPage: FC = () => {
     setHasLoginFailed(false);
     const res = await login(password);
     if (res.ok) {
-      setCookie("authToken", await res.text(), getCookieSetOptions());
-      router.replace("/");
-      router.reload();
+      setCookie("authToken", await res.text(), getCookieSetOptions(!isRememberMe));
+      router.push("/");
     } else setHasLoginFailed(true);
   };
 
@@ -116,13 +121,21 @@ const LoginPage: FC = () => {
           value={password}
           onChange={onPasswordChange}
           placeholder="Password"
-          hideInput={!isPasswordShown}
+          inputType={isPasswordShown ? "text" : "password"}
           onEnter={handleLogin}
+          toggleIcon={
+            <ToggleIcon
+              isToggled={isPasswordShown}
+              onIcon="bx bxs-show"
+              offIcon="bx bxs-hide"
+              onClick={onIsPasswordShownChange}
+            />
+          }
         />
         <FlexBox>
           <CheckboxLabel>
-            <Checkbox type={"checkbox"} checked={isPasswordShown} onChange={onIsPasswordShownChange} />
-            <h6>Show Password</h6>
+            <Checkbox type={"checkbox"} checked={isRememberMe} onChange={onIsRememberMe} />
+            <h6>Remeber Me</h6>
           </CheckboxLabel>
           <LoginButton>
             <ButtonIcon textOn="Login " icon="bx bx-log-in" onClick={handleLogin} />

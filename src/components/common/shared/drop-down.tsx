@@ -13,6 +13,7 @@ const DropDownBox = styled.div`
   background-color: ${(p): string => p.theme.backgroundContrast};
   z-index: 2;
   top: 30px;
+  user-select: none;
 `;
 
 const Option = styled.div`

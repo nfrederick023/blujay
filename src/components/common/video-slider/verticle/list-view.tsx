@@ -99,10 +99,10 @@ interface ListViewProps {
 
 const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
   const [paginatedResults, setPaginatedResults] = useState<Video[]>([]);
-  const { setVideos } = useContext(VideoContext);
+  const { updateVideo } = useContext(VideoContext);
 
-  const updateVideo = (res: Response, newVideo: Video): void => {
-    if (res.ok) setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
+  const videoResponseUpdate = (res: Response, newVideo: Video): void => {
+    if (res.ok) updateVideo(newVideo);
   };
 
   return (
@@ -152,9 +152,9 @@ const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
                 <ListOptions>
                   <Test>{video.views}</Test>
                   <Buttons>
-                    <FavoriteButton handleResponse={updateVideo} video={video} />
+                    <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
                     <CopyLinkButton link={window.location.origin + "/watch/" + video.id} />
-                    <RequireAuthButton handleResponse={updateVideo} video={video} showText={false} />
+                    <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={false} />
                   </Buttons>
                 </ListOptions>
               </SearchResult>

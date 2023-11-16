@@ -1,12 +1,13 @@
+import { VideoContext } from "../../contexts/video-context";
 import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./category-button";
 import Logo from "./logo";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import SideBarButton from "./page-button";
 import styled from "styled-components";
 
@@ -21,29 +22,30 @@ const SidebarWapper = styled.div`
   z-index: 4;
   min-height: 100vh;
 
-  ${(p): string => (p.isCollapsed ? "margin-left: -249px;" : "")};
+  ${(p): string => (p.isSidebarEnabled ? "" : "margin-left: -250px;")};
 
   @media (max-width: ${screenSizes.smallScreenSize}px) {
     position: fixed;
+    transition: 100ms;
   }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     position: fixed;
     min-width: 100%;
     height: 100%;
-    transition: 100ms;
 
-    ${(p: { isCollapsed: boolean }): string => (p.isCollapsed ? "margin-left: -100%;" : "")}
+    ${(p: { isSidebarEnabled: boolean }): string => (p.isSidebarEnabled ? "" : "margin-left: -100%;")}
   }
 `;
 
 const SidebarContent = styled.div`
-  max-width: 230px;
-  min-width: 230px;
+  max-width: inherit;
+  min-width: inherit;
   display: flex;
   position: fixed;
   flex-wrap: wrap;
-  margin-left: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   font-weight: 575;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
@@ -66,28 +68,28 @@ const LogoBackdrop = styled.div`
   z-index: 3;
 `;
 
-interface SidebarProps {
-  categories: string[];
-}
-
-const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
+const Sidebar: FC = () => {
   const [cookies] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
   const [selectedPath, setSelctedPath] = useState("");
+  const { videos } = useContext(VideoContext);
   const width = useWindowWidth({ wait: 10 });
-  const sidebarState = booleanify(cookies.isSidebarEnabled);
+  const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const [, setCookie] = useCookies();
-  const location = useRouter();
+  const router = useRouter();
   const selectedURL = selectedPath.split("/")[1];
   const selectedCategory = selectedPath.toLowerCase();
+  const categories = [...new Set(videos.map((video) => video.category))]
+    .filter((category) => category)
+    .sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
-    if (width < screenSizes.tabletScreenSize) {
+    if (width < screenSizes.smallScreenSize) {
       setCookie("isSidebarEnabled", "true", getCookieSetOptions());
     }
   }, [location]);
 
   useEffect(() => {
-    location.events.on("routeChangeStart", (path: string): void => {
+    router.events.on("routeChangeStart", (path: string): void => {
       setSelctedPath(path);
     });
 
@@ -100,7 +102,7 @@ const Sidebar: FC<SidebarProps> = ({ categories }: SidebarProps) => {
         <LogoBackdrop>
           <Logo onlyShowMenu={width < screenSizes.tabletScreenSize} />
         </LogoBackdrop>
-        <SidebarWapper isCollapsed={sidebarState}>
+        <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
           <SidebarContent>
             <Logo />
             <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} selectedURL={selectedURL} />

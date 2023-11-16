@@ -1,5 +1,5 @@
 import { debounce } from "lodash";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import React, { ChangeEvent, Dispatch, FC, SetStateAction, useRef } from "react";
 import styled from "styled-components";
 

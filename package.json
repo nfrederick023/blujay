@@ -40,6 +40,7 @@
     "react-bottom-scroll-listener": "^5.1.0",
     "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
+    "react-drag-drop-files": "^2.3.10",
     "react-timeago": "^7.1.0",
     "seedrandom": "^3.0.5",
     "styled-components": "^5.1.1"

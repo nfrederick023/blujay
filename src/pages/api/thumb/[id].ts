@@ -2,12 +2,10 @@
  * API route for downloading videos by name
  */
 
-import * as mime from "mime-types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Video } from "@client/utils/types";
 import { checkHashedPassword } from "@server/utils/auth";
 import { getThumbnailsPath, getVideoList } from "@server/utils/config";
-import { isMediaTypeVideo } from "@client/utils/checkMediaType";
 import fs from "fs";
 
 const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -41,14 +39,9 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
     return;
   }
 
-  if (isMediaTypeVideo(video.extentsion) || video.extentsion === "gif") {
-    res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=UTF-8 ${video.id}.jpeg` });
-    fs.createReadStream(`${getThumbnailsPath()}${video.id}.jpg`).pipe(res);
-  } else {
-    const mimeType = mime.lookup(video.fileName) || "";
-    res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=UTF-8 ${video.fileName}` });
-    fs.createReadStream(video.filePath).pipe(res);
-  }
+  res.writeHead(200, { "Content-Type": "image/webp", "Content-disposition": `attachment; filename=UTF-8 ${video.id}.webp` });
+  fs.createReadStream(`${getThumbnailsPath()}${video.id}.webp`).pipe(res);
+
   return;
 });
 

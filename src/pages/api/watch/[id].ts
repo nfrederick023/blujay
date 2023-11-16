@@ -4,16 +4,19 @@
 import * as mime from "mime-types";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Video } from "@client/utils/types";
+import { booleanify } from "@client/utils/cookie";
 import { checkHashedPassword } from "@server/utils/auth";
+import { getMediaType } from "@client/utils/checkMediaType";
 import { getVideoList } from "@server/utils/config";
-import { isMediaTypeVideo } from "@client/utils/checkMediaType";
+import { updateVideo } from "@server/api/video/video.service";
 import fs from "fs";
 
 const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
 
   const getID = req.query.id as string;
+  const isPreview = booleanify(req.query.isPreview as string);
   const videoId: string = getID.split(".")[0];
-  const videoList = await getVideoList();
+  const videoList = getVideoList();
   const video: Video | undefined = videoList.find((video: Video) => { return video.id === videoId; });
 
   if (req.method !== "GET") {
@@ -36,9 +39,16 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       return;
     }
 
-    if (isMediaTypeVideo(video.extentsion) && video.extentsion !== "gif") {
+    if (!isPreview) {
+      updateVideo({ id: video.id, views: video.views + 1 });
+    }
+
+    const mediaType = getMediaType(video.extentsion);
+
+    if (mediaType === "video") {
       serveVideo(req, res, video);
     }
+
     else {
       const mimeType = mime.lookup(video.fileName) || "";
       res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=${video.fileName}` });

@@ -16,7 +16,7 @@ export const sortVideos = (videos: Video[], sort: SortType, order: OrderType): V
       break;
     }
     case "View Count": {
-      sortedVideos.sort((a, b) => a.id.localeCompare(b.id));
+      sortedVideos.sort((a, b) => b.views - a.views);
       break;
     }
     default: {

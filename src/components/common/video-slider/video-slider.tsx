@@ -1,5 +1,5 @@
 import { OrderType, SliderType, SortType, Video } from "@client/utils/types";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useWindowWidth } from "@react-hook/window-size";
 import HorizontalSlider from "./hotizontal/horizontal-slider";

@@ -40,8 +40,9 @@ interface TextFieldProps {
   onEnter?: () => void;
   value: string;
   placeholder: string;
-  hideInput?: boolean;
+  inputType: "search" | "password" | "text";
   prefix?: string;
+  toggleIcon?: JSX.Element;
 }
 
 const TextField: FC<TextFieldProps> = ({
@@ -50,7 +51,8 @@ const TextField: FC<TextFieldProps> = ({
   value,
   placeholder,
   prefix,
-  hideInput,
+  inputType,
+  toggleIcon,
 }: TextFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const input = useRef<HTMLInputElement>(null);
@@ -86,8 +88,9 @@ const TextField: FC<TextFieldProps> = ({
         onKeyUp={handleKeyUp}
         placeholder={placeholder}
         value={value}
-        type={hideInput ? "password" : "text"}
+        type={inputType}
       />
+      <>{toggleIcon ? toggleIcon : {}}</>
     </TextFieldContent>
   );
 };

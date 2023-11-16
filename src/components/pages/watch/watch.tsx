@@ -1,14 +1,15 @@
 import { Video } from "@client/utils/types";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import { booleanify } from "@client/utils/cookie";
-import { isMediaTypeVideo } from "@client/utils/checkMediaType";
-import { screenSizes } from "@client/utils/theme";
+import { getMediaType } from "@client/utils/checkMediaType";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
 import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copyLink";
 import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";
 import Head from "next/head";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, SyntheticEvent, useRef, useState } from "react";
+import React, { FC, SyntheticEvent, useContext, useRef, useState } from "react";
 import RequireAuthButton from "@client/components/common/shared/button-icons/buttons/requireAuth";
 import TheatreModeButton from "@client/components/common/shared/button-icons/buttons/theatreMode";
 import TimeAgo from "react-timeago";
@@ -76,23 +77,23 @@ interface WatchPageProps {
   url: string;
 }
 
-const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
-  const [video, setVideo] = useState(originalVideo);
+const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
   const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
   const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const windowHeight = useWindowHeight();
   const windowWidth = useWindowWidth({ wait: 10 });
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
-  const isVideo = isMediaTypeVideo(originalVideo.extentsion);
+  const isVideo = getMediaType(video.extentsion);
   const isTheatreMode = booleanify(cookies.isTheaterMode);
+  const { updateVideo } = useContext(VideoContext);
 
   const handleVolumeChange = (): void => {
     //
   };
 
-  const updateVideo = (res: Response, newVideo: Video): void => {
-    if (res.ok) setVideo(newVideo);
+  const videoResponseUpdate = (res: Response, newVideo: Video): void => {
+    if (res.ok) updateVideo(newVideo);
   };
 
   const searchbarSize = 90;
@@ -163,7 +164,7 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
         <StyledMeta property="og:video" value={fullVideoURL} />
         <StyledMeta property="og:video:url" value={fullVideoURL} />
         <StyledMeta property="og:video:secure_url" value={fullVideoURL} />
-        <StyledMeta property="og:video:type" content={originalVideo.mimeType} />
+        <StyledMeta property="og:video:type" content={video.mimeType} />
         <StyledMeta property="og:video:width" content="1280" />
         <StyledMeta property="og:video:height" content="720" />
         <StyledMeta name="twitter:card" content="player" />
@@ -199,15 +200,15 @@ const WatchPage: FC<WatchPageProps> = ({ video: originalVideo, url }) => {
               <h4>{video.name}</h4>
             </VideoName>
             <Buttons>
-              <FavoriteButton handleResponse={updateVideo} video={video} />
+              <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
               <CopyLinkButton link={url} />
-              <RequireAuthButton handleResponse={updateVideo} video={video} showText={true} />
+              <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={true} />
               <TheatreModeButton />
             </Buttons>
           </VideoNameContainer>
           <VideoDetails>
             <h6>
-              {video.category} · <TimeAgo date={video.updated} />
+              {video.category} · <TimeAgo date={video.updated} /> · {video.views} views
             </h6>
           </VideoDetails>
           {video.description && <div className="content">{video.description}</div>}

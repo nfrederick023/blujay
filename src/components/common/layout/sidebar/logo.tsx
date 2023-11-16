@@ -1,5 +1,5 @@
 import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/theme";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import Gradient from "../../shared/gradient";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import styled from "styled-components";
 const LogoContainer = styled.div`
   user-select: none;
   display: flex;
-  height: 60px;
+  height: 55px;
   padding-right: 16px;
   ${(p: { onlyShowMenu: boolean }): string => (p.onlyShowMenu ? "width: 32px;" : "width: 210px;")}
 
@@ -20,6 +20,7 @@ const LogoContainer = styled.div`
 
 const LogoWrapper = styled.div`
   margin: auto;
+  margin-top: 13px;
 `;
 
 const Icon = styled.i`
@@ -28,7 +29,7 @@ const Icon = styled.i`
   padding-left: 3px;
 
   &:before {
-    margin-top: 2.2px;
+    margin-top: 1px;
     position: fixed;
   }
 

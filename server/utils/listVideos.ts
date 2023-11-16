@@ -1,7 +1,8 @@
 import * as mime from "mime-types";
 import { SupportedExtentsions, Video } from "@client/utils/types";
 import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getUserPassword, getVideoList, setVideoList } from "./config";
-import { isMediaTypeVideo } from "@client/utils/checkMediaType";
+import { getMediaType } from "@client/utils/checkMediaType";
+import { supportedFileExtensions } from "@client/utils/constants";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
 import fse from "fs-extra";
@@ -10,7 +11,6 @@ import path from "path";
 import pathToFfmpeg from "ffmpeg-static";
 import seedrandom from "seedrandom";
 
-
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
 
@@ -18,7 +18,14 @@ export const listVideos = async (): Promise<Video[]> => {
   createVideoListBackup();
 
   const libraryPath = getLibraryPath();
-  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(mkv|mp4|webm|mov|mpeg|avi|wmv|gif|jpg|png|jpeg)`);
+  // gets the file location of all videos which are supported
+  const allFiles = await glob.promise(`${libraryPath}/**/*.*`);
+  const videoFilePaths = await glob.promise(`${libraryPath}/**/*.@(${supportedFileExtensions.join("|")})`);
+
+  if (allFiles.length !== videoFilePaths.length) {
+    console.warn("Unsupported file extentsions were found in the library and will not be indexed!");
+  }
+
   cleanState(videoFilePaths);
 
   const videoDetails: Video[] = [];
@@ -36,23 +43,30 @@ export const listVideos = async (): Promise<Video[]> => {
 };
 
 const createThumbnails = async (videos: Video[]): Promise<void> => {
+  const sizeReductionPercent = 50;
   const folder = getThumbnailsPath();
   const thumbnails = await fse.readdir(folder);
   let oldThumbnails = thumbnails;
   videos.forEach(video => {
-    const filename = video.id + ".jpg";
+    const filename = video.id + ".webp";
     oldThumbnails = oldThumbnails.filter(thumbnail => !(thumbnail === filename));
     if (!thumbnails.includes(filename)) {
-      if (isMediaTypeVideo(video.extentsion) || video.extentsion === "gif") {
-        const timemarks = video.extentsion === "gif" ? ["0"] : ["20%"];
+      const mediaType = getMediaType(video.extentsion);
+      const timemarks = mediaType === "video" ? ["20%"] : ["0"];
+
+      if (mediaType === "video" || mediaType === "gif") {
         ffmpeg(video.filePath)
           .inputOptions("-t 10")
           .screenshots({
             count: 1,
             filename,
             folder,
+            size: `${sizeReductionPercent}%`,
             timemarks
           });
+      } else {
+        ffmpeg(video.filePath).output(folder + filename)
+          .outputOptions(["-preset", "default", "-vf", `scale=iw*0.${sizeReductionPercent}:ih*0.${sizeReductionPercent}`]).run();
       }
     }
   });
@@ -78,7 +92,7 @@ const getCreateVideo = (filePath: string): Video | null => {
   let category = path.dirname(filePath).split("\\").pop() ?? "";
   const extentsion = fileName.split(".").pop() as SupportedExtentsions;
   const id = parseInt((seedrandom(fileName + getUserPassword())() * 9e7 + 1e7).toString()).toString();
-  const thumbnailPath = isMediaTypeVideo(extentsion) || extentsion === "gif" ? path.join(getThumbnailsPath() + id + ".jpg") : filePath;
+  const thumbnailPath = path.join(getThumbnailsPath() + id + ".webp");
 
   if (category === "library")
     category = "";
