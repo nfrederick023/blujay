@@ -44,11 +44,7 @@ interface HorizontalSliderProps {
   headerText: string;
 }
 
-const HorizontalSlider: FC<HorizontalSliderProps> = ({
-  videos,
-  headerText,
-  videosPerRow,
-}: HorizontalSliderProps) => {
+const HorizontalSlider: FC<HorizontalSliderProps> = ({ videos, headerText, videosPerRow }: HorizontalSliderProps) => {
   const [displayedVideos, setDisplayedVideos] = useState<JSX.Element[]>([]);
   const [hubro, setHubro] = useState<HubroTypes>("pause");
   const [displayedPosition, setDisplayedPosition] = useState(0);
@@ -66,17 +62,13 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
 
       if (position < displayedPosition) {
         const newVideo = videos[displayedPosition - 2];
-        const newVideoEl = (
-          <VideoDetails key={newVideo?.id || "0"} video={newVideo} />
-        );
+        const newVideoEl = <VideoDetails key={newVideo?.id || "0"} video={newVideo} />;
 
         newDisplay.pop();
         newDisplay.unshift(newVideoEl);
       } else {
         const newVideo = videos[displayedVideos.length - 1 + displayedPosition];
-        const newVideoEl = (
-          <VideoDetails key={newVideo?.id || "1"} video={newVideo} />
-        );
+        const newVideoEl = <VideoDetails key={newVideo?.id || "1"} video={newVideo} />;
 
         newDisplay.splice(0, 1);
         newDisplay.push(newVideoEl);
@@ -91,10 +83,7 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
   if (videosPerRow + 2 !== displayedVideos.length) {
     setDisplayedVideos(
       [...new Array(videosPerRow + 2)].map((undef, i) => (
-        <VideoDetails
-          key={videos[i + displayedPosition - 1]?.id || i}
-          video={videos[i + displayedPosition - 1]}
-        />
+        <VideoDetails key={videos[i + displayedPosition - 1]?.id || i} video={videos[i + displayedPosition - 1]} />
       ))
     );
   }

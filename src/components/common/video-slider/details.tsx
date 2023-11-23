@@ -3,7 +3,6 @@ import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
 import styled from "styled-components";
-import useResizeObserver from "@react-hook/resize-observer";
 
 const VideoDetailsWrapper = styled.div`
   position: relative;
@@ -28,18 +27,18 @@ const thumbnailAttr = (p: { imageHeight: number }): unknown => ({
 
 const Thumbnail = styled.img.attrs(thumbnailAttr)`
   width: 100%;
+  aspect-ratio: 16/9;
   border-radius: 15px;
   object-fit: cover;
 `;
 
 const ImagePlayer = styled.img.attrs(thumbnailAttr)`
-  position: absolute;
-  object-fit: cover;
-  border-radius: 15px;
   width: 100%;
-
+  aspect-ratio: 16/9;
+  border-radius: 15px;
+  object-fit: cover;
+  position: absolute;
   opacity: 0;
-  transition: opacity 0.1s ease-in-out;
 
   &:hover {
     opacity: 1;
@@ -47,12 +46,11 @@ const ImagePlayer = styled.img.attrs(thumbnailAttr)`
 `;
 
 const VideoPlayer = styled.video.attrs(thumbnailAttr)`
-  position: absolute;
   width: 100%;
+  aspect-ratio: 16/9;
   border-radius: 15px;
   object-fit: cover;
-
-  transition: opacity 0.1s ease-in-out;
+  position: absolute;
 
   opacity: ${(p): string => {
     return p.isPlaying ? "1" : "0";
@@ -80,18 +78,8 @@ interface VideoDetailsProps {
 const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [size, setSize] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const imageHeight = (size / 1920) * 1080;
-
-  React.useLayoutEffect(() => setSize(ref.current?.getBoundingClientRect().width || 0), [ref]);
-
-  useResizeObserver(ref, (entry) => {
-    if (size !== entry.contentRect.width) {
-      setSize(entry.contentRect.width);
-    }
-  });
 
   const handleIsHoverTrueChange = async (): Promise<void> => {
     setIsHovering(true);
@@ -122,27 +110,20 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
                 onMouseLeave={handleIsHoverFalseChange}
                 src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
                 disablePictureInPicture
-                imageHeight={imageHeight}
                 isPlaying={isHovering}
                 preload={"none"}
-                type={"video/mp4"}
                 muted
                 loop
               />
             )}
             {video.type === "gif" && isHovering && (
               <ImagePlayer
-                imageHeight={imageHeight}
                 onMouseEnter={handleIsHoverTrueChange}
                 onMouseLeave={handleIsHoverFalseChange}
                 src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
               />
             )}
-            <Thumbnail
-              imageHeight={imageHeight}
-              onMouseEnter={handleIsHoverTrueChange}
-              src={"/api/thumb/" + encodeURIComponent(video.id)}
-            />
+            <Thumbnail onMouseEnter={handleIsHoverTrueChange} src={"/api/thumb/" + encodeURIComponent(video.id)} />
             <VideoNameWrapper>
               <h5>{video.name}</h5>
               <h6>

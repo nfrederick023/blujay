@@ -1,25 +1,23 @@
-import { FileFormatNotAllowed, UpdateVideoFailedException, VideoNotFoundException, VideoValidationFailed } from "./video.exceptions";
-import { FileTypeResult, fileTypeFromBuffer, fileTypeFromFile } from "file-type";
 import { UpdateVideo } from "./video.dto";
+import { UpdateVideoFailedException, VideoNotFoundException } from "../videoList/videoList.exceptions";
+import { ValidationException } from "./video.exceptions";
 import { Video } from "@client/utils/types";
-import { deleteVideo, getLibraryPath, getVideo, getVideoList, setVideoList } from "@server/utils/config";
-import { fileMimeTypes } from "@client/utils/constants";
+import { deleteVideo, getVideoList, moveVideoToLibrary, setVideoList } from "@server/utils/config";
+import { listVideos } from "@server/utils/listVideos";
+import { validateVideo } from "@server/utils/validateVideo";
 
-export const validateFiles = async (files: Express.Multer.File[]): Promise<void> => {
-  for (const file of files) {
-    let meta: FileTypeResult | undefined;
-    try {
-      meta = await fileTypeFromFile(file.path);
-    } catch {
-      deleteVideo(file.path);
-      throw new VideoValidationFailed();
-    }
 
-    if (!meta || !fileMimeTypes.includes(meta.mime)) {
-      deleteVideo(file.path);
-      throw new FileFormatNotAllowed();
-    }
+export const validateFiles = async (filePath: string): Promise<void> => {
+  try {
+    await validateVideo(filePath);
+  } catch (e: unknown) {
+    deleteVideo(filePath);
+    throw new ValidationException(e as string);
   }
+
+  moveVideoToLibrary(filePath);
+  // this will index and create thumbnails
+  await listVideos();
 };
 
 export const updateVideo = async (updateVideo: UpdateVideo): Promise<void> => {

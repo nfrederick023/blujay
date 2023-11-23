@@ -144,11 +144,12 @@ const WatchPage: FC<WatchPageProps> = ({ video, url }) => {
   const thumbSrc = "/api/thumb/" + encodeURIComponent(video.id);
   const fullVideoURL = `${src}${videoSrc}`;
   const fullThumbSrc = `${src}${thumbSrc}`;
+  const title = "Blujay · " + video.name;
 
   return (
     <>
       <Head>
-        <title>{video.name + "page title goes here"}</title>
+        <title>{title}</title>
         <StyledMeta property="og:type" value="videoDetails.other" />
         <StyledMeta property="og:site_name" value={"page title goes here"} />
         <StyledMeta property="og:url" value={url} />

@@ -5,34 +5,33 @@ import { authGuard } from "@server/utils/auth";
 import { listVideos } from "@server/utils/listVideos";
 import React, { useContext, useEffect } from "react";
 import WatchPage from "@client/components/pages/watch/watch";
-import router from "next/router";
 
 interface WatchProps {
-  video?: Video;
+  videoID?: string;
   serverVideos: Video[];
   url: string;
 }
 
-const Watch: NextPage<WatchProps> = ({ video, url, serverVideos }: WatchProps) => {
+const Watch: NextPage<WatchProps> = ({ videoID, url, serverVideos }: WatchProps) => {
   const { setVideos } = useContext(VideoContext);
-
-  if (!video) {
-    router.push("/404");
-    return <></>;
-  }
+  const video = serverVideos.find((video) => {
+    return video.id === videoID;
+  });
 
   useEffect(() => {
     setVideos(serverVideos);
   }, []);
+
+  if (!video) {
+    return <></>;
+  }
 
   return <WatchPage video={video} url={url}></WatchPage>;
 };
 
 export const getServerSideProps: GetServerSideProps<WatchProps> = authGuard(async (ctx) => {
   const serverVideos = await listVideos();
-  const video = serverVideos.find((video) => {
-    return video.id === ctx.query.id;
-  });
+  const videoID = ctx.query.id as string | undefined;
 
   // http://localhost:3000/watch/85818224
   const protocol = ctx.req.headers?.["x-forwarded-proto"] || "http";
@@ -40,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<WatchProps> = authGuard(asyn
   const url = new URL(ctx.req?.url ?? "", `${protocol}://${hostname}`).toString();
 
   // if no auth required
-  return { props: { video, url, serverVideos } };
+  return { props: { videoID, url, serverVideos } };
 });
 
 export default Watch;

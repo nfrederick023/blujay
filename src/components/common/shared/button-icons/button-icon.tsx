@@ -148,6 +148,11 @@ const ButtonIcon: FC<ButtonIconProps> = ({
     if (onClick) onClick(e);
   };
 
+  const onHoverOverSelectedBox = (): void => {
+    setIsPlaying(false);
+    setIsHover(false);
+  };
+
   const _icon = isSelected ? selectedIcon : icon;
   let confirmText = confrimTextOn || confrimTextOff;
   let hoverText = hoverTextOn || hoverTextOff;
@@ -188,7 +193,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
         )}
         {confirmText && isPlaying && (
           <Wrapper isOffscreen={isOffscreen}>
-            <SelectedBox>{confirmText}</SelectedBox>
+            <SelectedBox onMouseOver={onHoverOverSelectedBox}>{confirmText}</SelectedBox>
           </Wrapper>
         )}
       </Button>

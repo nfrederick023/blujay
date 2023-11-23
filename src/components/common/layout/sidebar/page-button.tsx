@@ -8,7 +8,6 @@ const ButtonWrapper = styled.div`
   color: white;
   margin-bottom: 5px;
   line-height: 5px;
-  transition: 0.1s;
 
   span {
     min-height: 40px;

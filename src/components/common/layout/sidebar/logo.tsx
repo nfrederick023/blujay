@@ -9,24 +9,24 @@ import styled from "styled-components";
 const LogoContainer = styled.div`
   user-select: none;
   display: flex;
-  height: 55px;
+  height: 60px;
   padding-right: 16px;
-  ${(p: { onlyShowMenu: boolean }): string => (p.onlyShowMenu ? "width: 32px;" : "width: 210px;")}
-
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    ${(p: { onlyShowMenu: boolean }): string => (p.onlyShowMenu ? "width: 32px;" : "width: 210px;")}
-  }
 `;
 
 const LogoWrapper = styled.div`
   margin: auto;
   margin-top: 13px;
+
+  @media (max-width: ${screenSizes.smallScreenSize}px) {
+    ${(p: { isSidebarEnabled: boolean }): string => (p.isSidebarEnabled ? "" : "display: none;")}
+  }
 `;
 
 const Icon = styled.i`
   padding-top: 9px;
   padding-right: 48px;
   padding-left: 3px;
+  color: ${(p): string => p.theme.textContrast};
 
   &:before {
     margin-top: 1px;
@@ -34,34 +34,29 @@ const Icon = styled.i`
   }
 
   &:hover {
+    color: ${(p): string => p.theme.text};
     cursor: pointer;
   }
 `;
 
-interface LogoProps {
-  onlyShowMenu?: boolean;
-}
-
-const Logo: FC<LogoProps> = ({ onlyShowMenu }: LogoProps) => {
+const Logo: FC = () => {
   const [cookies, setCookie] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
-  const sidebarState = booleanify(cookies.isSidebarEnabled);
+  const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
 
   const handleIsCollapsedChange = (): void => {
-    setCookie("isSidebarEnabled", !sidebarState, getCookieSetOptions());
+    setCookie("isSidebarEnabled", !isSidebarEnabled, getCookieSetOptions());
   };
 
   return (
-    <LogoContainer onlyShowMenu={onlyShowMenu ?? false}>
+    <LogoContainer>
       <Icon className={"bx bx-menu bx-md"} onClick={handleIsCollapsedChange} />
-      <LogoWrapper>
-        {!onlyShowMenu && (
-          <Link href={"/"}>
-            <Gradient type="text">
-              <h1>BLU</h1>
-            </Gradient>
-            <h1>JAY</h1>
-          </Link>
-        )}
+      <LogoWrapper isSidebarEnabled={isSidebarEnabled}>
+        <Link href={"/"}>
+          <Gradient type="text">
+            <h1>BLU</h1>
+          </Gradient>
+          <h1>JAY</h1>
+        </Link>
       </LogoWrapper>
     </LogoContainer>
   );

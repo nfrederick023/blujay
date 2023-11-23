@@ -22,14 +22,14 @@ const SearchBarContent = styled.div`
   }
 
   @media (max-width: ${screenSizes.smallScreenSize}px) {
-    margin-left: 225px;
-    margin-right: 70px;
+    margin-left: 70px;
+    margin-right: 115px;
     max-width: 100%;
   }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     margin-left: 70px;
-    margin-right: 70px;
+    margin-right: 20px;
   }
 `;
 
@@ -47,7 +47,7 @@ const SearchBarInput = styled.input`
 const SearchIcon = styled.i`
   font-size: 1.1rem !important;
   margin-left: 5px;
-  padding-top: 3.5px;
+  padding-top: 2px;
 
   &::before {
     vertical-align: top;

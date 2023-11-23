@@ -13,7 +13,6 @@ const SelectBox = styled.div`
   color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.textContrast};
   display: flex;
   user-select: none;
-  transition: 0.2s;
 
   &:hover {
     color: ${(p): string => p.theme.text};

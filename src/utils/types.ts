@@ -70,6 +70,12 @@ export interface Config {
   readonly thumbnailSettings: Thumbnail;
 }
 
+export interface FileUpload {
+  filename: string;
+  progress: number;
+  uploadStatus: "IN_PROGESS" | "FAILED" | "COMPLETE";
+}
+
 // DO NOT ALLOW SENSITIVE PARAMETERS IN PUBLICCONFIG!!!!! 
 export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;

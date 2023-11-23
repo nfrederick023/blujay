@@ -19,7 +19,6 @@ const DropDownBox = styled.div`
 const Option = styled.div`
   padding: 8px 8px 8px 15px;
   color: ${(p): string => p.theme.textContrast};
-  transition: 0.2s;
 
   &:hover {
     color: ${(p): string => p.theme.text};

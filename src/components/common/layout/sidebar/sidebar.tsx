@@ -3,7 +3,6 @@ import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
-import { useWindowWidth } from "@react-hook/window-size";
 import CategoryButton from "./category-button";
 import Logo from "./logo";
 import NoSSR from "@mpth/react-no-ssr";
@@ -44,8 +43,8 @@ const SidebarContent = styled.div`
   display: flex;
   position: fixed;
   flex-wrap: wrap;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
   font-weight: 575;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
@@ -56,14 +55,14 @@ const SidebarContent = styled.div`
 
 const Library = styled.div`
   border-left: ${(p): string => p.theme.textContrastLight} 2px solid;
-  margin-left: 40px;
+  margin-left: 20px;
   margin-top: 5px;
   width: 100%;
 `;
 
 const LogoBackdrop = styled.div`
   position: fixed;
-  left: 20px;
+  left: 15px;
   top: 0px;
   z-index: 3;
 `;
@@ -72,7 +71,6 @@ const Sidebar: FC = () => {
   const [cookies] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
   const [selectedPath, setSelctedPath] = useState("");
   const { videos } = useContext(VideoContext);
-  const width = useWindowWidth({ wait: 10 });
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const [, setCookie] = useCookies();
   const router = useRouter();
@@ -83,24 +81,27 @@ const Sidebar: FC = () => {
     .sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
-    if (width < screenSizes.smallScreenSize) {
-      setCookie("isSidebarEnabled", "true", getCookieSetOptions());
-    }
-  }, [router]);
+    const setPathAndCloseSidebar = (path: string): void => {
+      if (window.innerWidth < screenSizes.smallScreenSize) {
+        setCookie("isSidebarEnabled", "false", getCookieSetOptions());
+      }
 
-  useEffect(() => {
-    router.events.on("routeChangeStart", (path: string): void => {
       setSelctedPath(path);
-    });
+    };
 
     setSelctedPath(window.location.pathname);
+    router.events.on("routeChangeStart", setPathAndCloseSidebar);
+
+    return () => {
+      router.events.off("routeChangeStart", setPathAndCloseSidebar);
+    };
   }, []);
 
   return (
     <>
       <NoSSR>
         <LogoBackdrop>
-          <Logo onlyShowMenu={width < screenSizes.tabletScreenSize} />
+          <Logo />
         </LogoBackdrop>
         <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
           <SidebarContent>

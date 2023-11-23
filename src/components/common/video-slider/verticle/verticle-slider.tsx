@@ -72,7 +72,6 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
   };
 
   const sortedVideos: Video[] = sortVideos([...videos], sort, order);
-
   return (
     <>
       <VeticleSliderHeader

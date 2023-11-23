@@ -42,13 +42,22 @@ const LoadBar: FC = () => {
 
   useEffect(() => {
     firstRender.current = false;
-    router.events.on("routeChangeStart", (): void => {
-      setIsLoading(true);
-    });
 
-    router.events.on("routeChangeComplete", (): void => {
+    const enableLoadbar = (): void => {
+      setIsLoading(true);
+    };
+
+    const disableLoadbar = (): void => {
       setIsLoading(false);
-    });
+    };
+
+    router.events.on("routeChangeStart", enableLoadbar);
+    router.events.on("routeChangeComplete", disableLoadbar);
+
+    return () => {
+      router.events.off("routeChangeStart", enableLoadbar);
+      router.events.off("routeChangeComplete", disableLoadbar);
+    };
   }, []);
 
   return (

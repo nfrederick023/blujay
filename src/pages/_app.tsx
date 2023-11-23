@@ -5,7 +5,7 @@ import { Montserrat } from "next/font/google";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
-import GlobalFileUpload from "@client/components/common/layout/globalFileUpload";
+import GlobalFileUpload from "@client/components/common/layout/upload/globalFileUpload";
 import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
 import LoadBar from "@client/components/common/layout/loadbar";
@@ -114,13 +114,12 @@ const CenterContent = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  margin: 10px 30px 20px 30px;
+  margin: 10px 20px 20px 20px;
 `;
 
 const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   //TODO: move this state call into a component that doesn't rerender EVERYTHING
   const [search, setSearch] = useState("");
-  const [files, setFiles] = useState<FileList | null>(null);
   const router = useRouter();
 
   // assign default values to cookies if not set, get all cookies and set default if none
@@ -132,20 +131,28 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   });
 
   useEffect(() => {
-    if (search) {
-      setSearch("");
-    }
-  }, [router]);
+    const resetSearch = (): void => {
+      if (search) {
+        setSearch("");
+      }
+    };
+
+    router.events.on("routeChangeStart", resetSearch);
+
+    return () => {
+      router.events.off("routeChangeStart", resetSearch);
+    };
+  }, []);
 
   return (
     <CookiesProvider cookies={_cookies}>
       <ThemeProvider theme={blujayTheme}>
-        <GlobalStyle />
-        <Head>
-          <title>Blujay</title>
-        </Head>
-        <GlobalFileUpload setFiles={setFiles}>
-          <LayoutWrapper className={montserrat.className}>
+        <div className={montserrat.className}>
+          <GlobalStyle />
+          <Head>
+            <title>Blujay</title>
+          </Head>
+          <LayoutWrapper>
             {router.pathname.includes("/login") ? (
               <Component {...pageProps} />
             ) : (
@@ -155,15 +162,17 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
                   <Sidebar />
                   <CenterContent>
                     <Header setSearch={setSearch} />
-                    <ContentWrapper>
-                      {search ? <SearchSlider search={search} /> : <Component {...pageProps} />}
-                    </ContentWrapper>
+                    <GlobalFileUpload>
+                      <ContentWrapper>
+                        {search ? <SearchSlider search={search} /> : <Component {...pageProps} />}
+                      </ContentWrapper>
+                    </GlobalFileUpload>
                   </CenterContent>
                 </VideoProvider>
               </>
             )}
           </LayoutWrapper>
-        </GlobalFileUpload>
+        </div>
       </ThemeProvider>
     </CookiesProvider>
   );

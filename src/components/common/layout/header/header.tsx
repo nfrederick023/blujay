@@ -1,5 +1,6 @@
 import { BluJayTheme } from "@client/utils/types";
 import { getCookieSetOptions } from "@client/utils/cookie";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import DropDown from "../../shared/drop-down";
 import React, { FC, useState } from "react";
@@ -14,7 +15,7 @@ const HeaderWrapper = styled.div`
   display: flex;
   width: 100%;
   position: sticky;
-  top: 0; /* required */
+  top: 0;
   z-index: 2;
 `;
 
@@ -22,30 +23,42 @@ const CogDropDown = styled.span`
   position: absolute;
   width: 250px;
   margin-right: 170px;
-  right: -140px;
+  right: -150px;
   top: 20px;
 `;
 
-const CogContainer = styled.div`
+const IconContainer = styled.div`
   position: fixed;
   display: flex;
   height: 58px;
-  right: 30px;
+  right: 20px;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    display: none;
+  }
 `;
 
-const CogIcon = styled.i`
-  margin: auto;
+const Icon = styled.i`
+  color: ${(p): string => p.theme.textContrast};
 
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
-    p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
-  margin: auto 0px auto 0px;
+  margin: auto 0px auto 15px;
   font-size: 28px;
-  transition: 0.2s;
 
   &:hover {
     color: ${(p): string => p.theme.text};
     cursor: pointer;
   }
+`;
+
+const CogIcon = styled(Icon)`
+  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
+    p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
+
+  font-size: 32px;
+`;
+
+const UploadIcon = styled(Icon)`
+  font-size: 32px;
 `;
 
 interface HeaderProps {
@@ -100,9 +113,10 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
   return (
     <HeaderWrapper>
       <SearchBar setSearch={setSearch} />
-      <CogContainer>
+      <IconContainer>
+        <UploadIcon tabIndex={0} onClick={handleClick} className="bx bx-cloud-upload" />
         <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
-      </CogContainer>
+      </IconContainer>
       <div>
         <CogDropDown onClick={prevent} onMouseDown={mouseDown} onMouseUp={mouseUp}>
           {isFocused && <DropDown options={options}></DropDown>}
