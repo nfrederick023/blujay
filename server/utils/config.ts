@@ -1,6 +1,6 @@
 import { Config, Thumbnail, Video } from "../../src/utils/types";
 import { existsSync } from "fs";
-import fs from "fs-extra";
+import fs from "fs";
 
 export const getUserPassword = (): string => {
   return (getConfig()).password;
@@ -59,13 +59,13 @@ export const getTempPath = (): string => {
 
 export const getVideoListPath = (): string => {
   const dir = getAssetsPath() + "video_list.json";
-  checkCreateJSON(dir, []);
+  checkCreateJSON(dir, "[]");
   return dir;
 };
 
 export const getBackupVideoListPath = (): string => {
   const dir = getBackupPath() + "video_list.json";
-  checkCreateJSON(dir, []);
+  checkCreateJSON(dir, "[]");
   return dir;
 };
 
@@ -81,21 +81,21 @@ export const getConfigPath = (): string => {
     }
   };
 
-  checkCreateJSON(dir, defaultConfig);
+  checkCreateJSON(dir, JSON.stringify(defaultConfig));
   return dir;
 };
 
 export const setVideoList = (list: Video[]): void => {
-  fs.writeJSONSync(getVideoListPath(), list);
+  fs.writeFileSync(getVideoListPath(), JSON.stringify(list), "utf-8");
 };
 
 export const getVideoList = (): Video[] => {
-  return fs.readJSONSync(getVideoListPath()) as Video[];
+  return JSON.parse(fs.readFileSync(getVideoListPath(), "utf-8")) as Video[];
 };
 
 export const deleteVideo = (path: string): void => {
   if (existsSync(path)) {
-    fs.removeSync(path);
+    fs.rmSync(path, { force: true });
   }
 };
 
@@ -127,12 +127,12 @@ export const moveVideoFromTemp = (path: string): void => {
 };
 
 export const getConfig = (): Config => {
-  return fs.readJSONSync(getConfigPath()) as Config;
+  return JSON.parse(fs.readFileSync(getVideoListPath(), "utf-8")) as Config;
 };
 
 export const createVideoListBackup = (): void => {
   const videoList = getVideoList();
-  fs.writeJSONSync(getBackupVideoListPath(), videoList);
+  fs.writeFileSync(getBackupVideoListPath(), JSON.stringify(videoList), "utf-8");
 };
 
 export const deleteThumbnail = (thumbnailName: string): void => {
@@ -145,14 +145,14 @@ export const getDirListOfLibrarySubfolders = (): string[] => {
     .map(dirent => dirent.name);
 };
 
-const checkCreateJSON = <T>(dir: string, defaultValue: T): string => {
+const checkCreateJSON = <T extends string>(dir: string, defaultValue: T): string => {
   if (!fs.existsSync(dir))
-    fs.writeJSONSync(dir, defaultValue);
+    fs.writeFileSync(dir, defaultValue, "utf-8");
   return dir;
 };
 
 const checkCreateDir = (dir: string): string => {
-  if (!fs.existsSync(dir) || !fs.pathExistsSync(dir))
+  if (!fs.existsSync(dir) || !fs.existsSync(dir))
     fs.mkdirSync(dir);
   return dir;
 };

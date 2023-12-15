@@ -2,14 +2,14 @@ import { FileUpload } from "@client/utils/types";
 import { fileExtensions } from "@client/utils/constants";
 import { uploadVideo } from "@client/utils/api";
 import React, { DragEvent, FC, MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
-import UploadProgressBar from "./uploadProgressBar";
+import UploadProgressBar from "./upload-progress-bar";
 import styled from "styled-components";
 
 const FileUploadInput = styled.input`
   display: none;
 `;
 
-const OverlayWrapper = styled.div`
+const Overlay = styled.div`
   @keyframes fadeIn {
     0% {
       opacity: 0;
@@ -23,7 +23,7 @@ const OverlayWrapper = styled.div`
   left: 0px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.75);
   z-index: 6;
   animation: fadeIn 0.15s;
 `;
@@ -62,6 +62,7 @@ const DragDropText = styled.div`
 `;
 
 type Status = "FAILED" | "COMPLETE";
+type StatusList = { status: Status; error: string };
 
 export interface GlobalFileUploadProps {
   children: ReactNode;
@@ -70,11 +71,11 @@ export interface GlobalFileUploadProps {
 const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUploadProps) => {
   const [isDragFile, setIsDragFile] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<FileUpload[]>([]);
-  const [statusList, setStatusList] = useState<Status[]>([]);
+  const [statusList, setStatusList] = useState<StatusList[]>([]);
   const uploadedFilesRef = useRef<FileUpload[]>([]);
   uploadedFilesRef.current = uploadedFiles;
 
-  const statusListRef = useRef<Status[]>([]);
+  const statusListRef = useRef<StatusList[]>([]);
   statusListRef.current = statusList;
 
   const unsavedChange = (): boolean => {
@@ -89,11 +90,12 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
           filename: file.name,
           progress: 0,
           uploadStatus: "IN_PROGESS",
+          error: "",
         })
       ),
     ]);
 
-    const statusArr: ("FAILED" | "COMPLETE")[] = [];
+    const statusArr: StatusList[] = [];
     const currIndex = uploadedFilesRef.current.length;
     await Promise.all(
       Array.from(files).map(async (file, i) => {
@@ -102,14 +104,17 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
           await uploadVideo(file, (progress: number) => {
             setUploadedFiles(uploadedFilesRef.current.map((f, i) => (index === i ? { ...f, progress } : f)));
           });
-          statusArr[index] = "COMPLETE";
+          statusArr[index] = { status: "COMPLETE", error: "" };
           setUploadedFiles(
             uploadedFilesRef.current.map((f, i) => (index === i ? { ...f, uploadStatus: "COMPLETE", progress: 1 } : f))
           );
         } catch (e) {
-          statusArr[index] = "FAILED";
+          const error = e as unknown as string;
+          statusArr[index] = { status: "FAILED", error };
           setUploadedFiles(
-            uploadedFilesRef.current.map((f, i) => (index === i ? { ...f, uploadStatus: "FAILED", progress: 1 } : f))
+            uploadedFilesRef.current.map((f, i) =>
+              index === i ? { ...f, uploadStatus: "FAILED", progress: 1, error } : f
+            )
           );
         }
       })
@@ -152,12 +157,16 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
     await upload(files);
   };
 
-  console.log(uploadedFiles);
-  console.log(statusList);
-
-  if (uploadedFiles.find((file, i) => file.uploadStatus !== statusList[i] && statusList[i])) {
+  if (uploadedFiles.find((file, i) => statusList[i] && file.uploadStatus !== statusList[i].status)) {
     // sometimes the upload is so fast the progress/status isn't persisted properly, so here we fix any after upload
-    setUploadedFiles(uploadedFiles.map((file, i) => ({ ...file, uploadStatus: statusList[i], progress: 1 })));
+    setUploadedFiles(
+      uploadedFiles.map((file, i) => ({
+        ...file,
+        uploadStatus: statusList[i].status,
+        error: statusList[i].error,
+        progress: 1,
+      }))
+    );
   }
 
   useEffect(() => {
@@ -172,10 +181,13 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
   return (
     <div>
       <FileUploadInput type="file" id="file-upload" multiple />
-      <UploadProgressBar uploadedFiles={uploadedFiles} />
-      <div onDragOver={onDragOver}>{children}</div>
+      <div onDragOver={onDragOver}>
+        <UploadProgressBar uploadedFiles={uploadedFiles} />
+
+        {children}
+      </div>
       {isDragFile && (
-        <OverlayWrapper>
+        <Overlay>
           <LabelOverlay
             htmlFor="file-upload"
             onDragLeave={onDragLeave}
@@ -189,7 +201,7 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
               <h5>Drop to Upload</h5>
             </DragDropText>
           </DragDropBox>
-        </OverlayWrapper>
+        </Overlay>
       )}
     </div>
   );

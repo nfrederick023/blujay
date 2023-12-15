@@ -4,13 +4,24 @@ import { Video } from "./types";
 export const uploadVideo = async (file: File, onProgress: (progress: number) => void): Promise<void> => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.addEventListener("progress", e => onProgress(e.loaded / e.total));
+    xhr.upload.addEventListener("progress", e => onProgress(e.loaded / e.total));
     xhr.onreadystatechange = (): void => {
-      if (xhr.readyState === 4) {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === 204) {
           resolve();
         } else {
-          reject(xhr.statusText);
+          if (xhr.response) {
+            try {
+              reject(JSON.parse(xhr.response).message);
+            } catch (e) {
+              reject(xhr.response);
+            }
+          }
+
+          console.log("here!");
+          // chrome returns no reponse on abort, the most likely reason for abort is becuase file already exists
+          // on firefox it works as expected
+          reject("Failed to Upload File: Does file already exist?");
         }
       }
     };

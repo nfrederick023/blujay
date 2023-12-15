@@ -1,22 +1,14 @@
 import { UpdateVideo } from "./video.dto";
 import { UpdateVideoFailedException, VideoNotFoundException } from "../videoList/videoList.exceptions";
-import { ValidationException } from "./video.exceptions";
 import { Video } from "@client/utils/types";
-import { deleteVideo, getVideoList, moveVideoToLibrary, setVideoList } from "@server/utils/config";
+import { getVideoList, moveVideoToLibrary, setVideoList } from "@server/utils/config";
 import { listVideos } from "@server/utils/listVideos";
 import { validateVideo } from "@server/utils/validateVideo";
 
 
 export const validateFiles = async (filePath: string): Promise<void> => {
-  try {
-    await validateVideo(filePath);
-  } catch (e: unknown) {
-    deleteVideo(filePath);
-    throw new ValidationException(e as string);
-  }
-
+  await validateVideo(filePath);
   moveVideoToLibrary(filePath);
-  // this will index and create thumbnails
   await listVideos();
 };
 

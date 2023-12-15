@@ -1,9 +1,9 @@
 import * as mime from "mime-types";
 import { Extentsions, Video, VideoType } from "@client/utils/types";
 import { createVideoListBackup, deleteThumbnail, getLibraryPath, getThumbnailsPath, getUserPassword, getVideoList, markVideoUnsupported, setVideoList } from "./config";
-import { fileExtensions, imageExtensions } from "@client/utils/constants";
 import { fileTypeFromFile } from "file-type";
 import { glob } from "glob";
+import { imageExtensions } from "@client/utils/constants";
 import { validateVideo } from "./validateVideo";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
@@ -19,11 +19,10 @@ export const listVideos = async (): Promise<Video[]> => {
   createVideoListBackup();
 
   const libraryPath = getLibraryPath();
-  // gets the file location of all videos which are supported
-  let allFiles = await glob(`${libraryPath}/**/*.*`);
+  let videoFilePaths = await glob(`${libraryPath}/**/*.*`);
   let validationFailed = false;
 
-  await Promise.all(allFiles.map(async file => {
+  await Promise.all(videoFilePaths.map(async file => {
     try {
       await validateVideo(file);
     } catch (e: unknown) {
@@ -34,14 +33,9 @@ export const listVideos = async (): Promise<Video[]> => {
   }));
 
   if (validationFailed) {
-    allFiles = await glob(`${libraryPath}/**/*.*`);
+    videoFilePaths = await glob(`${libraryPath}/**/*.*`);
   }
 
-  const videoFilePaths = await glob(`${libraryPath}/**/*.@(${fileExtensions.join("|")})`);
-
-  if (allFiles.length !== videoFilePaths.length) {
-    console.warn("Unsupported extentsions were found in the library and will not be indexed!");
-  }
 
   cleanState(videoFilePaths);
 

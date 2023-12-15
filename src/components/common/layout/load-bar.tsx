@@ -9,7 +9,7 @@ const BlueBar = styled.div`
   position: fixed;
   width: 0%;
   height: 2px;
-  background-color: ${(p): string => p.theme.highlightDark};
+  background-color: ${(p): string => p.theme.highlightLight};
   border-radius: 5px;
   z-index: 5;
 `;

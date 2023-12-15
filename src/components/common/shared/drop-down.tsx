@@ -22,7 +22,7 @@ const Option = styled.div`
 
   &:hover {
     color: ${(p): string => p.theme.text};
-    background-color: ${(p): string => p.theme.highlightDark};
+    background-color: ${(p): string => p.theme.highlightLight};
     cursor: pointer;
   }
 `;

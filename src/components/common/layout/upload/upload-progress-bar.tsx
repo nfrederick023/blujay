@@ -1,5 +1,6 @@
 import { FileUpload } from "@client/utils/types";
 import React, { FC, useState } from "react";
+import UploadProgressPopup from "./upload-progress-popup";
 import styled from "styled-components";
 
 const ProgressBarWrapper = styled.div`
@@ -34,8 +35,8 @@ const IncompleteProgress = styled.div`
   height: 4px;
 `;
 
-const CmpleteProgress = styled.div`
-  background-color: ${(p): string => p.theme.highlightDark};
+const CompleteProgress = styled.div`
+  background-color: ${(p): string => p.theme.highlightLight};
   width: ${(p: { totalProgress: number }): string => `${p.totalProgress}`}%;
   transition: ${(p): string => (p.totalProgress === 0 ? "0s" : "1s")} ease-out;
   border-radius: 30px;
@@ -87,6 +88,22 @@ const UploadStatusContainter = styled.div`
 
 const UploadText = styled.div`
   margin: auto;
+  display: flex;
+  white-space: pre;
+`;
+
+const ErrorText = styled.div`
+  color: ${(p): string => p.theme.error};
+`;
+
+const DetailsText = styled.div`
+  font-size: 12px;
+  color: ${(p): string => p.theme.textContrast};
+  &:hover {
+    color: ${(p): string => p.theme.text};
+    cursor: pointer;
+  }
+  margin: auto;
 `;
 
 interface UploadProgressBarProps {
@@ -94,10 +111,13 @@ interface UploadProgressBarProps {
 }
 
 const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }: UploadProgressBarProps) => {
-  const [isClosed, setIsClosed] = useState(false);
+  const [showBar, setShowBar] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [totalUploaded, setTotalUploaded] = useState(0);
   const [uploadedThisBlock, setUploadedThisBlock] = useState(0);
   const inProgressUploads = uploadedFiles.filter((file) => file.uploadStatus === "IN_PROGESS");
+  const numberOfFailures = uploadedFiles.filter((file) => file.uploadStatus === "FAILED").length;
+  const numberOfSuccess = uploadedFiles.filter((file) => file.uploadStatus === "COMPLETE").length;
   const noUploading = inProgressUploads.length;
   const isUploading = noUploading > 0;
 
@@ -128,35 +148,55 @@ const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }: Upload
     ) || 0;
 
   const toggleUploadBar = (): void => {
-    setIsClosed(!isClosed);
+    setShowBar(!showBar);
+  };
+
+  const togglePopup = (): void => {
+    setShowPopup(!showPopup);
   };
 
   return (
     <>
+      {showPopup ? <UploadProgressPopup uploadedFiles={uploadedFiles} closePopup={togglePopup} /> : <></>}
       {uploadedFiles.length ? (
         <>
-          <OpenButtonWrapper isClosed={!uploadedFiles.length || isClosed}>
+          <OpenButtonWrapper isClosed={!uploadedFiles.length || showBar}>
             <OpenButton>
-              {isClosed ? (
+              {showBar ? (
                 <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx bx-chevron-up" />
               ) : (
                 <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx bx-chevron-down" />
               )}
             </OpenButton>
           </OpenButtonWrapper>
-          <ProgressBarWrapper isClosed={!uploadedFiles.length || isClosed}>
+          <ProgressBarWrapper isClosed={!uploadedFiles.length || showBar}>
             <ProgressBarFooter>
               <ProgressBarContent>
                 <IncompleteProgress>
                   {isUploading ? (
-                    <CmpleteProgress totalProgress={totalProgress}></CmpleteProgress>
+                    <CompleteProgress totalProgress={totalProgress}></CompleteProgress>
                   ) : (
-                    <CmpleteProgress totalProgress={100}></CmpleteProgress>
+                    <CompleteProgress totalProgress={100}></CompleteProgress>
                   )}
                 </IncompleteProgress>
                 <UploadStatusContainter>
                   <UploadText>
-                    {isUploading ? <>Uploading {inProgressUploads.length} files...</> : <>All Files Uploaded</>}
+                    {isUploading ? (
+                      <>Uploading {inProgressUploads.length} Files...</>
+                    ) : (
+                      <>
+                        {numberOfSuccess} Files Uploaded
+                        {numberOfFailures > 0 ? (
+                          <>
+                            {" · "}
+                            <ErrorText>{numberOfFailures} Failed!</ErrorText>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </>
+                    )}
+                    <DetailsText onClick={togglePopup}> See Details</DetailsText>
                   </UploadText>
                 </UploadStatusContainter>
               </ProgressBarContent>

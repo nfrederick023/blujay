@@ -24,7 +24,7 @@ export const videoMimeTypeList = [
   { name: "video/vnd.vivo", types: ["viv"] },
   { name: "video/mp2t", types: ["ts"] },
   { name: "video/x-matroska", types: ["mkv"] },
-] as const;
+];
 
 export const imageMimeTypeList = [
   { name: "image/avif", types: ["avif", "avifs"] },
@@ -111,10 +111,11 @@ export const blujayTheme: BluJayTheme = {
   text: "white",
   textContrast: "#868686",
   textContrastLight: "#8c8c8c",
-  highlightLight: "#3c81eb",
-  highlightDark: "#04befe",
+  highlightDark: "#3c81eb",
+  highlightLight: "#04befe",
   hightlightSilver: "#afdcff",
   button: "#272727",
+  error: "#ff0000"
 } as const;
 
 export const screenSizes = {

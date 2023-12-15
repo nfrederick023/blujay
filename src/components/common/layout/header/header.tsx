@@ -4,7 +4,7 @@ import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import DropDown from "../../shared/drop-down";
 import React, { FC, useState } from "react";
-import SearchBar from "./searchbar";
+import SearchBar from "./search-bar";
 import router from "next/router";
 import styled from "styled-components";
 

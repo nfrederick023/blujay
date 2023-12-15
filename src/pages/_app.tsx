@@ -5,13 +5,13 @@ import { Montserrat } from "next/font/google";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
-import GlobalFileUpload from "@client/components/common/layout/upload/globalFileUpload";
+import GlobalFileUpload from "@client/components/common/layout/upload/global-file-upload";
 import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
-import LoadBar from "@client/components/common/layout/loadbar";
+import LoadBar from "@client/components/common/layout/load-bar";
 import React, { ReactElement, useEffect, useState } from "react";
 import SearchSlider from "@client/components/common/video-slider/search-slider";
-import Sidebar from "@client/components/common/layout/sidebar/sidebar";
+import Sidebar from "@client/components/common/layout/sidebar/side-bar";
 import VideoProvider from "@client/components/common/contexts/video-provider";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
@@ -25,29 +25,30 @@ const GlobalStyle = createGlobalStyle`
     color: ${(p): string => p.theme.text};
   }
 
-  body {
+  body{
     overflow-y: scroll;
     overflow-x: hidden;
+  }
 
+  &::-webkit-scrollbar
+  {
+  -webkit-appearance: none;
+    width: 5px;
+    background-color: rgba(0,0,0,0.0);
+  }
+
+  &::-webkit-scrollbar-thumb
+  {
+    border-radius: 8px;
+    background-color: ${(p): string => p.theme.textContrast};
+  }
+
+    @media (max-width: ${screenSizes.tabletScreenSize}px) {
     &::-webkit-scrollbar
-    {
-      width: 8px;
-      background-color: rgba(0,0,0,0.0);
-    }
-
-    &::-webkit-scrollbar-thumb
-    {
-      border-radius: 8px;
-      background-color: ${(p): string => p.theme.textContrast};
-    }
-
-      @media (max-width: ${screenSizes.tabletScreenSize}px) {
-      &::-webkit-scrollbar
-        {
-          width: 0px;
-          background-color: rgba(0,0,0,0.0);
-        }
-    }
+      {
+        width: 0px;
+        background-color: rgba(0,0,0,0.0);
+      }
   }
 
   a:hover, a:visited, a:link, a:active

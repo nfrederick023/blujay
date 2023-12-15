@@ -11,10 +11,6 @@
     "start": "next start",
     "test:e2e": "npx kill-port 8000 && playwright test"
   },
-  "browser": {
-    "fs": false,
-    "fs-extra": false
-  },
   "dependencies": {
     "@mpth/react-no-ssr": "^1.0.1",
     "@react-hook/resize-observer": "^1.2.6",
@@ -26,7 +22,6 @@
     "ffprobe-static": "^3.1.0",
     "file-type": "^18.7.0",
     "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^10.1.0",
     "get-video-dimensions": "^1.0.0",
     "glob": "^10.3.10",
     "lodash": "^4.17.20",

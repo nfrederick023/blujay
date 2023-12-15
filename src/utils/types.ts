@@ -8,9 +8,10 @@ export interface BluJayTheme {
   readonly text: string;
   readonly textContrast: string;
   readonly textContrastLight: string;
-  readonly highlightLight: string;
   readonly highlightDark: string;
+  readonly highlightLight: string;
   readonly hightlightSilver: string;
+  readonly error: string;
   readonly button: string;
 }
 
@@ -74,6 +75,7 @@ export interface FileUpload {
   filename: string;
   progress: number;
   uploadStatus: "IN_PROGESS" | "FAILED" | "COMPLETE";
+  error: string;
 }
 
 // DO NOT ALLOW SENSITIVE PARAMETERS IN PUBLICCONFIG!!!!! 

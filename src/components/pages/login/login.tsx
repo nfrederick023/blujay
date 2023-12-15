@@ -44,7 +44,7 @@ const BlujayText = styled.span`
 
 const Checkbox = styled.input`
   margin-right: 10px;
-  accent-color: ${(p): string => p.theme.highlightLight};
+  accent-color: ${(p): string => p.theme.highlightDark};
 `;
 
 const CheckboxLabel = styled.label`

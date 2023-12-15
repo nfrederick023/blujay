@@ -5,7 +5,7 @@ import styled from "styled-components";
 const Button = styled.div`
   user-select: none;
   background: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
-    p.isSelected ? p.theme.highlightDark : p.theme.button};
+    p.isSelected ? p.theme.highlightLight : p.theme.button};
   border-radius: 8px;
   display: grid;
   white-space: pre;
@@ -15,12 +15,12 @@ const Button = styled.div`
   min-height: 38px;
   max-height: 38px;
   border: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
-      p.isSelected ? p.theme.highlightDark : p.theme.button}
+      p.isSelected ? p.theme.highlightLight : p.theme.button}
     2px solid;
 
   &:hover {
     border: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
-        p.isSelected ? p.theme.hightlightSilver : p.theme.highlightDark}
+        p.isSelected ? p.theme.hightlightSilver : p.theme.highlightLight}
       2px solid;
   }
 

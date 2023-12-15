@@ -21,12 +21,12 @@ const PageButton = styled.div`
   user-select: none;
   &:hover {
     cursor: pointer;
-    border: 2px solid ${(p): string => p.theme.highlightDark};
+    border: 2px solid ${(p): string => p.theme.highlightLight};
     color: ${(p): string => p.theme.text};
   }
   ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
     p.isSelected
-      ? `border: 2px solid ${p.theme.highlightDark}; color: ${p.theme.text}; background-color: ${p.theme.highlightDark}`
+      ? `border: 2px solid ${p.theme.highlightLight}; color: ${p.theme.text}; background-color: ${p.theme.highlightLight}`
       : ""};
 `;
 

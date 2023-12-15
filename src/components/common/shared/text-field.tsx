@@ -12,7 +12,7 @@ const TextFieldContent = styled.div`
   min-height: 32px;
 
   ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
-    p.isFocused ? `border: 1px solid ${p.theme.highlightDark};` : ""}
+    p.isFocused ? `border: 1px solid ${p.theme.highlightLight};` : ""}
 
   &:hover {
     cursor: text;
