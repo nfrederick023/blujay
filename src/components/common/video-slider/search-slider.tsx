@@ -10,6 +10,6 @@ const SearchSlider: FC<SearchSliderProps> = ({ search }: SearchSliderProps) => {
   const { videos } = useContext(VideoContext);
   const searchResults = videos.filter((video) => video.name.toLowerCase().includes(search.toLowerCase()));
 
-  return <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} />;
+  return <VideoSlider videos={searchResults} sliderType={"verticle"} headerText={"Search Results"} search={search} />;
 };
 export default SearchSlider;

@@ -58,14 +58,25 @@ const CogIcon = styled(Icon)`
 `;
 
 const UploadIcon = styled(Icon)`
+  margin: auto;
   font-size: 32px;
 `;
 
+const FileUploadInput = styled.input`
+  display: none;
+`;
+
+const FileUploadLabel = styled.label`
+  display: flex;
+`;
+
 interface HeaderProps {
+  search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  setFilesToUpload: React.Dispatch<React.SetStateAction<FileList | null>>;
 }
 
-const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
+const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }: HeaderProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const [cookies, setCookie] = useCookies(["authToken"]);
@@ -73,6 +84,10 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
   const handleClick = (e: React.MouseEvent): void => {
     e.stopPropagation();
     setIsFocused(!isFocused);
+  };
+
+  const uploadFiles = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setFilesToUpload(e.target.files);
   };
 
   const prevent = (e: React.MouseEvent): void => {
@@ -112,9 +127,12 @@ const Header: FC<HeaderProps> = ({ setSearch }: HeaderProps) => {
 
   return (
     <HeaderWrapper>
-      <SearchBar setSearch={setSearch} />
+      <FileUploadInput type="file" id="click-file-upload" onChange={uploadFiles} multiple />
+      <SearchBar search={search} setSearch={setSearch} />
       <IconContainer>
-        <UploadIcon tabIndex={0} onClick={handleClick} className="bx bx-cloud-upload" />
+        <FileUploadLabel htmlFor="click-file-upload">
+          <UploadIcon tabIndex={0} className="bx bx-cloud-upload" />
+        </FileUploadLabel>
         <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
       </IconContainer>
       <div>

@@ -4,25 +4,13 @@ import styled from "styled-components";
 
 const Button = styled.div`
   user-select: none;
-  background: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
-    p.isSelected ? p.theme.highlightLight : p.theme.button};
   border-radius: 8px;
   display: grid;
   white-space: pre;
   align-content: center;
-  cursor: pointer;
   min-width: 38px;
   min-height: 38px;
   max-height: 38px;
-  border: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
-      p.isSelected ? p.theme.highlightLight : p.theme.button}
-    2px solid;
-
-  &:hover {
-    border: ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
-        p.isSelected ? p.theme.hightlightSilver : p.theme.highlightLight}
-      2px solid;
-  }
 
   h6 {
     margin-right: 2px;
@@ -34,6 +22,32 @@ const Button = styled.div`
     padding-right: 1px;
     font-size: 1.1em !important;
   }
+
+  ${(p: { isSelected: boolean; disabled: boolean; theme: BluJayTheme }): string => {
+    if (p.disabled) {
+      return `
+        background: ${p.theme.backgroundContrast};
+        border: ${p.theme.backgroundContrast} 2px solid;
+        cursor: not-allowed;
+
+        &:hover {
+          border: ${p.theme.backgroundContrast} 2px solid;
+        }
+
+        color: ${p.theme.textContrast};
+      `;
+    } else {
+      return `
+        background: ${p.isSelected ? p.theme.highlightLight : p.theme.button};
+        border: ${p.isSelected ? p.theme.highlightLight : p.theme.button} 2px solid;
+        cursor: pointer;
+
+        &:hover {
+          border: ${p.isSelected ? p.theme.hightlightSilver : p.theme.highlightLight} 2px solid;
+        }
+      `;
+    }
+  }};
 `;
 
 const Text = styled.h6`
@@ -98,6 +112,8 @@ interface ButtonIconProps {
   hoverTextOff?: string;
   confrimTextOn?: string;
   confrimTextOff?: string;
+  className?: string;
+  disabled?: boolean;
   onClick?: (e: MouseEvent) => void;
 }
 
@@ -111,6 +127,8 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   hoverTextOff,
   confrimTextOn,
   confrimTextOff,
+  className,
+  disabled,
   onClick,
 }: ButtonIconProps) => {
   const [isHover, setIsHover] = useState(false);
@@ -175,27 +193,31 @@ const ButtonIcon: FC<ButtonIconProps> = ({
         isSelected={isSelected || false}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        className={className}
+        disabled={!!disabled}
       >
-        {_text ? (
-          <>
-            <FlexBox>
-              {icon && <IconWithText className={_icon} />}
-              <Text maxLength={maxLength}>{_text}</Text>
-            </FlexBox>
-          </>
-        ) : (
-          <>{icon && <i className={_icon} />}</>
-        )}
-        {hoverText && !isPlaying && isHover && (
-          <Wrapper isOffscreen={isOffscreen}>
-            <Box ref={hoverEl}>{hoverText}</Box>
-          </Wrapper>
-        )}
-        {confirmText && isPlaying && (
-          <Wrapper isOffscreen={isOffscreen}>
-            <SelectedBox onMouseOver={onHoverOverSelectedBox}>{confirmText}</SelectedBox>
-          </Wrapper>
-        )}
+        <>
+          {_text ? (
+            <>
+              <FlexBox>
+                {icon && <IconWithText className={_icon} />}
+                <Text maxLength={maxLength}>{_text}</Text>
+              </FlexBox>
+            </>
+          ) : (
+            <>{icon && <i className={_icon} />}</>
+          )}
+          {hoverText && !isPlaying && isHover && (
+            <Wrapper isOffscreen={isOffscreen}>
+              <Box ref={hoverEl}>{hoverText}</Box>
+            </Wrapper>
+          )}
+          {confirmText && isPlaying && (
+            <Wrapper isOffscreen={isOffscreen}>
+              <SelectedBox onMouseOver={onHoverOverSelectedBox}>{confirmText}</SelectedBox>
+            </Wrapper>
+          )}
+        </>
       </Button>
     </>
   );

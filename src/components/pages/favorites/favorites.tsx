@@ -8,7 +8,7 @@ interface FavoritesPageProps {
 
 const FavoritesPage: FC<FavoritesPageProps> = ({ videos }: FavoritesPageProps) => {
   const favoritedVideos = videos.filter((video) => video.isFavorite);
-  return <VideoSlider videos={favoritedVideos} sliderType={"verticle"} headerText={"Favorites"} />;
+  return <VideoSlider videos={favoritedVideos} sliderType={"verticle"} headerText={"Favorites"} isFavorites />;
 };
 
 export default FavoritesPage;

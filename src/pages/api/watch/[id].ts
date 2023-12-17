@@ -38,18 +38,23 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       return;
     }
 
-    if (!isPreview) {
-      updateVideo({ id: video.id, views: video.views + 1 });
-    }
-
     if (video.type === "video") {
       serveVideo(req, res, video);
-    }
 
-    else {
+      // count as a view if it's not a preview and if you're at the start of the video
+      if (!isPreview && req.headers.range && Number(req.headers.range.replace(/\D/g, "")) === 0) {
+        updateVideo({ id: video.id, views: video.views + 1 });
+      }
+    } else {
       const mimeType = mime.lookup(video.fileName) || "";
-      res.writeHead(200, { "Content-Type": mimeType, "Content-disposition": `attachment; filename=${video.fileName}` });
+      // "Content-disposition": `attachment; filename=${video.fileName}`
+      res.writeHead(200, { "Content-Type": mimeType });
       fs.createReadStream(video.filePath).pipe(res);
+
+      // count as a view if it's not a preview
+      if (!isPreview) {
+        updateVideo({ id: video.id, views: video.views + 1 });
+      }
     }
     return;
   }
@@ -60,11 +65,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
 };
 
 const serveVideo = (req: NextApiRequest, res: NextApiResponse, video: Video): void => {
-  const range = req.headers.range;
-  if (!range) {
-    res.status(400).send("Requires Range header");
-    return;
-  }
+  const range = req.headers.range ?? "0";
   const videoSize = video.size;
   const chunkSize = 1 * 4e6; // 4mbs
   const start = Number(range.replace(/\D/g, ""));

@@ -19,6 +19,9 @@ interface VideoSliderProps {
   intialOrder?: OrderType;
   sliderType: SliderType;
   intialSort?: SortType;
+  isFavorites?: boolean;
+  category?: string;
+  search?: string;
   headerText: string;
   videos: Video[];
 }
@@ -26,6 +29,9 @@ interface VideoSliderProps {
 const VideoSlider: FC<VideoSliderProps> = ({
   intialOrder,
   intialSort,
+  isFavorites,
+  category,
+  search,
   sliderType,
   headerText,
   videos,
@@ -39,11 +45,14 @@ const VideoSlider: FC<VideoSliderProps> = ({
   if (width + scrollbarWidth >= screenSizes.smallScreenSize) videoWidthPercent = 25;
   if (width + scrollbarWidth >= screenSizes.mediumScreenSize) videoWidthPercent = 15;
 
+  const sort: SortType = intialSort || "Alphabetical";
+  const order: OrderType = intialOrder || "Ascending";
   const videosPerRow = Math.floor(width / (width * (videoWidthPercent / 100)));
 
   let sortedVideos = [...videos];
-  if (intialSort || intialOrder)
-    sortedVideos = sortVideos(sortedVideos, intialSort || "Alphabetical", intialOrder || "Ascending");
+  if (intialSort || intialOrder) {
+    sortedVideos = sortVideos(sortedVideos, sort, order);
+  }
 
   return (
     <>
@@ -58,14 +67,26 @@ const VideoSlider: FC<VideoSliderProps> = ({
         <VideoSliderWrapper>
           <NoSSR>
             {sliderType === "horizontal" ? (
-              <HorizontalSlider videos={sortedVideos} videosPerRow={videosPerRow} headerText={headerText} />
+              <HorizontalSlider
+                videos={sortedVideos}
+                videosPerRow={videosPerRow}
+                headerText={headerText}
+                category={category}
+                isFavorites={isFavorites}
+                search={search}
+                intialOrder={order}
+                intialSort={sort}
+              />
             ) : (
               <VerticleSlider
                 videos={sortedVideos}
-                intialOrder={intialOrder}
-                intialSort={intialSort}
+                intialOrder={order}
+                intialSort={sort}
                 videosPerRow={videosPerRow}
                 headerText={headerText}
+                category={category}
+                isFavorites={isFavorites}
+                search={search}
               />
             )}
           </NoSSR>

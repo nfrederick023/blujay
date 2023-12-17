@@ -1,5 +1,4 @@
 import { Config, Thumbnail, Video } from "../../src/utils/types";
-import { existsSync } from "fs";
 import fs from "fs";
 
 export const getUserPassword = (): string => {
@@ -94,7 +93,7 @@ export const getVideoList = (): Video[] => {
 };
 
 export const deleteVideo = (path: string): void => {
-  if (existsSync(path)) {
+  if (fs.existsSync(path)) {
     fs.rmSync(path, { force: true });
   }
 };
@@ -113,14 +112,14 @@ export const moveVideoToLibrary = (path: string): void => {
 };
 
 export const markVideoUnsupported = (path: string): void => {
-  if (existsSync(path)) {
+  if (fs.existsSync(path)) {
     const filename = path.split("\\").pop();
     fs.renameSync(path, getUnsupportedPath() + filename);
   }
 };
 
 export const moveVideoFromTemp = (path: string): void => {
-  if (existsSync(path)) {
+  if (fs.existsSync(path)) {
     const filename = path.split("\\").pop();
     fs.renameSync(path, getUnsupportedPath() + filename);
   }

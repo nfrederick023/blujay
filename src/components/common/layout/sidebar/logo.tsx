@@ -51,7 +51,7 @@ const Logo: FC = () => {
     <LogoContainer>
       <Icon className={"bx bx-menu bx-md"} onClick={handleIsCollapsedChange} />
       <LogoWrapper isSidebarEnabled={isSidebarEnabled}>
-        <Link href={"/"}>
+        <Link href={"/"} draggable={false}>
           <Gradient type="text">
             <h1>BLU</h1>
           </Gradient>

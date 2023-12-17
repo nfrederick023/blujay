@@ -1,12 +1,13 @@
-import { Body, Post, Put, Req, Res, ValidationPipe, createHandler } from "next-api-decorators";
+import { Body, Get, Param, Post, Put, Req, Res, ValidationPipe, createHandler } from "next-api-decorators";
 import { UpdateVideo } from "./video.dto";
 import { UploadFailedException } from "./video.exceptions";
 import { deleteVideo, getLibraryPath, getTempPath, getVideo, moveVideoToLibrary } from "@server/utils/config";
+import { getVideos, updateVideo } from "./video.service";
 import { listVideos } from "@server/utils/listVideos";
-import { updateVideo } from "./video.service";
 import { validateVideo } from "@server/utils/validateVideo";
 import multer, { diskStorage } from "multer";
 import path from "path";
+import type { OrderType, QueryField, SortType, Video } from "@client/utils/types";
 import type { Request, Response } from "express";
 
 class VideoController {
@@ -73,6 +74,18 @@ class VideoController {
   @Put()
   public async UpdateVideo(@Body(ValidationPipe) req: UpdateVideo): Promise<void> {
     await updateVideo(req);
+  }
+
+  @Get()
+  public async getVideoList(
+    @Param("page") page?: number,
+    @Param("size") size?: number,
+    @Param("sort") sort?: SortType,
+    @Param("order") order?: OrderType,
+    @Param("query") query?: string,
+    @Param("queryField") queryField?: QueryField[]
+  ): Promise<Video[]> {
+    return await getVideos(page || 0, size || 5, sort || "Alphabetical", order || "Ascending", query || "", queryField || []);
   }
 }
 

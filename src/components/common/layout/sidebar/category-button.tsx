@@ -32,7 +32,7 @@ const CategoryButton: FC<CategoryButtonProps> = ({ category, selectedCategory }:
   const isSelected = categoryURL === selectedCategory;
 
   return (
-    <Link href={categoryURL}>
+    <Link href={categoryURL} draggable={false}>
       <CategoryButtonWrapper>
         <CategoryButtonName>
           {isSelected ? <SelectedCategory>{category}</SelectedCategory> : <div>{category}</div>}

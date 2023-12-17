@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { RouterEvent, useRouter } from "next/router";
 import React, { FC, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -43,12 +43,16 @@ const LoadBar: FC = () => {
   useEffect(() => {
     firstRender.current = false;
 
-    const enableLoadbar = (): void => {
-      setIsLoading(true);
+    const enableLoadbar = (url: string, { shallow }: { shallow: boolean }): void => {
+      if (!shallow) {
+        setIsLoading(true);
+      }
     };
 
-    const disableLoadbar = (): void => {
-      setIsLoading(false);
+    const disableLoadbar = (url: string, { shallow }: { shallow: boolean }): void => {
+      if (!shallow) {
+        setIsLoading(false);
+      }
     };
 
     router.events.on("routeChangeStart", enableLoadbar);

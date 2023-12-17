@@ -1,4 +1,4 @@
-import { Video } from "@client/utils/types";
+import { OrderType, SortType, Video } from "@client/utils/types";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
@@ -73,9 +73,21 @@ const VideoNameWrapper = styled.div`
 
 interface VideoDetailsProps {
   video?: Video;
+  category?: string;
+  isFavorites?: boolean;
+  sort?: SortType;
+  order?: OrderType;
+  search?: string;
 }
 
-const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
+const VideoDetails: FC<VideoDetailsProps> = ({
+  video,
+  category,
+  isFavorites,
+  sort,
+  order,
+  search,
+}: VideoDetailsProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -97,9 +109,37 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
     videoRef.current?.pause();
   }
 
+  const queryParams = new URLSearchParams({});
+
+  if (search) {
+    queryParams.append("search", search);
+  }
+
+  if (sort) {
+    queryParams.append("sort", sort);
+  }
+
+  if (order) {
+    queryParams.append("order", order);
+  }
+
+  if (category) {
+    queryParams.append("category", category);
+  }
+
+  if (isFavorites) {
+    queryParams.append("isFavorites", "true");
+  }
+
+  let params = queryParams.toString();
+
+  if (params) {
+    params = "?" + params;
+  }
+
   return (
     <VideoDetailsWrapper ref={ref}>
-      <Link href={"/watch/" + video?.id}>
+      <Link href={"/watch/" + video?.id + params} draggable={false}>
         {video ? (
           <VideoDetailsContainer>
             {video.type === "video" && (
@@ -112,6 +152,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
                 disablePictureInPicture
                 isPlaying={isHovering}
                 preload={"none"}
+                draggable={false}
                 muted
                 loop
               />
@@ -121,9 +162,14 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
                 onMouseEnter={handleIsHoverTrueChange}
                 onMouseLeave={handleIsHoverFalseChange}
                 src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
+                draggable={false}
               />
             )}
-            <Thumbnail onMouseEnter={handleIsHoverTrueChange} src={"/api/thumb/" + encodeURIComponent(video.id)} />
+            <Thumbnail
+              onMouseEnter={handleIsHoverTrueChange}
+              src={"/api/thumb/" + encodeURIComponent(video.id)}
+              draggable={false}
+            />
             <VideoNameWrapper>
               <h5>{video.name}</h5>
               <h6>

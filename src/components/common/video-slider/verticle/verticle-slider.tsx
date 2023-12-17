@@ -26,6 +26,9 @@ interface VerticleSliderProps {
   videosPerRow: number;
   headerText: string;
   videos: Video[];
+  isFavorites?: boolean;
+  category?: string;
+  search?: string;
 }
 
 const VerticleSlider: FC<VerticleSliderProps> = ({
@@ -34,6 +37,9 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
   intialSort,
   headerText,
   videos,
+  isFavorites,
+  category,
+  search,
 }: VerticleSliderProps) => {
   const [sort, setSort] = useState<SortType>(intialSort || "Alphabetical");
   const [order, setOrder] = useState<OrderType>(intialOrder || "Ascending");
@@ -91,6 +97,11 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
                 <VideoDetails
                   key={sortedVideos[i * videosPerRow + j]?.id || j}
                   video={sortedVideos[i * videosPerRow + j]}
+                  sort={sort}
+                  order={order}
+                  category={category}
+                  isFavorites={isFavorites}
+                  search={search}
                 />
               ))}
             </VideoRow>

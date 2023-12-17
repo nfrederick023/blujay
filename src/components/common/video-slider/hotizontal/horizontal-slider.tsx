@@ -1,4 +1,4 @@
-import { Video } from "@client/utils/types";
+import { OrderType, SortType, Video } from "@client/utils/types";
 import HorizontalSliderHeader from "./horizontal-header";
 import React, { FC, useState } from "react";
 import VideoDetails from "../details";
@@ -42,9 +42,23 @@ interface HorizontalSliderProps {
   videos: Video[];
   videosPerRow: number;
   headerText: string;
+  isFavorites?: boolean;
+  category?: string;
+  search?: string;
+  intialOrder?: OrderType;
+  intialSort?: SortType;
 }
 
-const HorizontalSlider: FC<HorizontalSliderProps> = ({ videos, headerText, videosPerRow }: HorizontalSliderProps) => {
+const HorizontalSlider: FC<HorizontalSliderProps> = ({
+  videos,
+  headerText,
+  videosPerRow,
+  isFavorites,
+  category,
+  search,
+  intialOrder,
+  intialSort,
+}: HorizontalSliderProps) => {
   const [displayedVideos, setDisplayedVideos] = useState<JSX.Element[]>([]);
   const [hubro, setHubro] = useState<HubroTypes>("pause");
   const [displayedPosition, setDisplayedPosition] = useState(0);
@@ -83,7 +97,15 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({ videos, headerText, video
   if (videosPerRow + 2 !== displayedVideos.length) {
     setDisplayedVideos(
       [...new Array(videosPerRow + 2)].map((undef, i) => (
-        <VideoDetails key={videos[i + displayedPosition - 1]?.id || i} video={videos[i + displayedPosition - 1]} />
+        <VideoDetails
+          key={videos[i + displayedPosition - 1]?.id || i}
+          video={videos[i + displayedPosition - 1]}
+          category={category}
+          isFavorites={isFavorites}
+          search={search}
+          sort={intialSort}
+          order={intialOrder}
+        />
       ))
     );
   }

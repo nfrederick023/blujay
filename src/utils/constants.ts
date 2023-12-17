@@ -1,4 +1,4 @@
-import { BluJayTheme } from "./types";
+import { BluJayTheme, OrderType, SortType } from "./types";
 
 export const videoMimeTypeList = [
   { name: "video/3gpp2", types: ["3g2"] },
@@ -104,6 +104,7 @@ export const queryField = ["name", "filename", "category", "description", "id"] 
 export const viewType = ["List View", "Grid View"] as const;
 export const sortOptions = ["Alphabetical", "Date Updated", "Date Uploaded", "File Size", "View Count"] as const;
 export const sliderType = ["verticle", "horizontal"] as const;
+export const orderOptions = ["Ascending", "Descending"] as const;
 
 export const blujayTheme: BluJayTheme = {
   background: "#0e0e0f",

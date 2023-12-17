@@ -1,6 +1,6 @@
 import { IncomingMessage } from "http";
 import { Redirect } from "next/types";
-import { cookieOptions, fileExtensions, sortOptions } from "./constants";
+import { cookieOptions, fileExtensions, orderOptions, sortOptions } from "./constants";
 
 export interface BluJayTheme {
   readonly background: string;
@@ -86,7 +86,7 @@ export interface PublicConfig {
 export type Extentsions = typeof fileExtensions[number];
 export type CookieTypes = typeof cookieOptions[number]
 export type SortType = typeof sortOptions[number];
-export type OrderType = "Ascending" | "Descending";
+export type OrderType = typeof orderOptions[number];
 export type QueryField = "name" | "filename" | "category" | "description" | "id";
 export type ViewType = "List View" | "Grid View";
 export type SliderType = "verticle" | "horizontal";

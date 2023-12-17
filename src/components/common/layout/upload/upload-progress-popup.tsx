@@ -88,6 +88,9 @@ const Status = styled.div`
 
 const ErrorWrapper = styled.div`
   margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Icon = styled.i`
@@ -127,14 +130,13 @@ const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, clos
     setHoveredItem(null);
   };
 
-  // useEffect(() => {
-  //   document.body.style.overflowY = "hidden";
-  //   document.body.style.marginRight = "5px";
-  //   return () => {
-  //     document.body.style.overflowY = "scroll";
-  //     document.body.style.marginRight = "0px";
-  //   };
-  // }, []);
+  const showFullErrorMessage =
+    (file: FileUpload): (() => void) =>
+    (): void => {
+      if (file.error) {
+        alert(file.error);
+      }
+    };
 
   return (
     <>
@@ -156,7 +158,12 @@ const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, clos
         </Header>
         <ItemWrapper>
           {uploadedFiles.map((file, i) => (
-            <Item key={i} onMouseOver={setItemOnHover(file)} onMouseOut={removeItemOnHover}>
+            <Item
+              key={i}
+              onMouseOver={setItemOnHover(file)}
+              onMouseOut={removeItemOnHover}
+              onClick={showFullErrorMessage(file)}
+            >
               <Filename>{file.filename}</Filename>
               <Status hasFailed={file.uploadStatus === "FAILED"}>{file.uploadStatus}</Status>
               <Progress>{formatPercentage(file)}</Progress>

@@ -44,7 +44,7 @@ const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url, selectedURL }
   return (
     <>
       <ButtonWrapper>
-        <Link href={"/" + url}>
+        <Link href={"/" + url} draggable={false}>
           {selectedURL === url ? (
             <Gradient type="background">
               <Icon className={icon} />

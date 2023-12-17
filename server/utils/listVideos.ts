@@ -7,7 +7,7 @@ import { imageExtensions } from "@client/utils/constants";
 import { validateVideo } from "./validateVideo";
 import ffmpeg from "fluent-ffmpeg";
 import ffprobeStatic from "ffprobe-static";
-import fse from "fs-extra";
+import fs from "fs";
 import path from "path";
 import pathToFfmpeg from "ffmpeg-static";
 import seedrandom from "seedrandom";
@@ -56,7 +56,7 @@ export const listVideos = async (): Promise<Video[]> => {
 const createThumbnails = async (videos: Video[]): Promise<Video[]> => {
   const sizeReductionPercent = 50;
   const folder = getThumbnailsPath();
-  const thumbnails = await fse.readdir(folder);
+  const thumbnails = fs.readdirSync(folder);
   let oldThumbnails = thumbnails;
   const newVideoList = await Promise.all(videos.filter(async video => {
     const filename = video.id + ".webp";
@@ -117,7 +117,7 @@ const cleanState = (videoFilePaths: string[]): void => {
 const getCreateVideo = (filePath: string): Video | null => {
   const fileName = path.basename(filePath);
   const name = path.parse(fileName).name;
-  const videoStats = fse.statSync(filePath);
+  const videoStats = fs.statSync(filePath);
   const mimeType = mime.lookup(fileName) as string;
   const views = 0;
 

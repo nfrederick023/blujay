@@ -2,25 +2,52 @@ import { OrderType, SortType, Video } from "./types";
 
 export const sortVideos = (videos: Video[], sort: SortType, order: OrderType): Video[] => {
   const sortedVideos = [...videos];
+
+  const sortByField = (fieldName: "updated" | "uploaded" | "size" | "views" | "name"): void => {
+    sortedVideos.sort((a, b) => {
+
+      let comparison = 0;
+
+      const fieldA = a[fieldName];
+      const fieldB = b[fieldName];
+      if (typeof fieldA === "string" && typeof fieldB === "string") {
+        comparison = fieldA.localeCompare(fieldB);
+      }
+      if (typeof fieldA === "number" && typeof fieldB === "number") {
+        comparison = fieldA - fieldB;
+      }
+
+      if (comparison) {
+        return comparison;
+      } else {
+        // use the ID for comparison if the sort is not stable (ie the values are equal)
+        return a.id.localeCompare(b.id);
+      }
+    });
+
+  };
+
   switch (sort) {
     case "Date Updated": {
-      sortedVideos.sort((a, b) => b.updated - a.updated);
+      sortByField("updated");
+      sortedVideos.reverse();
       break;
     }
     case "Date Uploaded": {
-      sortedVideos.sort((a, b) => b.uploaded - a.uploaded);
+      sortByField("uploaded");
+      sortedVideos.reverse();
       break;
     }
     case "File Size": {
-      sortedVideos.sort((a, b) => a.size - b.size);
+      sortByField("size");
       break;
     }
     case "View Count": {
-      sortedVideos.sort((a, b) => b.views - a.views);
+      sortByField("views");
       break;
     }
     default: {
-      sortedVideos.sort((a, b) => a.name.localeCompare(b.name));
+      sortByField("name");
     }
   }
 
@@ -28,3 +55,4 @@ export const sortVideos = (videos: Video[], sort: SortType, order: OrderType): V
 
   return sortedVideos;
 };
+

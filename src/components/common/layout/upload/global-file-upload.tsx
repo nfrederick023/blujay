@@ -24,7 +24,7 @@ const Overlay = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.75);
-  z-index: 6;
+  z-index: 7;
   animation: fadeIn 0.15s;
 `;
 
@@ -34,11 +34,11 @@ const LabelOverlay = styled.label`
   left: inherit;
   width: inherit;
   height: inherit;
-  z-index: 8;
+  z-index: 9;
 `;
 
 const DragDropBox = styled.div`
-  z-index: 7;
+  z-index: 8;
   opacity: 1;
   position: fixed;
   display: flex;
@@ -59,6 +59,7 @@ const UploadIcon = styled.i`
 const DragDropText = styled.div`
   margin: auto;
   display: grid;
+  text-align: center;
 `;
 
 type Status = "FAILED" | "COMPLETE";
@@ -66,9 +67,15 @@ type StatusList = { status: Status; error: string };
 
 export interface GlobalFileUploadProps {
   children: ReactNode;
+  filesToUpload: FileList | null;
+  setFilesToUpload: React.Dispatch<React.SetStateAction<FileList | null>>;
 }
 
-const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUploadProps) => {
+const GlobalFileUpload: FC<GlobalFileUploadProps> = ({
+  children,
+  filesToUpload,
+  setFilesToUpload,
+}: GlobalFileUploadProps) => {
   const [isDragFile, setIsDragFile] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<FileUpload[]>([]);
   const [statusList, setStatusList] = useState<StatusList[]>([]);
@@ -83,6 +90,15 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
   };
 
   const upload = async (files: FileList): Promise<void> => {
+    // do a simple client side file type check
+    for (const file of files) {
+      const ext = file.name.split(".").pop();
+      if (!ext || !fileExtensions.includes(ext)) {
+        alert("Unsupported File Type");
+        return;
+      }
+    }
+
     setUploadedFiles([
       ...uploadedFilesRef.current,
       ...Array.from(files).map(
@@ -145,15 +161,6 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
     setIsDragFile(false);
 
     const files = e.dataTransfer.files;
-
-    for (const file of files) {
-      const ext = file.name.split(".").pop();
-      if (!ext || !fileExtensions.includes(ext)) {
-        alert("Unsupported File Type");
-        return;
-      }
-    }
-
     await upload(files);
   };
 
@@ -170,6 +177,13 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
   }
 
   useEffect(() => {
+    if (filesToUpload) {
+      setFilesToUpload(null);
+      upload(filesToUpload);
+    }
+  }, [filesToUpload]);
+
+  useEffect(() => {
     // warns the user if an upload is in progress
     window.onbeforeunload = (): string | void => {
       if (unsavedChange()) {
@@ -180,7 +194,7 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
 
   return (
     <div>
-      <FileUploadInput type="file" id="file-upload" multiple />
+      <FileUploadInput type="file" id="drag-drop-file-upload" multiple />
       <div onDragOver={onDragOver}>
         <UploadProgressBar uploadedFiles={uploadedFiles} />
 
@@ -189,7 +203,7 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children }: GlobalFileUpl
       {isDragFile && (
         <Overlay>
           <LabelOverlay
-            htmlFor="file-upload"
+            htmlFor="drag-drop-file-upload"
             onDragLeave={onDragLeave}
             onClick={stopDefaults}
             onDragOver={stopDefaults}

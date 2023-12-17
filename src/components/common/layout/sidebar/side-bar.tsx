@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import CategoryButton from "./category-button";
 import Logo from "./logo";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import SideBarButton from "./page-button";
 import styled from "styled-components";
 
@@ -71,12 +71,14 @@ const LogoBackdrop = styled.div`
 const Sidebar: FC = () => {
   const [cookies] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
   const [selectedPath, setSelctedPath] = useState("");
+  const selectedURL = selectedPath ? selectedPath.split("/")[1] : "";
   const { videos } = useContext(VideoContext);
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const [, setCookie] = useCookies();
   const router = useRouter();
-  const selectedURL = selectedPath.split("/")[1];
   const selectedCategory = selectedPath.toLowerCase();
+  const selectedPathRef = useRef<string>("");
+  selectedPathRef.current = selectedPath;
   const categories = [...new Set(videos.map((video) => video.category))]
     .filter((category) => category)
     .sort((a, b) => a.localeCompare(b));
@@ -87,10 +89,19 @@ const Sidebar: FC = () => {
         setCookie("isSidebarEnabled", "false", getCookieSetOptions());
       }
 
-      setSelctedPath(path);
+      if (path === "/" || path === "/all" || path === "/favorites" || path.includes("/library/")) {
+        setSelctedPath(path);
+        return;
+      }
+
+      if (selectedPathRef.current) {
+        return;
+      } else {
+        setSelctedPath("");
+      }
     };
 
-    setSelctedPath(window.location.pathname);
+    setPathAndCloseSidebar(window.location.pathname);
     router.events.on("routeChangeStart", setPathAndCloseSidebar);
 
     return () => {

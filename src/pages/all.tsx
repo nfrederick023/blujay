@@ -10,11 +10,11 @@ interface AllProps {
 }
 
 const All: NextPage<AllProps> = ({ serverVideos }: AllProps) => {
-  const { videos, setVideos } = useContext(VideoContext);
+  const { videos, touched, setVideos } = useContext(VideoContext);
   useEffect(() => {
     setVideos(serverVideos);
   }, []);
-  return <AllPage videos={videos} />;
+  return <AllPage videos={touched ? videos : serverVideos} />;
 };
 
 export const getServerSideProps: GetServerSideProps<AllProps> = authGuard(async (ctx) => {

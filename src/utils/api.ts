@@ -18,7 +18,6 @@ export const uploadVideo = async (file: File, onProgress: (progress: number) => 
             }
           }
 
-          console.log("here!");
           // chrome returns no reponse on abort, the most likely reason for abort is becuase file already exists
           // on firefox it works as expected
           reject("Failed to Upload File: Does file already exist?");
@@ -27,7 +26,7 @@ export const uploadVideo = async (file: File, onProgress: (progress: number) => 
     };
     xhr.addEventListener("error", (e: Event) => reject(e));
     xhr.addEventListener("abort", (e: Event) => reject(e));
-    xhr.open("POST", "/api/video", true);
+    xhr.open("POST", "/api/upload", true);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("size", file.size.toString());

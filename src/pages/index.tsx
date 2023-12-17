@@ -10,11 +10,13 @@ interface IndexProps {
 }
 
 const Index: NextPage<IndexProps> = ({ serverVideos }: IndexProps) => {
-  const { videos, setVideos } = useContext(VideoContext);
+  const { videos, touched, setVideos } = useContext(VideoContext);
+
   useEffect(() => {
     setVideos(serverVideos);
   }, []);
-  return <IndexPage videos={videos} />;
+
+  return <IndexPage videos={touched ? videos : serverVideos} />;
 };
 
 export const getServerSideProps: GetServerSideProps<IndexProps> = authGuard(async (ctx) => {

@@ -10,11 +10,11 @@ interface FavoritesProps {
 }
 
 const Favorites: NextPage<FavoritesProps> = ({ serverVideos }: FavoritesProps) => {
-  const { videos, setVideos } = useContext(VideoContext);
+  const { videos, touched, setVideos } = useContext(VideoContext);
   useEffect(() => {
     setVideos(serverVideos);
   }, []);
-  return <FavoritesPage videos={videos} />;
+  return <FavoritesPage videos={touched ? videos : serverVideos} />;
 };
 
 export const getServerSideProps: GetServerSideProps<FavoritesProps> = authGuard(async (ctx) => {
