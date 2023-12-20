@@ -40,7 +40,7 @@ interface SideBarButtonProps {
   selectedURL: string;
 }
 
-const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url, selectedURL }: SideBarButtonProps) => {
+const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url, selectedURL }) => {
   return (
     <>
       <ButtonWrapper>

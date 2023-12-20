@@ -72,7 +72,7 @@ interface SelectProps {
   onChange: (options: SelectOptions) => void;
 }
 
-const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, defaultSelected, onChange }: SelectProps) => {
+const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, defaultSelected, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const handleAddOption = (option: string) => (e: React.MouseEvent) => {

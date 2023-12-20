@@ -11,6 +11,7 @@ import fs from "fs";
 import path from "path";
 import pathToFfmpeg from "ffmpeg-static";
 import seedrandom from "seedrandom";
+import sizeOf from "image-size";
 
 ffmpeg.setFfprobePath(ffprobeStatic.path);
 ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
@@ -41,7 +42,7 @@ export const listVideos = async (): Promise<Video[]> => {
 
   const videoDetails: Video[] = [];
   for (const filePath of videoFilePaths) {
-    const videoState = getCreateVideo(filePath);
+    const videoState = await getCreateVideo(filePath);
     if (videoState) {
       videoDetails.push(
         videoState
@@ -114,17 +115,16 @@ const cleanState = (videoFilePaths: string[]): void => {
 };
 
 // gets a video from videoList, creates one if not found
-const getCreateVideo = (filePath: string): Video | null => {
+const getCreateVideo = async (filePath: string): Promise<Video | null> => {
   const fileName = path.basename(filePath);
   const name = path.parse(fileName).name;
   const videoStats = fs.statSync(filePath);
   const mimeType = mime.lookup(fileName) as string;
-  const views = 0;
-
   const videoList = getVideoList();
   let category = path.dirname(filePath).split("\\").pop() ?? "";
   const extentsion = fileName.split(".").pop() as Extentsions;
   let type: VideoType = "video";
+  const views = 0;
 
   if (imageExtensions.includes(extentsion)) {
     type = "image";
@@ -132,6 +132,24 @@ const getCreateVideo = (filePath: string): Video | null => {
 
   if (extentsion === "gif") {
     type = "gif";
+  }
+
+  let width = 0;
+  let height = 0;
+  if (type === "video") {
+    const dimensions = await new Promise<ffmpeg.FfprobeStream>((res, rej) => ffmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) {
+        rej(err);
+      } else {
+        res(metadata.streams[0]);
+      }
+    }));
+    width = dimensions.width || 0;
+    height = dimensions.height || 0;
+  } else {
+    const dimensions = sizeOf(filePath);
+    width = dimensions.width || 0;
+    height = dimensions.height || 0;
   }
 
   if (category === "library")
@@ -147,7 +165,7 @@ const getCreateVideo = (filePath: string): Video | null => {
     thumbnailPath = path.join(getThumbnailsPath() + videoState.id + ".webp");
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category || videoState.views === undefined || videoState.type !== type) {
+    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category || videoState.views === undefined || videoState.type !== type || videoState.width !== width || videoState.height !== height) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
         description: videoState.description,
@@ -165,7 +183,9 @@ const getCreateVideo = (filePath: string): Video | null => {
         thumbnailPath,
         category,
         views,
-        type
+        type,
+        width,
+        height,
       };
       newVideoList.push(newVideoState);
       setVideoList(newVideoList);
@@ -191,7 +211,9 @@ const getCreateVideo = (filePath: string): Video | null => {
     category,
     id,
     views,
-    type
+    type,
+    width,
+    height
   };
 
   videoList.push(newVideoState);

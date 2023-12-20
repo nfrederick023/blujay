@@ -1,28 +1,9 @@
-import { GetServerSideProps, NextPage } from "next";
-import { Video } from "@client/utils/types";
-import { VideoContext } from "@client/components/common/contexts/video-context";
-import { authGuard, getProtectedVideoList } from "@server/utils/auth";
+import { NextPage } from "next";
 import AllPage from "@client/components/pages/all/all";
-import React, { useContext, useEffect } from "react";
+import React from "react";
 
-interface AllProps {
-  serverVideos: Video[];
-}
-
-const All: NextPage<AllProps> = ({ serverVideos }: AllProps) => {
-  const { videos, touched, setVideos } = useContext(VideoContext);
-  useEffect(() => {
-    setVideos(serverVideos);
-  }, []);
-  return <AllPage videos={touched ? videos : serverVideos} />;
+const All: NextPage = () => {
+  return <AllPage />;
 };
-
-export const getServerSideProps: GetServerSideProps<AllProps> = authGuard(async (ctx) => {
-  return {
-    props: {
-      serverVideos: await getProtectedVideoList(ctx),
-    },
-  };
-});
 
 export default All;

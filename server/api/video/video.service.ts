@@ -17,7 +17,7 @@ export const updateVideo = async (updateVideo: UpdateVideo): Promise<void> => {
   const videoList = getVideoList();
   const videoIndexToUpdate = videoList.findIndex(video => video.id === updateVideo.id);
 
-  if (!videoIndexToUpdate) {
+  if (videoIndexToUpdate === -1) {
     throw new VideoNotFoundException();
   }
 

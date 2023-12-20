@@ -26,7 +26,7 @@ interface VerticleSliderProps {
   videosPerRow: number;
   headerText: string;
   videos: Video[];
-  isFavorites?: boolean;
+  onlyFavorites?: boolean;
   category?: string;
   search?: string;
 }
@@ -37,10 +37,10 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
   intialSort,
   headerText,
   videos,
-  isFavorites,
+  onlyFavorites,
   category,
   search,
-}: VerticleSliderProps) => {
+}) => {
   const [sort, setSort] = useState<SortType>(intialSort || "Alphabetical");
   const [order, setOrder] = useState<OrderType>(intialOrder || "Ascending");
   const [view, setView] = useState<ViewType>("Grid View");
@@ -100,7 +100,7 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
                   sort={sort}
                   order={order}
                   category={category}
-                  isFavorites={isFavorites}
+                  onlyFavorites={onlyFavorites}
                   search={search}
                 />
               ))}

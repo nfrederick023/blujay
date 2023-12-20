@@ -1,7 +1,7 @@
 import { OrderType, SortType, Video } from "./types";
 
-export const sortVideos = (videos: Video[], sort: SortType, order: OrderType): Video[] => {
-  const sortedVideos = [...videos];
+export const sortVideos = (videos: Video[], sort?: SortType, order?: OrderType, search?: string, onlyFavorites?: boolean, category?: string): Video[] => {
+  let sortedVideos = [...videos];
 
   const sortByField = (fieldName: "updated" | "uploaded" | "size" | "views" | "name"): void => {
     sortedVideos.sort((a, b) => {
@@ -52,6 +52,18 @@ export const sortVideos = (videos: Video[], sort: SortType, order: OrderType): V
   }
 
   if (order === "Descending") sortedVideos.reverse();
+
+  if (category) {
+    sortedVideos = sortedVideos.filter((video) => video.category.toLowerCase() === category?.toLowerCase());
+  }
+
+  if (onlyFavorites) {
+    sortedVideos = sortedVideos.filter((video) => video.isFavorite);
+  }
+
+  if (search) {
+    sortedVideos = sortedVideos.filter((video) => video.name.toLowerCase().includes(search.toLowerCase()));
+  }
 
   return sortedVideos;
 };

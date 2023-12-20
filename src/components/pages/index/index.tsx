@@ -1,14 +1,12 @@
-import { Video } from "@client/utils/types";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import KeepAlive from "@client/components/common/shared/keep-alive";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 
-interface IndexPageProps {
-  videos: Video[];
-}
-
-const IndexPage: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
+const IndexPage: FC = () => {
+  const { videos } = useContext(VideoContext);
   const favoritedVideos = videos.filter((video) => video.isFavorite);
+
   return (
     <KeepAlive>
       <VideoSlider
@@ -22,7 +20,7 @@ const IndexPage: FC<IndexPageProps> = ({ videos }: IndexPageProps) => {
         sliderType={"horizontal"}
         headerText={"Recent Favorites"}
         intialSort={"Date Uploaded"}
-        isFavorites
+        onlyFavorites
       />
       <VideoSlider videos={videos} sliderType={"verticle"} headerText={"All Videos"} intialSort={"Alphabetical"} />
     </KeepAlive>

@@ -71,11 +71,7 @@ export interface GlobalFileUploadProps {
   setFilesToUpload: React.Dispatch<React.SetStateAction<FileList | null>>;
 }
 
-const GlobalFileUpload: FC<GlobalFileUploadProps> = ({
-  children,
-  filesToUpload,
-  setFilesToUpload,
-}: GlobalFileUploadProps) => {
+const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children, filesToUpload, setFilesToUpload }) => {
   const [isDragFile, setIsDragFile] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<FileUpload[]>([]);
   const [statusList, setStatusList] = useState<StatusList[]>([]);

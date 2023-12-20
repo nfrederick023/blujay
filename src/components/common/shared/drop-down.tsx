@@ -36,7 +36,7 @@ interface DropDownProps {
   options: DropDownOption[];
 }
 
-const DropDown: FC<DropDownProps> = ({ options }: DropDownProps) => {
+const DropDown: FC<DropDownProps> = ({ options }) => {
   return (
     <DropDownBox>
       {options.length ? (

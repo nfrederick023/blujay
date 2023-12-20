@@ -59,7 +59,7 @@ interface SearchBarProps {
   setSearch: Dispatch<SetStateAction<string>>;
 }
 
-const SearchBar: FC<SearchBarProps> = ({ setSearch, search }: SearchBarProps) => {
+const SearchBar: FC<SearchBarProps> = ({ setSearch, search }) => {
   const searchInput = useRef<HTMLInputElement>(null);
 
   const handleSearchClick = (): void => {

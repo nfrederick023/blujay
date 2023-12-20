@@ -110,7 +110,7 @@ interface UploadProgressBarProps {
   uploadedFiles: FileUpload[];
 }
 
-const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }: UploadProgressBarProps) => {
+const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }) => {
   const [showBar, setShowBar] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [totalUploaded, setTotalUploaded] = useState(0);

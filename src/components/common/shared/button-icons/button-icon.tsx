@@ -130,7 +130,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   className,
   disabled,
   onClick,
-}: ButtonIconProps) => {
+}) => {
   const [isHover, setIsHover] = useState(false);
   const [isOffscreen, setIsOffscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);

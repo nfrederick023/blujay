@@ -3,10 +3,11 @@ import { VideoContext } from "./video-context";
 import React, { FC, ReactNode, useState } from "react";
 export interface VideoProviderProps {
   children: ReactNode;
+  intialVideos: Video[];
 }
 
-const VideoProvider: FC<VideoProviderProps> = ({ children }: VideoProviderProps) => {
-  const [videos, _setVideos] = useState<Video[]>([]);
+const VideoProvider: FC<VideoProviderProps> = ({ children, intialVideos }) => {
+  const [videos, _setVideos] = useState<Video[]>(intialVideos);
   const [touched, setTouched] = useState(false);
 
   const setVideos = (newVideos: Video[]): void => {
@@ -19,7 +20,13 @@ const VideoProvider: FC<VideoProviderProps> = ({ children }: VideoProviderProps)
   };
 
   const updateVideo = (newVideo: Video): void => {
-    setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
+    const listClone = [...videos];
+    const videoIndexToUpdate = videos.findIndex((video) => video.id === newVideo.id);
+    if (videoIndexToUpdate !== 1) {
+      const updatedVideo: Video = { ...videos[videoIndexToUpdate], ...updateVideo };
+      listClone[videoIndexToUpdate] = updatedVideo;
+      setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
+    }
   };
 
   return <VideoContext.Provider value={{ touched, videos, setVideos, updateVideo }}>{children}</VideoContext.Provider>;

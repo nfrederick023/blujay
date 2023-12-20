@@ -5,7 +5,7 @@ export interface KeepAliveProps {
   children: ReactNode;
 }
 
-const KeepAlive: FC<KeepAliveProps> = ({ children }: KeepAliveProps) => {
+const KeepAlive: FC<KeepAliveProps> = ({ children }) => {
   const [keepAliveChildren, setKeepAliveChildren] = useState(<>{children}</>);
 
   useEffect(() => {

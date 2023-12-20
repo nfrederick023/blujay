@@ -4,7 +4,7 @@ import { sortVideos } from "@client/utils/sortVideo";
 import { useWindowWidth } from "@react-hook/window-size";
 import HorizontalSlider from "./hotizontal/horizontal-slider";
 import NoSSR from "@mpth/react-no-ssr";
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import SliderHeader from "./header";
 import VerticleSlider from "./verticle/verticle-slider";
 import styled from "styled-components";
@@ -19,7 +19,7 @@ interface VideoSliderProps {
   intialOrder?: OrderType;
   sliderType: SliderType;
   intialSort?: SortType;
-  isFavorites?: boolean;
+  onlyFavorites?: boolean;
   category?: string;
   search?: string;
   headerText: string;
@@ -29,14 +29,14 @@ interface VideoSliderProps {
 const VideoSlider: FC<VideoSliderProps> = ({
   intialOrder,
   intialSort,
-  isFavorites,
+  onlyFavorites,
   category,
   search,
   sliderType,
   headerText,
   videos,
-}: VideoSliderProps) => {
-  const width = useWindowWidth({ wait: 10 });
+}) => {
+  const width = useWindowWidth({ wait: 10, initialWidth: 1920 });
   const scrollbarWidth = 20;
 
   let videoWidthPercent = 90;
@@ -54,6 +54,8 @@ const VideoSlider: FC<VideoSliderProps> = ({
     sortedVideos = sortVideos(sortedVideos, sort, order);
   }
 
+  console.log(videosPerRow);
+
   return (
     <>
       {!videos.length ? (
@@ -65,31 +67,29 @@ const VideoSlider: FC<VideoSliderProps> = ({
         </>
       ) : (
         <VideoSliderWrapper>
-          <NoSSR>
-            {sliderType === "horizontal" ? (
-              <HorizontalSlider
-                videos={sortedVideos}
-                videosPerRow={videosPerRow}
-                headerText={headerText}
-                category={category}
-                isFavorites={isFavorites}
-                search={search}
-                intialOrder={order}
-                intialSort={sort}
-              />
-            ) : (
-              <VerticleSlider
-                videos={sortedVideos}
-                intialOrder={order}
-                intialSort={sort}
-                videosPerRow={videosPerRow}
-                headerText={headerText}
-                category={category}
-                isFavorites={isFavorites}
-                search={search}
-              />
-            )}
-          </NoSSR>
+          {sliderType === "horizontal" ? (
+            <HorizontalSlider
+              videos={sortedVideos}
+              videosPerRow={videosPerRow}
+              headerText={headerText}
+              category={category}
+              onlyFavorites={onlyFavorites}
+              search={search}
+              intialOrder={order}
+              intialSort={sort}
+            />
+          ) : (
+            <VerticleSlider
+              videos={sortedVideos}
+              intialOrder={order}
+              intialSort={sort}
+              videosPerRow={videosPerRow}
+              headerText={headerText}
+              category={category}
+              onlyFavorites={onlyFavorites}
+              search={search}
+            />
+          )}
         </VideoSliderWrapper>
       )}
     </>

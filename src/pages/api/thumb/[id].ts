@@ -10,8 +10,8 @@ import fs from "fs";
 
 const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
 
-  const videoId = req.query.id;
-
+  const getID = req.query.id as string;
+  const videoId: string = getID.split(".")[0];
   const videoList = getVideoList();
   const video: Video | undefined = videoList.find((video: Video) => { return video.id === videoId; });
 

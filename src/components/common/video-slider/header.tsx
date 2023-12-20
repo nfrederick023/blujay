@@ -30,7 +30,7 @@ interface SliderHeaderProps {
   sliderType: SliderType;
 }
 
-const SliderHeader: FC<SliderHeaderProps> = ({ children, headerText, sliderType }: SliderHeaderProps) => {
+const SliderHeader: FC<SliderHeaderProps> = ({ children, headerText, sliderType }) => {
   return (
     <HeaderWrapper sliderType={sliderType}>
       <Gradient type="text">

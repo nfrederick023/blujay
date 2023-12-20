@@ -97,7 +97,7 @@ interface ListViewProps {
   videos: Video[];
 }
 
-const ListView: FC<ListViewProps> = ({ videos }: ListViewProps) => {
+const ListView: FC<ListViewProps> = ({ videos }) => {
   const [paginatedResults, setPaginatedResults] = useState<Video[]>([]);
   const { updateVideo } = useContext(VideoContext);
 

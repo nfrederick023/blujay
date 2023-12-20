@@ -8,7 +8,7 @@ interface FavoriteButtonProps {
   handleResponse: (res: Response, newVideo: Video) => unknown;
 }
 
-const FavoriteButton: FC<FavoriteButtonProps> = ({ video, handleResponse }: FavoriteButtonProps) => {
+const FavoriteButton: FC<FavoriteButtonProps> = ({ video, handleResponse }) => {
   const handleSetAsFavorite = async (): Promise<void> => {
     const newVideo: Video = { ...video, isFavorite: !video.isFavorite };
     const res = await updateVideo(newVideo);

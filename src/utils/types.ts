@@ -1,5 +1,3 @@
-import { IncomingMessage } from "http";
-import { Redirect } from "next/types";
 import { cookieOptions, fileExtensions, orderOptions, sortOptions } from "./constants";
 
 export interface BluJayTheme {
@@ -32,32 +30,8 @@ export interface Video {
   readonly extentsion: Extentsions;
   readonly views: number;
   readonly type: VideoType;
-}
-
-export enum AuthStatus {
-  authenticated,
-  notAuthenticated
-}
-
-export enum LinkTypes {
-  publicLink,
-  privateLink,
-  favoriteLink,
-  unfavoriteLink,
-  copyLink,
-  favoriteLinkNoAuth
-}
-
-export interface PropsWithAuth {
-  readonly authStatus: AuthStatus
-}
-
-export interface IncomingMessageCookies extends IncomingMessage {
-  readonly cookies: { [key: string]: string | boolean | number };
-}
-
-export interface NextRedirect {
-  readonly redirect: Redirect
+  readonly height: number;
+  readonly width: number;
 }
 
 export interface Thumbnail {
@@ -91,3 +65,4 @@ export type QueryField = "name" | "filename" | "category" | "description" | "id"
 export type ViewType = "List View" | "Grid View";
 export type SliderType = "verticle" | "horizontal";
 export type VideoType = "video" | "image" | "gif";
+export type CookieObject = { [key: string]: string };

@@ -22,7 +22,7 @@ export interface ToggleIconProps {
   onClick?: (e: MouseEvent) => void;
 }
 
-const ToggleIcon: FC<ToggleIconProps> = ({ onIcon, offIcon, isToggled, onClick }: ToggleIconProps) => {
+const ToggleIcon: FC<ToggleIconProps> = ({ onIcon, offIcon, isToggled, onClick }) => {
   return <Icon className={isToggled ? onIcon : offIcon} onClick={onClick} />;
 };
 

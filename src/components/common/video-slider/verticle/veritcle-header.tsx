@@ -46,7 +46,7 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
   order,
   sort,
   view,
-}: VeticleSliderHeaderProps) => {
+}) => {
   return (
     <>
       <SliderHeader headerText={headerText} sliderType="verticle">

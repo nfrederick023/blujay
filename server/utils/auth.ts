@@ -1,40 +1,29 @@
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult, PreviewData } from "next";
-import { ParsedUrlQuery } from "querystring";
+import { NextPageContext } from "next";
 import { Video } from "@client/utils/types";
 import { randomBytes, scryptSync } from "crypto";
 
 import { getPrivateLibrary, getUserPassword } from "./config";
 import { listVideos } from "./listVideos";
 
-export const getProtectedVideoList = async (ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>): Promise<Video[]> => {
+export const getProtectedVideoList = async (authToken: string): Promise<Video[]> => {
   const videoList = await listVideos();
-  const authToken = ctx.req.cookies?.authToken;
   const authStatus = checkHashedPassword(authToken ?? "");
 
   if (authStatus) return videoList;
   else return videoList.filter((video) => !video.requireAuth);
 };
 
+export const authGuard = (ctx: NextPageContext, authToken: string): void => {
+  const isAuthenticated = checkHashedPassword(authToken);
+  const isPrivateLibrary = getPrivateLibrary();
 
-export const authGuard = <T extends { [key: string]: unknown; }>(func: (ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) => Promise<GetServerSidePropsResult<T>>): GetServerSideProps<T, ParsedUrlQuery, PreviewData> => {
-
-  const newFunc: GetServerSideProps<T, ParsedUrlQuery, PreviewData> = async (ctx) => {
-    const authToken = ctx.req.cookies?.authToken ?? "";
-    const isAuthenticated = checkHashedPassword(authToken);
-    const isPrivateLibrary = getPrivateLibrary();
-
-    if (!isAuthenticated) {
-      if (authToken) ctx.res.setHeader("Set-Cookie", "authToken=; path=/;");
-      if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
-        ctx.res.writeHead(302, { Location: "/login" });
-        ctx.res.end();
-      }
+  if (!isAuthenticated) {
+    if (authToken) ctx.res?.setHeader("Set-Cookie", "authToken=; path=/;");
+    if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
+      ctx.res?.writeHead(302, { Location: "/login" });
+      ctx.res?.end();
     }
-
-    return await func(ctx);
-  };
-
-  return newFunc;
+  }
 };
 
 export const checkHashedPassword = (hashedPassword: string): boolean => {

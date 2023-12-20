@@ -1,14 +1,11 @@
-import { Video } from "@client/utils/types";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 
-interface CategoryPageProps {
-  videos: Video[];
-}
-
-const CategoryPage: FC<CategoryPageProps> = ({ videos }: CategoryPageProps) => {
+const CategoryPage: FC = () => {
   const router = useRouter();
+  const { videos } = useContext(VideoContext);
   const { category } = router.query;
   const isArr = !Array.isArray(category);
 

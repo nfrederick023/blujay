@@ -45,15 +45,7 @@ interface TextFieldProps {
   toggleIcon?: JSX.Element;
 }
 
-const TextField: FC<TextFieldProps> = ({
-  onChange,
-  onEnter,
-  value,
-  placeholder,
-  prefix,
-  inputType,
-  toggleIcon,
-}: TextFieldProps) => {
+const TextField: FC<TextFieldProps> = ({ onChange, onEnter, value, placeholder, prefix, inputType, toggleIcon }) => {
   const [isFocused, setIsFocused] = useState(false);
   const input = useRef<HTMLInputElement>(null);
 

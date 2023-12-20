@@ -27,7 +27,7 @@ interface CategoryButtonProps {
   selectedCategory: string;
 }
 
-const CategoryButton: FC<CategoryButtonProps> = ({ category, selectedCategory }: CategoryButtonProps) => {
+const CategoryButton: FC<CategoryButtonProps> = ({ category, selectedCategory }) => {
   const categoryURL = ("/library/" + encodeURIComponent(category)).toLowerCase();
   const isSelected = categoryURL === selectedCategory;
 

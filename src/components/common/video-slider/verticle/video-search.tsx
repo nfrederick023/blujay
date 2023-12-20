@@ -61,7 +61,7 @@ const VideoSearch: FC<VideoSearchProps> = ({
   intialResultsPerPage,
   setPaginatedResults,
   paginationFilter,
-}: VideoSearchProps) => {
+}) => {
   const [resultsPerPage, setResultsPerPage] = useState(Number(intialResultsPerPage));
   const [currentPage, setCurrentPage] = useState(0);
 

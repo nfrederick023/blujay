@@ -25,6 +25,12 @@ const thumbnailAttr = (p: { imageHeight: number }): unknown => ({
   },
 });
 
+const Overlay = styled.div`
+  height: 100%;
+  width: 100%;
+  position: absolute;
+`;
+
 const Thumbnail = styled.img.attrs(thumbnailAttr)`
   width: 100%;
   aspect-ratio: 16/9;
@@ -38,11 +44,10 @@ const ImagePlayer = styled.img.attrs(thumbnailAttr)`
   border-radius: 15px;
   object-fit: cover;
   position: absolute;
-  opacity: 0;
 
-  &:hover {
-    opacity: 1;
-  }
+  opacity: ${(p): string => {
+    return p.isPlaying ? "1" : "0";
+  }};
 `;
 
 const VideoPlayer = styled.video.attrs(thumbnailAttr)`
@@ -51,7 +56,7 @@ const VideoPlayer = styled.video.attrs(thumbnailAttr)`
   border-radius: 15px;
   object-fit: cover;
   position: absolute;
-
+  pointer-events: none;
   opacity: ${(p): string => {
     return p.isPlaying ? "1" : "0";
   }};
@@ -74,20 +79,13 @@ const VideoNameWrapper = styled.div`
 interface VideoDetailsProps {
   video?: Video;
   category?: string;
-  isFavorites?: boolean;
+  onlyFavorites?: boolean;
   sort?: SortType;
   order?: OrderType;
   search?: string;
 }
 
-const VideoDetails: FC<VideoDetailsProps> = ({
-  video,
-  category,
-  isFavorites,
-  sort,
-  order,
-  search,
-}: VideoDetailsProps) => {
+const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, sort, order, search }) => {
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -127,8 +125,8 @@ const VideoDetails: FC<VideoDetailsProps> = ({
     queryParams.append("category", category);
   }
 
-  if (isFavorites) {
-    queryParams.append("isFavorites", "true");
+  if (onlyFavorites) {
+    queryParams.append("onlyFavorites", "true");
   }
 
   let params = queryParams.toString();
@@ -142,12 +140,11 @@ const VideoDetails: FC<VideoDetailsProps> = ({
       <Link href={"/watch/" + video?.id + params} draggable={false}>
         {video ? (
           <VideoDetailsContainer>
+            <Overlay onMouseEnter={handleIsHoverTrueChange} onMouseLeave={handleIsHoverFalseChange} />
             {video.type === "video" && (
               <VideoPlayer
                 ref={videoRef}
                 poster={"/api/thumb/" + encodeURIComponent(video.id)}
-                onMouseEnter={handleIsHoverTrueChange}
-                onMouseLeave={handleIsHoverFalseChange}
                 src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
                 disablePictureInPicture
                 isPlaying={isHovering}
@@ -163,6 +160,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({
                 onMouseLeave={handleIsHoverFalseChange}
                 src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
                 draggable={false}
+                isPlaying={isHovering}
               />
             )}
             <Thumbnail

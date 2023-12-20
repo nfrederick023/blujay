@@ -1,7 +1,8 @@
-import { Video } from "@client/utils/types";
+import { OrderType, SortType, Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
 import { booleanify } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/constants";
+import { sortVideos } from "@client/utils/sortVideo";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
@@ -9,44 +10,44 @@ import ButtonIcon from "@client/components/common/shared/button-icons/button-ico
 import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copyLink";
 import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";
 import Head from "next/head";
-import NoSSR from "@mpth/react-no-ssr";
-import React, { FC, SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import RequireAuthButton from "@client/components/common/shared/button-icons/buttons/requireAuth";
 import TheatreModeButton from "@client/components/common/shared/button-icons/buttons/theatreMode";
 import TimeAgo from "react-timeago";
 import styled from "styled-components";
 
 const VideoContainer = styled.div`
-  max-width: ${(p: { maxWidth: number }): number => p.maxWidth}px;
-  height: 100%;
   margin: auto;
+  max-width: 65%;
 `;
 
 const BlackOverlay = styled.div`
   position: absolute;
   background: black;
-  max-height: ${(p: { height: number }): number => p.height}px;
-  min-height: ${(p: { height: number }): number => p.height}px;
   width: 100vw;
   right: 0px;
   z-index: -1;
 `;
 
 const VideoPlayer = styled.video`
-  width: ${(p: { maxWidth: number; maxHeight: number }): number => p.maxWidth}px;
-  max-height: ${(p): number => p.maxHeight}px;
-  height: ${(p): number => p.maxHeight}px;
   width: 100%;
-  aspect-ratio: 16/9;
+  height: calc(100cqw / 16 * 9);
+  aspect-ratio: 16 / 9;
 `;
 
 const Image = styled.img`
-  width: ${(p: { maxWidth: number; maxHeight: number }): number => p.maxWidth}px;
-  max-height: ${(p): number => p.maxHeight}px;
-  height: ${(p): number => p.maxHeight}px;
   object-fit: contain;
   cursor: zoom-in;
   width: 100%;
+  height: calc(100cqw / 16 * 9);
+`;
+
+const VideoWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  background-color: black;
+  container-type: inline-size;
+  line-height: 0;
 `;
 
 const VideoDetails = styled.div`
@@ -110,37 +111,35 @@ const PeviousVideoButton = styled(ButtonIcon)`
   margin-right: 5px;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const StyledMeta = styled.meta`` as any;
-
 interface WatchPageProps {
-  selectedVideo: Video;
-  sortedVideos: Video[];
-  videos: Video[];
-  url: string;
-  params: string;
+  domain: string;
 }
 
-const WatchPage: FC<WatchPageProps> = ({ selectedVideo, url, sortedVideos, params, videos }) => {
-  const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
-  const [video, setVideo] = useState(videos.find((video) => video.id === selectedVideo.id));
-  const currentVideoIndex = sortedVideos.findIndex((_video) => _video.id === video?.id);
-  const [dimensions, setDimensions] = useState({ height: 1, width: 1 });
-  const [isZoomedIn, setIsZoomedIn] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
-  const windowHeight = useWindowHeight();
-  const windowWidth = useWindowWidth({ wait: 10 });
-  const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
-  const isTheatreMode = booleanify(cookies.isTheaterMode);
-  const { updateVideo } = useContext(VideoContext);
-  const nextVideo = sortedVideos[currentVideoIndex + 1];
-  const previousVideo = sortedVideos[currentVideoIndex - 1];
+const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   const router = useRouter();
+  const query = router.query;
+  const { videos, updateVideo } = useContext(VideoContext);
+  const [currentVideoID, setCurrentVideoID] = useState(videos.find((_video) => _video.id === query.id)?.id);
+  const video = videos.find((_video) => _video.id === currentVideoID);
 
   if (!video) {
+    router.push("/404");
     return <></>;
   }
+
+  const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
+  const [isZoomedIn, setIsZoomedIn] = useState(false);
+  const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
+
+  const sort = typeof query.sort === "string" ? (query.sort as SortType) : undefined;
+  const order = typeof query.order === "string" ? (query.order as OrderType) : undefined;
+  const search = typeof query.search === "string" ? query.search : undefined;
+  const onlyFavorites = typeof query.onlyFavorites === "string";
+  const category = typeof query.category === "string" ? query.category : undefined;
+  const sortedVideos = sortVideos(videos, sort, order, search, onlyFavorites, category);
+  const videoIndex = sortedVideos.findIndex((_video) => _video.id === video.id);
+  const nextVideo = sortedVideos[videoIndex + 1];
+  const previousVideo = sortedVideos[videoIndex - 1];
 
   const handleVolumeChange = (): void => {
     //
@@ -164,72 +163,28 @@ const WatchPage: FC<WatchPageProps> = ({ selectedVideo, url, sortedVideos, param
 
   const goToNextVideo = (): void => {
     if (nextVideo) {
-      setVideo(nextVideo);
+      setCurrentVideoID(nextVideo.id);
       navigateToVideo(nextVideo);
     }
   };
   const goToPreviousVideo = (): void => {
     if (previousVideo) {
-      setVideo(previousVideo);
+      setCurrentVideoID(previousVideo.id);
       navigateToVideo(previousVideo);
     }
   };
 
   const navigateToVideo = (videoToNavigateTo: Video): void => {
+    const newQuery = { ...router.query };
+    delete newQuery.id;
     router.replace(
       {
         pathname: "/watch/" + videoToNavigateTo.id,
-        query: params,
+        query: newQuery,
       },
       undefined,
       { shallow: true }
     );
-  };
-
-  const searchbarSize = 90;
-  const descriptionSize = 60;
-  const sideBarSize = isSidebarEnabled && windowWidth > screenSizes.tabletScreenSize ? 250 : 0;
-  const leftRightPadding = windowWidth < screenSizes.smallScreenSize ? 0 : 80;
-  const marginSize = 60;
-
-  let maxHeight = windowHeight - descriptionSize - searchbarSize - marginSize;
-  let maxWidth = windowWidth - sideBarSize - leftRightPadding - marginSize;
-
-  const expectedWidth = dimensions.width * (maxHeight / dimensions.height);
-  const expectedHeight = dimensions.height * (maxWidth / dimensions.width);
-
-  let actualHeight = 0;
-  let actualWidth = 0;
-
-  // todo clean up and explain this garbage logic
-  if (dimensions.width > dimensions.height) {
-    if (expectedWidth < maxWidth) maxWidth = expectedWidth;
-    actualHeight = dimensions.height * (maxWidth / dimensions.width);
-    actualWidth = maxWidth;
-  } else {
-    if (expectedHeight < maxHeight) maxHeight = expectedHeight;
-    actualHeight = maxHeight;
-    actualWidth = dimensions.width * (maxHeight / dimensions.height);
-  }
-
-  if (maxHeight < 1) maxHeight = 1;
-  if (maxWidth < 1) maxWidth = 1;
-
-  if (!isTheatreMode) {
-    actualHeight = Math.min(windowHeight * ((windowWidth * 0.6) / windowWidth), windowHeight * 0.75);
-    actualWidth = Math.min(dimensions.width * (actualHeight / dimensions.height), windowWidth * 0.75);
-  }
-
-  const onLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement, Event>): void => {
-    const videoEl = event.target as HTMLVideoElement;
-    setDimensions({ height: videoEl.videoHeight, width: videoEl.videoWidth });
-    setIsLoaded(true);
-  };
-
-  const onLoad = (event: SyntheticEvent<HTMLImageElement, Event>): void => {
-    const imageEl = event.target as HTMLImageElement;
-    setDimensions({ height: imageEl.naturalHeight, width: imageEl.naturalWidth });
-    setIsLoaded(true);
   };
 
   const handleKeyDown = (e: KeyboardEvent): void => {
@@ -243,12 +198,11 @@ const WatchPage: FC<WatchPageProps> = ({ selectedVideo, url, sortedVideos, param
     }
   };
 
-  const _url = new URL(url);
-  const src = `${_url.protocol}//${_url.host}`;
-  const videoSrc = `/api/watch/${encodeURIComponent(video.id)}.${video.extentsion}`;
-  const thumbSrc = "/api/thumb/" + encodeURIComponent(video.id);
-  const fullVideoURL = `${src}${videoSrc}`;
-  const fullThumbSrc = `${src}${thumbSrc}`;
+  const videoSrc = `/api/watch/${video.id}.${video.extentsion}`;
+  const thumbSrc = `/api/thumb/${video.id}.${video.extentsion}`;
+  const fullVideoURL = `${domain}${videoSrc}`;
+  const fullThumbSrc = `${domain}${thumbSrc}`;
+  const url = `${domain}/watch/${video.id}`;
   const title = "Blujay · " + video.name;
 
   useEffect(() => {
@@ -262,28 +216,44 @@ const WatchPage: FC<WatchPageProps> = ({ selectedVideo, url, sortedVideos, param
     <>
       <Head>
         <title>{title}</title>
-        <StyledMeta property="og:type" value="videoDetails.other" />
-        <StyledMeta property="og:site_name" value={"page title goes here"} />
-        <StyledMeta property="og:url" value={url} />
-        <StyledMeta property="og:title" value={video.name} />
-        <StyledMeta property="og:image" content={fullThumbSrc} />
-        <StyledMeta property="og:image:secure_url" content={fullThumbSrc} />
-        <StyledMeta property="og:image:type" content="image/jpeg" />
-        <StyledMeta property="og:image:width" content="1920" />
-        <StyledMeta property="og:image:height" content="1080" />
-        <StyledMeta property="og:description" value="na" />
-        <StyledMeta property="og:video" value={fullVideoURL} />
-        <StyledMeta property="og:video:url" value={fullVideoURL} />
-        <StyledMeta property="og:video:secure_url" value={fullVideoURL} />
-        <StyledMeta property="og:video:type" content={video.mimeType} />
-        <StyledMeta property="og:video:width" content="1280" />
-        <StyledMeta property="og:video:height" content="720" />
-        <StyledMeta name="twitter:card" content="player" />
-        <StyledMeta name="twitter:site" content="@streamable" />
-        <StyledMeta name="twitter:image" content={fullThumbSrc} />
-        <StyledMeta name="twitter:player:width" content="1280" />
-        <StyledMeta name="twitter:player:height" content="720" />
-        <StyledMeta name="twitter:player" content={url} />
+        <meta name="og:title" property="og:title" content={video.name} />
+        <meta name="og:url" property="og:url" content="blah" />
+        <meta name="og:type" property="og:type" content={video.mimeType} />
+        <meta name="og:description" property="og:description" content={video.description} />
+
+        {video.type === "video" ? (
+          <>
+            <meta name="og:video" property="og:video" content={fullVideoURL} />
+            <meta name="og:video:secure_url" property="og:video:secure_url" content={fullVideoURL} />
+            <meta name="og:video:type" property="og:video:type" content={video.mimeType} />
+            <meta name="og:video:width" property="og:video:width" content={video.width.toString()} />
+            <meta name="og:video:height" property="og:video:height" content={video.height.toString()} />
+            <meta name="twitter:card" property="twitter:card" content="player" />
+            <meta name="twitter:player" property="twitter:player" content={fullVideoURL} />
+            <meta name="twitter:player:width" property="twitter:player:width" content={video.width.toString()} />
+            <meta name="twitter:player:height" property="twitter:player:height" content={video.height.toString()} />
+            <meta
+              name="twitter:twitter:player:stream"
+              property="twitter:twitter:player:stream"
+              content={fullVideoURL}
+            />
+          </>
+        ) : (
+          <>
+            <meta name="og:image" property="og:image" content={fullVideoURL} />
+            <meta name="og:image:type" property="og:image:type" content={video.mimeType} />
+            <meta name="og:image:url" property="og:image:url" content={fullVideoURL} />
+            <meta name="og:image:width" property="og:image:width" content={video.width.toString()} />
+            <meta name="og:image:height" property="og:image:height" content={video.height.toString()} />
+            <meta name="og:image:alt" property="og:image:alt" content="" />
+            <meta name="twitter:card" property="twitter:card" content="summary_large_image" />
+          </>
+        )}
+
+        <meta name="twitter:site" property="twitter:site" content="Blujay" />
+        <meta name="twitter:title" property="twitter:title" content={video.name} />
+        <meta name="twitter:description" property="twitter:description" content={video.description} />
+        <meta name="twitter:image" property="twitter:image" content={fullThumbSrc} />
       </Head>
       {isZoomedIn ? (
         <>
@@ -293,66 +263,56 @@ const WatchPage: FC<WatchPageProps> = ({ selectedVideo, url, sortedVideos, param
       ) : (
         <></>
       )}
-      <NoSSR>
-        <VideoContainer maxWidth={actualWidth}>
-          <PageOptions>
-            <BackButton icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></BackButton>
-            <PeviousVideoButton
-              icon="bx bx-chevron-left"
-              hoverTextOn="Previous Video"
-              onClick={goToPreviousVideo}
-              disabled={!previousVideo}
-            ></PeviousVideoButton>
-            <ButtonIcon
-              icon="bx bx-chevron-right"
-              hoverTextOn="Next Video"
-              onClick={goToNextVideo}
-              disabled={!nextVideo}
-            ></ButtonIcon>
-          </PageOptions>
-          {isLoaded && <BlackOverlay height={isTheatreMode ? actualHeight : 0} />}
+      <VideoContainer>
+        <PageOptions>
+          <BackButton icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></BackButton>
+          <PeviousVideoButton
+            icon="bx bx-chevron-left"
+            hoverTextOn="Previous Video"
+            onClick={goToPreviousVideo}
+            disabled={!previousVideo}
+          ></PeviousVideoButton>
+          <ButtonIcon
+            icon="bx bx-chevron-right"
+            hoverTextOn="Next Video"
+            onClick={goToNextVideo}
+            disabled={!nextVideo}
+          ></ButtonIcon>
+        </PageOptions>
+        <BlackOverlay />
+        <VideoWrapper>
           {video.type === "video" ? (
             <VideoPlayer
               src={videoSrc}
               ref={ref}
-              maxWidth={actualWidth}
-              maxHeight={actualHeight}
               controls
               autoPlay
-              onLoadedMetadata={onLoadedMetadata}
+              playsInline
               onVolumeChange={handleVolumeChange}
               draggable={false}
             />
           ) : (
-            <Image
-              ref={ref}
-              src={videoSrc}
-              maxWidth={actualWidth}
-              maxHeight={actualHeight}
-              onLoad={onLoad}
-              onClick={setZoomedIn}
-              draggable={false}
-            />
+            <Image ref={ref} src={videoSrc} onClick={setZoomedIn} draggable={false} />
           )}
-          <VideoNameContainer>
-            <VideoName>
-              <h4>{video.name}</h4>
-            </VideoName>
-            <Buttons>
-              <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
-              <CopyLinkButton link={url} />
-              <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={true} />
-              <TheatreModeButton />
-            </Buttons>
-          </VideoNameContainer>
-          <VideoDetails>
-            <h6>
-              {video.category ? <>{video.category} ·</> : <></>} <TimeAgo date={video.updated} /> · {video.views} views
-            </h6>
-          </VideoDetails>
-          {video.description && <div className="content">{video.description}</div>}
-        </VideoContainer>
-      </NoSSR>
+        </VideoWrapper>
+        <VideoNameContainer>
+          <VideoName>
+            <h4>{video.name}</h4>
+          </VideoName>
+          <Buttons>
+            <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
+            <CopyLinkButton link={url} />
+            <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={true} />
+            <TheatreModeButton />
+          </Buttons>
+        </VideoNameContainer>
+        <VideoDetails>
+          <h6>
+            {video.category ? <>{video.category} ·</> : <></>} <TimeAgo date={video.updated} /> · {video.views} views
+          </h6>
+        </VideoDetails>
+        {video.description && <div className="content">{video.description}</div>}
+      </VideoContainer>
     </>
   );
 };

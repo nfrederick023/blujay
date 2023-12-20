@@ -5,7 +5,7 @@ interface CopyLinkButtonProps {
   link: string;
 }
 
-const CopyLinkButton: FC<CopyLinkButtonProps> = ({ link }: CopyLinkButtonProps) => {
+const CopyLinkButton: FC<CopyLinkButtonProps> = ({ link }) => {
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(link);
   };

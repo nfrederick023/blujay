@@ -76,7 +76,7 @@ interface HeaderProps {
   setFilesToUpload: React.Dispatch<React.SetStateAction<FileList | null>>;
 }
 
-const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }: HeaderProps) => {
+const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const [cookies, setCookie] = useCookies(["authToken"]);

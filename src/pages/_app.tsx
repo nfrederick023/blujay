@@ -1,10 +1,10 @@
-import { AppProps } from "next/app";
-import { CookieTypes } from "../utils/types";
+import { CookieObject, CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { Montserrat } from "next/font/google";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
+import App, { AppContext, AppInitialProps, AppProps } from "next/app";
 import GlobalFileUpload from "@client/components/common/layout/upload/global-file-upload";
 import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
@@ -119,18 +119,22 @@ const ContentWrapper = styled.div`
   margin: 10px 20px 20px 20px;
 `;
 
-const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
+interface MyAppProps {
+  intialVideos: Video[];
+  cookieString: string | undefined;
+}
+
+const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & MyAppProps): ReactElement => {
   //TODO: move this state call into a component that doesn't rerender EVERYTHING
   const [search, setSearch] = useState("");
   const [filesToUpload, setFilesToUpload] = useState<FileList | null>(null);
   const router = useRouter();
 
+  const cookies = new Cookies(cookieString);
   // assign default values to cookies if not set, get all cookies and set default if none
-  const _cookies = new Cookies();
   const allCookieTypes: CookieTypes[] = ["authToken", "isTheaterMode", "videoVolume", "isSidebarEnabled"];
-
   allCookieTypes.forEach((cookieType) => {
-    if (!_cookies.get(cookieType)) _cookies.set(cookieType, getCookieDefault(cookieType), getCookieSetOptions());
+    if (!cookies.get(cookieType)) cookies.set(cookieType, getCookieDefault(cookieType), getCookieSetOptions());
   });
 
   useEffect(() => {
@@ -140,9 +144,9 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   }, [router.asPath]);
 
   return (
-    <CookiesProvider cookies={_cookies}>
+    <CookiesProvider cookies={cookies}>
       <ThemeProvider theme={blujayTheme}>
-        <VideoProvider>
+        <VideoProvider intialVideos={intialVideos}>
           <div className={montserrat.className}>
             <GlobalStyle />
             <Head>
@@ -171,6 +175,27 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
       </ThemeProvider>
     </CookiesProvider>
   );
+};
+
+MyApp.getInitialProps = async (context: AppContext): Promise<MyAppProps & AppInitialProps> => {
+  const ctx = await App.getInitialProps(context);
+
+  let cookieString: string | undefined;
+  let intialVideos: Video[] = [];
+  if (typeof window === "undefined") {
+    cookieString = context.ctx.req?.headers.cookie;
+    const cookies = new Cookies(cookieString);
+    const authToken = cookies.get("authToken");
+    const auth = await import("@server/utils/auth");
+    if (context.router.pathname !== "/login") {
+      auth.authGuard(context.ctx, authToken);
+    }
+    intialVideos = await auth.getProtectedVideoList(authToken);
+  } else {
+    cookieString = document.cookie;
+  }
+
+  return { ...ctx, intialVideos, cookieString };
 };
 
 export default MyApp;

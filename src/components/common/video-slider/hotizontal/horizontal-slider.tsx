@@ -42,7 +42,7 @@ interface HorizontalSliderProps {
   videos: Video[];
   videosPerRow: number;
   headerText: string;
-  isFavorites?: boolean;
+  onlyFavorites?: boolean;
   category?: string;
   search?: string;
   intialOrder?: OrderType;
@@ -53,12 +53,12 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
   videos,
   headerText,
   videosPerRow,
-  isFavorites,
+  onlyFavorites,
   category,
   search,
   intialOrder,
   intialSort,
-}: HorizontalSliderProps) => {
+}) => {
   const [displayedVideos, setDisplayedVideos] = useState<JSX.Element[]>([]);
   const [hubro, setHubro] = useState<HubroTypes>("pause");
   const [displayedPosition, setDisplayedPosition] = useState(0);
@@ -101,7 +101,7 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
           key={videos[i + displayedPosition - 1]?.id || i}
           video={videos[i + displayedPosition - 1]}
           category={category}
-          isFavorites={isFavorites}
+          onlyFavorites={onlyFavorites}
           search={search}
           sort={intialSort}
           order={intialOrder}

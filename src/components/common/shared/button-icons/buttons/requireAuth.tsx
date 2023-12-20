@@ -9,7 +9,7 @@ interface RequireAuthButtonProps {
   showText: boolean;
 }
 
-const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, handleResponse, showText }: RequireAuthButtonProps) => {
+const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, handleResponse, showText }) => {
   const handleSetVisibility = async (): Promise<void> => {
     const newVideo: Video = { ...video, requireAuth: !video.requireAuth };
     const res = await updateVideo(newVideo);

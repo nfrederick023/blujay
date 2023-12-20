@@ -114,7 +114,7 @@ interface UploadProgressPopupProps {
   closePopup: () => void;
 }
 
-const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, closePopup }: UploadProgressPopupProps) => {
+const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, closePopup }) => {
   const [hoveredItem, setHoveredItem] = useState<FileUpload | null>(null);
   const formatPercentage = (uploadedFile: FileUpload): string => {
     return `${Math.trunc(uploadedFile.progress * 100)}%`;

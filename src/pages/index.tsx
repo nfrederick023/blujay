@@ -1,30 +1,9 @@
-import { GetServerSideProps, NextPage } from "next";
-import { Video } from "@client/utils/types";
-import { VideoContext } from "@client/components/common/contexts/video-context";
-import { authGuard, getProtectedVideoList } from "@server/utils/auth";
+import { NextPage } from "next";
 import IndexPage from "@client/components/pages/index";
-import React, { useContext, useEffect } from "react";
+import React from "react";
 
-interface IndexProps {
-  serverVideos: Video[];
-}
-
-const Index: NextPage<IndexProps> = ({ serverVideos }: IndexProps) => {
-  const { videos, touched, setVideos } = useContext(VideoContext);
-
-  useEffect(() => {
-    setVideos(serverVideos);
-  }, []);
-
-  return <IndexPage videos={touched ? videos : serverVideos} />;
+const Index: NextPage = () => {
+  return <IndexPage />;
 };
-
-export const getServerSideProps: GetServerSideProps<IndexProps> = authGuard(async (ctx) => {
-  return {
-    props: {
-      serverVideos: await getProtectedVideoList(ctx),
-    },
-  };
-});
 
 export default Index;

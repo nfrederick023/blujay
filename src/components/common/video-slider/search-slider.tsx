@@ -6,7 +6,7 @@ interface SearchSliderProps {
   search: string;
 }
 
-const SearchSlider: FC<SearchSliderProps> = ({ search }: SearchSliderProps) => {
+const SearchSlider: FC<SearchSliderProps> = ({ search }) => {
   const { videos } = useContext(VideoContext);
   const searchResults = videos.filter((video) => video.name.toLowerCase().includes(search.toLowerCase()));
 

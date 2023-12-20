@@ -38,7 +38,7 @@ const HorizontalSliderHeader: FC<HorizontalSliderHeaderProps> = ({
   setPosition,
   headerText,
   position,
-}: HorizontalSliderHeaderProps) => {
+}) => {
   const handleIncrementOffset = (): void => {
     if (!isMaxOffset && displayedPosition === position) setPosition(position + 1);
   };

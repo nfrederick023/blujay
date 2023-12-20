@@ -37,7 +37,7 @@ interface GradientProps {
   color?: Color;
 }
 
-const Gradient: FC<GradientProps> = ({ children, type, color }: GradientProps) => {
+const Gradient: FC<GradientProps> = ({ children, type, color }) => {
   return (
     <>
       {type === "background" && <GradientBackground color={color || "blue"}>{children}</GradientBackground>}

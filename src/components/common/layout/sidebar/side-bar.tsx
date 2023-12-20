@@ -111,28 +111,26 @@ const Sidebar: FC = () => {
 
   return (
     <>
-      <NoSSR>
-        <LogoBackdrop>
+      <LogoBackdrop>
+        <Logo />
+      </LogoBackdrop>
+      <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
+        <SidebarContent>
           <Logo />
-        </LogoBackdrop>
-        <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
-          <SidebarContent>
-            <Logo />
-            <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} selectedURL={selectedURL} />
+          <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} selectedURL={selectedURL} />
 
-            <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} selectedURL={selectedURL} />
+          <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} selectedURL={selectedURL} />
 
-            <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} selectedURL={selectedURL} />
+          <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} selectedURL={selectedURL} />
 
-            <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={"library"} selectedURL={selectedURL} />
-            <Library>
-              {categories.map((dir, i) => {
-                return <CategoryButton key={i} category={dir} selectedCategory={selectedCategory} />;
-              })}
-            </Library>
-          </SidebarContent>
-        </SidebarWapper>
-      </NoSSR>
+          <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={"library"} selectedURL={selectedURL} />
+          <Library>
+            {categories.map((dir, i) => {
+              return <CategoryButton key={i} category={dir} selectedCategory={selectedCategory} />;
+            })}
+          </Library>
+        </SidebarContent>
+      </SidebarWapper>
     </>
   );
 };
