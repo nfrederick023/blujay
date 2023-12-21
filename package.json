@@ -12,9 +12,6 @@
     "test:e2e": "npx kill-port 8000 && playwright test"
   },
   "dependencies": {
-    "@mpth/react-no-ssr": "^1.0.1",
-    "@react-hook/resize-observer": "^1.2.6",
-    "@react-hook/window-size": "^3.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "eslint-config-next": "^13.3.4",

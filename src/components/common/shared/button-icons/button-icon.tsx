@@ -66,6 +66,7 @@ const Wrapper = styled.div`
   display: grid;
   justify-content: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
   justify-self: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
+  z-index: 2;
 `;
 
 const FlexBox = styled.div`

@@ -1,4 +1,5 @@
 import { OrderType, SortType, Video } from "@client/utils/types";
+import { screenSizes } from "@client/utils/constants";
 import HorizontalSliderHeader from "./horizontal-header";
 import React, { FC, useState } from "react";
 import VideoDetails from "../details";
@@ -7,13 +8,12 @@ import styled from "styled-components";
 const transitionTimeMS = 150;
 
 const CarouselWrapper = styled.div`
-  overflow: clip;
   width: 100%;
 `;
 
 const Carousel = styled.div`
   > div {
-    transition: ${(p: { videoWidth: number; hubro: HubroTypes }): number => {
+    transition: ${(p: { hubro: HubroTypes }): number => {
       if (p.hubro === "pause") return 0;
       return transitionTimeMS * 0.001;
     }}s;
@@ -25,22 +25,16 @@ const Carousel = styled.div`
     }};
   }
 
-  & :not(:last-child) {
-    margin-right: 15px;
-  }
-  width: ${(p): number => 100 + p.videoWidth * 2}%;
-  left: -${(p): number => p.videoWidth}%;
-
   position: relative;
-
   display: flex;
+  container-type: inline-size;
+  overflow-x: scroll;
 `;
 
 type HubroTypes = "pause" | "forward" | "backward";
 
 interface HorizontalSliderProps {
   videos: Video[];
-  videosPerRow: number;
   headerText: string;
   onlyFavorites?: boolean;
   category?: string;
@@ -52,7 +46,6 @@ interface HorizontalSliderProps {
 const HorizontalSlider: FC<HorizontalSliderProps> = ({
   videos,
   headerText,
-  videosPerRow,
   onlyFavorites,
   category,
   search,
@@ -64,8 +57,7 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
   const [displayedPosition, setDisplayedPosition] = useState(0);
   const [position, setPosition] = useState(0);
 
-  const videoWidth = 100 / videosPerRow;
-  const isMaxOffset = videosPerRow + position >= videos.length;
+  const isMaxOffset = 6 + position >= videos.length;
 
   if (hubro === "pause" && displayedPosition !== position) {
     setHubro(position < displayedPosition ? "backward" : "forward");
@@ -94,22 +86,6 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
     }, transitionTimeMS);
   }
 
-  if (videosPerRow + 2 !== displayedVideos.length) {
-    setDisplayedVideos(
-      [...new Array(videosPerRow + 2)].map((undef, i) => (
-        <VideoDetails
-          key={videos[i + displayedPosition - 1]?.id || i}
-          video={videos[i + displayedPosition - 1]}
-          category={category}
-          onlyFavorites={onlyFavorites}
-          search={search}
-          sort={intialSort}
-          order={intialOrder}
-        />
-      ))
-    );
-  }
-
   return (
     <>
       <HorizontalSliderHeader
@@ -120,8 +96,18 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
         headerText={headerText}
       />
       <CarouselWrapper>
-        <Carousel videoWidth={videoWidth} hubro={hubro}>
-          {displayedVideos}
+        <Carousel hubro={hubro}>
+          {videos.map((video, i) => (
+            <VideoDetails
+              key={i}
+              video={video}
+              category={category}
+              onlyFavorites={onlyFavorites}
+              search={search}
+              sort={intialSort}
+              order={intialOrder}
+            />
+          ))}
         </Carousel>
       </CarouselWrapper>
     </>

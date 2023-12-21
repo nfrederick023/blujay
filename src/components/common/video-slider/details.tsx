@@ -1,12 +1,36 @@
 import { OrderType, SortType, Video } from "@client/utils/types";
+import { screenSizes } from "@client/utils/constants";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
 import styled from "styled-components";
 
+// - ${(15 * (6 - 1)) / 6}px
 const VideoDetailsWrapper = styled.div`
   position: relative;
-  width: 100%;
+
+  margin-bottom: 15px;
+  margin-right: 15px;
+
+  @media (min-width: ${screenSizes.mediumScreenSize}px) {
+    min-width: calc((100cqw / 6) - ${(15 * (6 - 1)) / 6}px);
+    max-width: calc((100cqw / 6) - ${(15 * (6 - 1)) / 6}px);
+  }
+
+  @media (max-width: ${screenSizes.mediumScreenSize}px) {
+    min-width: calc((100cqw / 4) - ${(15 * (4 - 1)) / 4}px);
+    max-width: calc((100cqw / 4) - ${(15 * (4 - 1)) / 4}px);
+  }
+
+  @media (max-width: ${screenSizes.smallScreenSize}px) {
+    min-width: calc((100cqw / 2) - ${(15 * (2 - 1)) / 2}px);
+    max-width: calc((100cqw / 2) - ${(15 * (2 - 1)) / 2}px);
+  }
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    min-width: calc((100cqw / 1) - ${(15 * (1 - 1)) / 1}px);
+    max-width: calc((100cqw / 1) - ${(15 * (1 - 1)) / 1}px);
+  }
 `;
 
 const VideoDetailsContainer = styled.div`

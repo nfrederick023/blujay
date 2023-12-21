@@ -1,11 +1,8 @@
 import { OrderType, SortType, Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
-import { booleanify } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/constants";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
-import { useWindowHeight, useWindowWidth } from "@react-hook/window-size";
 import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
 import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copyLink";
 import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";

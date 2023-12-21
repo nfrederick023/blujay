@@ -5,7 +5,6 @@ import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import CategoryButton from "./category-button";
 import Logo from "./logo";
-import NoSSR from "@mpth/react-no-ssr";
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import SideBarButton from "./page-button";
 import styled from "styled-components";
