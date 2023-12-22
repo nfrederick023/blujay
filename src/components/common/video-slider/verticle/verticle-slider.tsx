@@ -64,7 +64,6 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
   const [videosDisplayed, setVideosDisplayed] = useState(36); // 36 is arbitrary
 
   const bottomScrollCallback = (): void => {
-    // prevents the bottomScrollCallback from incorrectly firing on initial load on mobile
     const videosToAdd = 36;
     if (videosDisplayed + videosToAdd > videos.length) {
       setVideosDisplayed(videos.length);

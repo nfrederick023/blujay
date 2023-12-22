@@ -24,7 +24,6 @@ const LoadBar: FC = () => {
 
   if (!firstRender.current) {
     if (!isLoading && ref.current?.getAttribute("style") !== "") {
-      console.log(endTansitionTime);
       ref.current?.setAttribute("style", "transition: 100ms; width: 100%;");
       setTimeout(() => {
         ref.current?.setAttribute("style", "");

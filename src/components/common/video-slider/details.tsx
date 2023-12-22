@@ -8,7 +8,7 @@ import styled from "styled-components";
 // - ${(15 * (6 - 1)) / 6}px
 const VideoDetailsWrapper = styled.div`
   position: relative;
-
+  user-select: none;
   margin-bottom: 15px;
   margin-right: 15px;
 

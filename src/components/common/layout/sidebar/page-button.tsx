@@ -41,11 +41,13 @@ interface SideBarButtonProps {
 }
 
 const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url, selectedURL }) => {
+  const isSelected = selectedURL.includes("library") ? title === "Library" : selectedURL === url;
+
   return (
     <>
       <ButtonWrapper>
         <Link href={"/" + url} draggable={false}>
-          {selectedURL === url ? (
+          {isSelected ? (
             <Gradient type="background">
               <Icon className={icon} />
               {title}

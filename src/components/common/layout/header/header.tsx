@@ -13,7 +13,6 @@ const HeaderWrapper = styled.div`
   height: 60px;
   justify-content: center;
   display: flex;
-  width: 100%;
   position: sticky;
   top: 0;
   z-index: 2;
@@ -31,7 +30,9 @@ const IconContainer = styled.div`
   position: fixed;
   display: flex;
   height: 58px;
-  right: 20px;
+  width: 80px;
+  // 79px is the width of this element, 20px
+  left: calc(100vw - 80px - 20px);
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     display: none;

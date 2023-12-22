@@ -1,14 +1,15 @@
-import { CookieObject, CookieTypes, Video } from "../utils/types";
+import { AliveScope } from "react-activation";
+import { CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { Montserrat } from "next/font/google";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
 import App, { AppContext, AppInitialProps, AppProps } from "next/app";
+import BackToTop from "@client/components/common/layout/back-to-top";
 import GlobalFileUpload from "@client/components/common/layout/upload/global-file-upload";
 import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
-import KeepAlive, { AliveScope } from "react-activation";
 import LoadBar from "@client/components/common/layout/load-bar";
 import React, { ReactElement, useEffect, useState } from "react";
 import SearchSlider from "@client/components/common/video-slider/search-slider";
@@ -24,31 +25,46 @@ const GlobalStyle = createGlobalStyle`
   html {
     background-color: ${(p): string => p.theme.background};
     color: ${(p): string => p.theme.text};
+    cursor: pointer;
   }
-
   body{
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
   }
 
-  &::-webkit-scrollbar
+  ::-webkit-scrollbar
   {
-  -webkit-appearance: none;
     width: 5px;
-    background-color: rgba(0,0,0,0.0);
+    -webkit-appearance: none;
+    background-color: transparent;
+    cursor: pointer !important;
   }
 
-  &::-webkit-scrollbar-thumb
+  ::-webkit-scrollbar-track-piece
+  {
+   display:none;
+  }
+
+  ::-webkit-scrollbar-thumb
   {
     border-radius: 8px;
     background-color: ${(p): string => p.theme.textContrast};
+    cursor: pointer !important;
   }
 
-    @media (max-width: ${screenSizes.tabletScreenSize}px) {
+  :-webkit-scrollbar-thumb:hover {
+    cursor: pointer !important;
+  }
+
+  ::-webkit-scrollbar-track {
+    cursor: pointer !important;
+  }
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
     &::-webkit-scrollbar
       {
         width: 0px;
-        background-color: rgba(0,0,0,0.0);
+        background-color: transparent;
       }
   }
 
@@ -107,6 +123,7 @@ const GlobalStyle = createGlobalStyle`
 
 const LayoutWrapper = styled.div`
   display: flex;
+  width: calc(100vw - 5px);
 `;
 
 const CenterContent = styled.div`
@@ -158,6 +175,7 @@ const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & 
               ) : (
                 <AliveScope>
                   <LoadBar />
+                  <BackToTop />
                   <Sidebar />
                   <CenterContent>
                     <Header search={search} setSearch={setSearch} setFilesToUpload={setFilesToUpload} />

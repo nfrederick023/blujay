@@ -7,7 +7,6 @@ import VerticleSlider from "./verticle/verticle-slider";
 import styled from "styled-components";
 
 const VideoSliderWrapper = styled.div`
-  padding: 0px 0px 15px 0px;
   width: auto;
   min-width: auto;
 `;

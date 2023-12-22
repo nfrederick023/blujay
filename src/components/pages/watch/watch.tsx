@@ -1,5 +1,6 @@
 import { OrderType, SortType, Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
+import { booleanify } from "@client/utils/cookie";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
@@ -15,14 +16,14 @@ import styled from "styled-components";
 
 const VideoContainer = styled.div`
   margin: auto;
-  max-width: 65%;
+  max-width: ${(p: { isTheaterMode: boolean }): string => (p.isTheaterMode ? "75%" : "60%")};
 `;
 
 const BlackOverlay = styled.div`
   position: absolute;
   background: black;
-  width: 100vw;
-  right: 0px;
+  width: 120vw;
+  height: 100%;
   z-index: -1;
 `;
 
@@ -124,8 +125,9 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
     return <></>;
   }
 
-  const [cookies] = useCookies(["videoVolume", "isSidebarEnabled", "isTheaterMode"]);
+  const [cookies] = useCookies(["videoVolume", "isTheaterMode"]);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
+  const isTheaterMode = booleanify(cookies.isTheaterMode);
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
 
   const sort = typeof query.sort === "string" ? (query.sort as SortType) : undefined;
@@ -260,7 +262,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
       ) : (
         <></>
       )}
-      <VideoContainer>
+      <VideoContainer isTheaterMode={isTheaterMode}>
         <PageOptions>
           <BackButton icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></BackButton>
           <PeviousVideoButton
@@ -276,8 +278,8 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
             disabled={!nextVideo}
           ></ButtonIcon>
         </PageOptions>
-        <BlackOverlay />
         <VideoWrapper>
+          {isTheaterMode && <BlackOverlay />}
           {video.type === "video" ? (
             <VideoPlayer
               src={videoSrc}
