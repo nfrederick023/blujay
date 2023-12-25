@@ -1,78 +1,25 @@
 import { FileUpload } from "@client/utils/types";
 import { fileExtensions } from "@client/utils/constants";
 import { uploadVideo } from "@client/utils/api";
-import React, { DragEvent, FC, MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import UploadProgressBar from "./upload-progress-bar";
-import styled from "styled-components";
-
-const FileUploadInput = styled.input`
-  display: none;
-`;
-
-const Overlay = styled.div`
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.75);
-  z-index: 7;
-  animation: fadeIn 0.15s;
-`;
-
-const LabelOverlay = styled.label`
-  position: inherit;
-  top: inherit;
-  left: inherit;
-  width: inherit;
-  height: inherit;
-  z-index: 9;
-`;
-
-const DragDropBox = styled.div`
-  z-index: 8;
-  opacity: 1;
-  position: fixed;
-  display: flex;
-  top: 50%;
-  left: 50%;
-  width: 500px;
-  height: 300px;
-  margin-left: -250px; // half the width
-  margin-top: -150px; // half the height
-  color: ${(p): string => p.theme.text};
-  border-radius: 15px;
-`;
-
-const UploadIcon = styled.i`
-  margin: auto;
-`;
-
-const DragDropText = styled.div`
-  margin: auto;
-  display: grid;
-  text-align: center;
-`;
 
 type Status = "FAILED" | "COMPLETE";
 type StatusList = { status: Status; error: string };
 
-export interface GlobalFileUploadProps {
-  children: ReactNode;
+export interface UploadProgressProps {
   filesToUpload: FileList | null;
   setFilesToUpload: React.Dispatch<React.SetStateAction<FileList | null>>;
+  isProgressBarShown: boolean;
+  setIsProgressBarShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children, filesToUpload, setFilesToUpload }) => {
-  const [isDragFile, setIsDragFile] = useState(false);
+const UploadProgress: FC<UploadProgressProps> = ({
+  filesToUpload,
+  setFilesToUpload,
+  isProgressBarShown,
+  setIsProgressBarShown,
+}) => {
   const [uploadedFiles, setUploadedFiles] = useState<FileUpload[]>([]);
   const [statusList, setStatusList] = useState<StatusList[]>([]);
   const uploadedFilesRef = useRef<FileUpload[]>([]);
@@ -138,28 +85,6 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children, filesToUpload, 
     setStatusList(newStatus);
   };
 
-  const stopDefaults = (e: DragEvent | MouseEvent): void => {
-    e.preventDefault();
-  };
-
-  const onDragOver = (e: DragEvent): void => {
-    setIsDragFile(true);
-    stopDefaults(e);
-  };
-
-  const onDragLeave = (e: DragEvent): void => {
-    setIsDragFile(false);
-    stopDefaults(e);
-  };
-
-  const onDrop = async (e: DragEvent): Promise<void> => {
-    stopDefaults(e);
-    setIsDragFile(false);
-
-    const files = e.dataTransfer.files;
-    await upload(files);
-  };
-
   if (uploadedFiles.find((file, i) => statusList[i] && file.uploadStatus !== statusList[i].status)) {
     // sometimes the upload is so fast the progress/status isn't persisted properly, so here we fix any after upload
     setUploadedFiles(
@@ -189,32 +114,12 @@ const GlobalFileUpload: FC<GlobalFileUploadProps> = ({ children, filesToUpload, 
   }, []);
 
   return (
-    <div>
-      <FileUploadInput type="file" id="drag-drop-file-upload" multiple />
-      <div onDragOver={onDragOver}>
-        <UploadProgressBar uploadedFiles={uploadedFiles} />
-
-        {children}
-      </div>
-      {isDragFile && (
-        <Overlay>
-          <LabelOverlay
-            htmlFor="drag-drop-file-upload"
-            onDragLeave={onDragLeave}
-            onClick={stopDefaults}
-            onDragOver={stopDefaults}
-            onDrop={onDrop}
-          />
-          <DragDropBox>
-            <DragDropText>
-              <UploadIcon className="bx bx-cloud-upload bx-lg" />
-              <h5>Drop to Upload</h5>
-            </DragDropText>
-          </DragDropBox>
-        </Overlay>
-      )}
-    </div>
+    <UploadProgressBar
+      uploadedFiles={uploadedFiles}
+      isProgressBarShown={isProgressBarShown}
+      setIsProgressBarShown={setIsProgressBarShown}
+    />
   );
 };
 
-export default GlobalFileUpload;
+export default UploadProgress;

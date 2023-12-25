@@ -19,7 +19,7 @@ const SidebarWapper = styled.div`
   top: 0px;
   z-index: 4;
   min-height: 100vh;
-  transition: 0.05s;
+  /* transition: 0.05s; */
 
   ${(p): string => (p.isSidebarEnabled ? "" : "margin-left: -250px;")};
 

@@ -7,13 +7,15 @@ import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
 import App, { AppContext, AppInitialProps, AppProps } from "next/app";
 import BackToTop from "@client/components/common/layout/back-to-top";
-import GlobalFileUpload from "@client/components/common/layout/upload/global-file-upload";
+import GlobalFileUpload from "@client/components/common/layout/upload/upload-progress";
+import GlobalUploadWrapper from "@client/components/common/layout/upload/gobal-upload-wrapper";
 import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
 import LoadBar from "@client/components/common/layout/load-bar";
 import React, { ReactElement, useEffect, useState } from "react";
 import SearchSlider from "@client/components/common/video-slider/search-slider";
 import Sidebar from "@client/components/common/layout/sidebar/side-bar";
+import UploadProgress from "@client/components/common/layout/upload/upload-progress";
 import VideoProvider from "@client/components/common/contexts/video-provider";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
@@ -25,7 +27,6 @@ const GlobalStyle = createGlobalStyle`
   html {
     background-color: ${(p): string => p.theme.background};
     color: ${(p): string => p.theme.text};
-    cursor: pointer;
   }
   body{
     overflow-y: auto;
@@ -37,7 +38,6 @@ const GlobalStyle = createGlobalStyle`
     width: 5px;
     -webkit-appearance: none;
     background-color: transparent;
-    cursor: pointer !important;
   }
 
   ::-webkit-scrollbar-track-piece
@@ -49,15 +49,6 @@ const GlobalStyle = createGlobalStyle`
   {
     border-radius: 8px;
     background-color: ${(p): string => p.theme.textContrast};
-    cursor: pointer !important;
-  }
-
-  :-webkit-scrollbar-thumb:hover {
-    cursor: pointer !important;
-  }
-
-  ::-webkit-scrollbar-track {
-    cursor: pointer !important;
   }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
@@ -144,6 +135,7 @@ interface MyAppProps {
 const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & MyAppProps): ReactElement => {
   //TODO: move this state call into a component that doesn't rerender EVERYTHING
   const [search, setSearch] = useState("");
+  const [isProgressBarShown, setIsProgressBarShown] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<FileList | null>(null);
   const router = useRouter();
 
@@ -164,31 +156,35 @@ const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & 
     <CookiesProvider cookies={cookies}>
       <ThemeProvider theme={blujayTheme}>
         <VideoProvider intialVideos={intialVideos}>
-          <div className={montserrat.className}>
-            <GlobalStyle />
-            <Head>
-              <title>Blujay</title>
-            </Head>
-            <LayoutWrapper>
-              {router.pathname.includes("/login") ? (
-                <Component {...pageProps} />
-              ) : (
-                <AliveScope>
+          <GlobalStyle />
+          <Head>
+            <title>Blujay</title>
+          </Head>
+          <LayoutWrapper className={montserrat.className}>
+            {router.pathname.includes("/login") ? (
+              <Component {...pageProps} />
+            ) : (
+              <AliveScope>
+                <GlobalUploadWrapper setFilesToUpload={setFilesToUpload}>
                   <LoadBar />
-                  <BackToTop />
                   <Sidebar />
                   <CenterContent>
+                    <BackToTop isProgressBarShown={isProgressBarShown} />
+                    <UploadProgress
+                      filesToUpload={filesToUpload}
+                      setFilesToUpload={setFilesToUpload}
+                      isProgressBarShown={isProgressBarShown}
+                      setIsProgressBarShown={setIsProgressBarShown}
+                    />
                     <Header search={search} setSearch={setSearch} setFilesToUpload={setFilesToUpload} />
-                    <GlobalFileUpload filesToUpload={filesToUpload} setFilesToUpload={setFilesToUpload}>
-                      <ContentWrapper>
-                        {search ? <SearchSlider search={search} /> : <Component {...pageProps} />}
-                      </ContentWrapper>
-                    </GlobalFileUpload>
+                    <ContentWrapper>
+                      {search ? <SearchSlider search={search} /> : <Component {...pageProps} />}
+                    </ContentWrapper>
                   </CenterContent>
-                </AliveScope>
-              )}
-            </LayoutWrapper>
-          </div>
+                </GlobalUploadWrapper>
+              </AliveScope>
+            )}
+          </LayoutWrapper>
         </VideoProvider>
       </ThemeProvider>
     </CookiesProvider>

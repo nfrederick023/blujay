@@ -13,18 +13,22 @@ const Overlay = styled.div`
   cursor: pointer;
 `;
 
-const PopupBox = styled.div`
+const PopupWrapper = styled.div`
   z-index: 6;
   position: fixed;
   display: flex;
+  width: fill-available;
+  height: fill-available;
+  pointer-events: none;
+`;
+
+const PopupBox = styled.div`
+  pointer-events: auto;
+  margin: auto;
   flex-wrap: wrap;
   align-content: baseline;
-  top: 50%;
-  left: 50%;
   width: 800px;
   height: 510px;
-  margin-left: -400px; // half the width
-  margin-top: -255px; // half the height
   background-color: ${(p): string => p.theme.backgroundContrast};
   border-radius: 10px;
   padding: 20px;
@@ -141,39 +145,41 @@ const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, clos
   return (
     <>
       <Overlay onClick={closePopup} />
-      <PopupBox>
-        <CloseWrapper>
-          <Icon onClick={closePopup} className="bx bx-x" />
-        </CloseWrapper>
-        <Header>
-          <Filename>
-            <h5>Filename</h5>
-          </Filename>
-          <Status>
-            <h5>Status</h5>
-          </Status>
-          <Progress>
-            <h5>Progress</h5>
-          </Progress>
-        </Header>
-        <ItemWrapper>
-          {uploadedFiles.map((file, i) => (
-            <Item
-              key={i}
-              onMouseOver={setItemOnHover(file)}
-              onMouseOut={removeItemOnHover}
-              onClick={showFullErrorMessage(file)}
-            >
-              <Filename>{file.filename}</Filename>
-              <Status hasFailed={file.uploadStatus === "FAILED"}>{file.uploadStatus}</Status>
-              <Progress>{formatPercentage(file)}</Progress>
-            </Item>
-          ))}
-        </ItemWrapper>
-        <ErrorWrapper>
-          {hoveredItem && hoveredItem.uploadStatus === "FAILED" ? <>Error: {`"${hoveredItem.error}"`}</> : <></>}
-        </ErrorWrapper>
-      </PopupBox>
+      <PopupWrapper>
+        <PopupBox>
+          <CloseWrapper>
+            <Icon onClick={closePopup} className="bx bx-x" />
+          </CloseWrapper>
+          <Header>
+            <Filename>
+              <h5>Filename</h5>
+            </Filename>
+            <Status>
+              <h5>Status</h5>
+            </Status>
+            <Progress>
+              <h5>Progress</h5>
+            </Progress>
+          </Header>
+          <ItemWrapper>
+            {uploadedFiles.map((file, i) => (
+              <Item
+                key={i}
+                onMouseOver={setItemOnHover(file)}
+                onMouseOut={removeItemOnHover}
+                onClick={showFullErrorMessage(file)}
+              >
+                <Filename>{file.filename}</Filename>
+                <Status hasFailed={file.uploadStatus === "FAILED"}>{file.uploadStatus}</Status>
+                <Progress>{formatPercentage(file)}</Progress>
+              </Item>
+            ))}
+          </ItemWrapper>
+          <ErrorWrapper>
+            {hoveredItem && hoveredItem.uploadStatus === "FAILED" ? <>Error: {`"${hoveredItem.error}"`}</> : <></>}
+          </ErrorWrapper>
+        </PopupBox>
+      </PopupWrapper>
     </>
   );
 };

@@ -1,9 +1,10 @@
 import { Video } from "@client/utils/types";
 import { VideoContext } from "../../contexts/video-context";
-import CopyLinkButton from "../../shared/button-icons/buttons/copyLink";
+import CopyLinkButton from "../../shared/button-icons/buttons/copy-link";
+import DownloadButton from "../../shared/button-icons/buttons/download";
 import FavoriteButton from "../../shared/button-icons/buttons/favorite";
 import React, { FC, useContext, useState } from "react";
-import RequireAuthButton from "../../shared/button-icons/buttons/requireAuth";
+import RequireAuthButton from "../../shared/button-icons/buttons/require-auth";
 import TimeAgo from "react-timeago";
 import VideoSearch from "./video-search";
 import prettyBytes from "pretty-bytes";
@@ -85,10 +86,6 @@ const Test = styled.div`
 const Buttons = styled.div`
   margin-left: auto;
   display: flex;
-
-  * {
-    margin-left: 5px;
-  }
 `;
 
 const resultsPerPageOptions = ["5", "10", "20", "50", "100"];
@@ -154,6 +151,7 @@ const ListView: FC<ListViewProps> = ({ videos }) => {
                   <Buttons>
                     <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
                     <CopyLinkButton link={window.location.origin + "/watch/" + video.id} />
+                    <DownloadButton link={window.location.origin + "/watch/" + video.id} />
                     <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={false} />
                   </Buttons>
                 </ListOptions>

@@ -16,13 +16,6 @@ const Button = styled.div`
     margin-right: 2px;
   }
 
-  i {
-    margin: auto;
-    margin-top: 1px;
-    padding-right: 1px;
-    font-size: 1.1em !important;
-  }
-
   ${(p: { isSelected: boolean; disabled: boolean; theme: BluJayTheme }): string => {
     if (p.disabled) {
       return `
@@ -54,8 +47,16 @@ const Text = styled.h6`
   width: ${(p: { maxLength: number }): number => p.maxLength}ch;
 `;
 
-const IconWithText = styled.i`
+const Icon = styled.i`
+  margin: auto;
+  margin-top: 1px;
+  padding-right: 1px;
+  font-size: 1.1em !important;
+`;
+
+const IconWithText = styled(Icon)`
   padding-right: 5px;
+  margin-left: 5px;
 `;
 
 const Wrapper = styled.div`
@@ -206,7 +207,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
               </FlexBox>
             </>
           ) : (
-            <>{icon && <i className={_icon} />}</>
+            <>{icon && <Icon className={_icon} />}</>
           )}
           {hoverText && !isPlaying && isHover && (
             <Wrapper isOffscreen={isOffscreen}>

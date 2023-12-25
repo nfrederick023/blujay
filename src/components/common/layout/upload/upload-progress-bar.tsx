@@ -108,10 +108,15 @@ const DetailsText = styled.div`
 
 interface UploadProgressBarProps {
   uploadedFiles: FileUpload[];
+  isProgressBarShown: boolean;
+  setIsProgressBarShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }) => {
-  const [showBar, setShowBar] = useState(false);
+const UploadProgressBar: FC<UploadProgressBarProps> = ({
+  uploadedFiles,
+  isProgressBarShown,
+  setIsProgressBarShown,
+}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [totalUploaded, setTotalUploaded] = useState(0);
   const [uploadedThisBlock, setUploadedThisBlock] = useState(0);
@@ -148,7 +153,7 @@ const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }) => {
     ) || 0;
 
   const toggleUploadBar = (): void => {
-    setShowBar(!showBar);
+    setIsProgressBarShown(!isProgressBarShown);
   };
 
   const togglePopup = (): void => {
@@ -160,16 +165,16 @@ const UploadProgressBar: FC<UploadProgressBarProps> = ({ uploadedFiles }) => {
       {showPopup ? <UploadProgressPopup uploadedFiles={uploadedFiles} closePopup={togglePopup} /> : <></>}
       {uploadedFiles.length ? (
         <>
-          <OpenButtonWrapper isClosed={!uploadedFiles.length || showBar}>
+          <OpenButtonWrapper isClosed={!uploadedFiles.length || !isProgressBarShown}>
             <OpenButton>
-              {showBar ? (
+              {!isProgressBarShown ? (
                 <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx bx-chevron-up" />
               ) : (
                 <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx bx-chevron-down" />
               )}
             </OpenButton>
           </OpenButtonWrapper>
-          <ProgressBarWrapper isClosed={!uploadedFiles.length || showBar}>
+          <ProgressBarWrapper isClosed={!uploadedFiles.length || !isProgressBarShown}>
             <ProgressBarFooter>
               <ProgressBarContent>
                 <IncompleteProgress>

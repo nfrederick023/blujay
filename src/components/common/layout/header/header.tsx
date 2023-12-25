@@ -18,7 +18,7 @@ const HeaderWrapper = styled.div`
   z-index: 2;
 `;
 
-const CogDropDown = styled.span`
+const CogDropDown = styled.div`
   position: absolute;
   width: 250px;
   margin-right: 170px;
@@ -30,9 +30,8 @@ const IconContainer = styled.div`
   position: fixed;
   display: flex;
   height: 58px;
-  width: 80px;
-  // 79px is the width of this element, 20px
-  left: calc(100vw - 80px - 20px);
+  left: calc(100vw - 20px);
+  transform: translate(-100%, 0);
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     display: none;
@@ -78,47 +77,30 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
+  const [isDropDownShown, setIsDropDownShow] = useState(false);
   const [cookies, setCookie] = useCookies(["authToken"]);
 
-  const handleClick = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    setIsFocused(!isFocused);
+  const handleClick = (): void => {
+    setIsDropDownShow(!isDropDownShown);
   };
 
   const uploadFiles = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setFilesToUpload(e.target.files);
   };
 
-  const prevent = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-  };
-  const mouseDown = (): void => {
-    setIsUnselectedFocus(true);
-  };
-
-  const mouseUp = (): void => {
-    setIsUnselectedFocus(false);
-  };
-
-  const onBlur = (): void => {
-    if (!isUnselectedFocus) setIsFocused(false);
-  };
-
   const navigateToLogin = (): void => {
-    setIsFocused(false);
+    setIsDropDownShow(false);
     router.push("/login");
   };
 
   const navigateToSetings = (): void => {
-    setIsFocused(false);
+    setIsDropDownShow(false);
     router.push("/settings");
   };
 
   const handleLogout = (): void => {
     setCookie("authToken", "", getCookieSetOptions());
-    setIsFocused(false);
+    setIsDropDownShow(false);
     router.reload();
   };
 
@@ -134,13 +116,11 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
         <FileUploadLabel htmlFor="click-file-upload">
           <UploadIcon tabIndex={0} className="bx bx-cloud-upload" />
         </FileUploadLabel>
-        <CogIcon tabIndex={0} isFocused={isFocused} onClick={handleClick} onBlur={onBlur} className="bx bx-cog" />
+        <CogIcon tabIndex={0} isFocused={isDropDownShown} onClick={handleClick} className="bx bx-cog" />
       </IconContainer>
-      <div>
-        <CogDropDown onClick={prevent} onMouseDown={mouseDown} onMouseUp={mouseUp}>
-          {isFocused && <DropDown options={options}></DropDown>}
-        </CogDropDown>
-      </div>
+      <CogDropDown>
+        <DropDown options={options} isShown={isDropDownShown} setIsShown={setIsDropDownShow} />
+      </CogDropDown>
     </HeaderWrapper>
   );
 };

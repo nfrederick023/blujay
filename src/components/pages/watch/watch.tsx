@@ -5,13 +5,15 @@ import { sortVideos } from "@client/utils/sortVideo";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
-import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copyLink";
+import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copy-link";
+import DownloadButton from "@client/components/common/shared/button-icons/buttons/download";
 import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";
 import Head from "next/head";
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
-import RequireAuthButton from "@client/components/common/shared/button-icons/buttons/requireAuth";
-import TheatreModeButton from "@client/components/common/shared/button-icons/buttons/theatreMode";
+import RequireAuthButton from "@client/components/common/shared/button-icons/buttons/require-auth";
+import TheatreModeButton from "@client/components/common/shared/button-icons/buttons/theatre-mode";
 import TimeAgo from "react-timeago";
+import VideoSettingsButton from "@client/components/common/shared/button-icons/buttons/video-settings";
 import styled from "styled-components";
 
 const VideoContainer = styled.div`
@@ -56,7 +58,7 @@ const Buttons = styled.span`
   margin-left: auto;
   display: flex;
 
-  * {
+  & > * {
     margin-left: 5px;
   }
 `;
@@ -267,16 +269,11 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
           <BackButton icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></BackButton>
           <PeviousVideoButton
             icon="bx bx-chevron-left"
-            hoverTextOn="Previous Video"
+            hoverTextOn="Previous"
             onClick={goToPreviousVideo}
             disabled={!previousVideo}
-          ></PeviousVideoButton>
-          <ButtonIcon
-            icon="bx bx-chevron-right"
-            hoverTextOn="Next Video"
-            onClick={goToNextVideo}
-            disabled={!nextVideo}
-          ></ButtonIcon>
+          />
+          <ButtonIcon icon="bx bx-chevron-right" hoverTextOn="Next" onClick={goToNextVideo} disabled={!nextVideo} />
         </PageOptions>
         <VideoWrapper>
           {isTheaterMode && <BlackOverlay />}
@@ -301,8 +298,10 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
           <Buttons>
             <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
             <CopyLinkButton link={url} />
+            <DownloadButton link={fullVideoURL} />
             <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={true} />
             <TheatreModeButton />
+            <VideoSettingsButton />
           </Buttons>
         </VideoNameContainer>
         <VideoDetails>

@@ -150,7 +150,7 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
         await new Promise((res) => {
           setTimeout(() => {
             res("");
-          }, 1);
+          }, 10);
         });
       }
       setIsScrolling(false);

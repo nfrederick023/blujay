@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const DropDownBox = styled.div`
@@ -34,25 +34,45 @@ interface DropDownOption {
 
 interface DropDownProps {
   options: DropDownOption[];
+  isShown: boolean;
+  setIsShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DropDown: FC<DropDownProps> = ({ options }) => {
+const DropDown: FC<DropDownProps> = ({ options, isShown, setIsShown }) => {
+  const dropDownRef = useRef<HTMLDivElement>(null);
+
+  const onBlur = (): void => {
+    setIsShown(false);
+  };
+
+  useEffect(() => {
+    if (dropDownRef && isShown) {
+      dropDownRef.current?.focus();
+    }
+  }, [isShown]);
+
   return (
-    <DropDownBox>
-      {options.length ? (
-        <>
-          {options.map((option, i) => {
-            return (
-              <Option key={i} onClick={option.action}>
-                {option.text}
-              </Option>
-            );
-          })}
-        </>
+    <>
+      {isShown ? (
+        <DropDownBox tabIndex={0} onBlur={onBlur} ref={dropDownRef}>
+          {options.length ? (
+            <>
+              {options.map((option, i) => {
+                return (
+                  <Option key={i} onClick={option.action}>
+                    {option.text}
+                  </Option>
+                );
+              })}
+            </>
+          ) : (
+            <Option>No Options</Option>
+          )}
+        </DropDownBox>
       ) : (
-        <Option>No Options</Option>
+        <></>
       )}
-    </DropDownBox>
+    </>
   );
 };
 
