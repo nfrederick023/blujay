@@ -23,14 +23,14 @@ const LogoWrapper = styled.div`
 `;
 
 const Icon = styled.i`
-  padding-top: 9px;
-  padding-right: 48px;
+  padding-top: 10px;
+  padding-right: 8px;
   padding-left: 3px;
   color: ${(p): string => p.theme.textContrast};
 
   &:before {
     margin-top: 1px;
-    position: fixed;
+    position: relative;
   }
 
   &:hover {

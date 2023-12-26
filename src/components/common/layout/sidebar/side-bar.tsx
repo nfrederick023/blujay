@@ -69,15 +69,17 @@ const Sidebar: FC = () => {
   const [, setCookie] = useCookies();
   const router = useRouter();
   const selectedCategory = selectedPath.toLowerCase();
-  const selectedPathRef = useRef<string>("");
+  const selectedPathRef = useRef("");
+  const selectedCookieRef = useRef(cookies);
   selectedPathRef.current = selectedPath;
+  selectedCookieRef.current = cookies;
   const categories = [...new Set(videos.flatMap((video) => video.categories))]
     .filter((category) => category)
     .sort((a, b) => a.localeCompare(b));
 
   useEffect(() => {
     const setPathAndCloseSidebar = (path: string): void => {
-      if (window.innerWidth < screenSizes.smallScreenSize) {
+      if (window.innerWidth < screenSizes.smallScreenSize && booleanify(selectedCookieRef.current.isSidebarEnabled)) {
         setCookie("isSidebarEnabled", "false", getCookieSetOptions());
       }
 

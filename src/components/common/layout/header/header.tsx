@@ -10,16 +10,17 @@ import router from "next/router";
 import styled from "styled-components";
 
 const HeaderWrapper = styled.div`
-  background-color: ${(p: { theme: BluJayTheme; scroll: number }): string => p.theme.background};
+  background-color: ${(p: { theme: BluJayTheme; scrolledDown: boolean }): string => p.theme.background};
   height: 60px;
   justify-content: center;
   display: flex;
   position: sticky;
   top: 0px;
   z-index: 2;
+  transition: 250ms;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    top: -${(p): number => p.scroll}px;
+    top: ${(p: { scrolledDown: boolean }): string => (p.scrolledDown ? "-60px" : "0px")};
   }
 `;
 
@@ -68,7 +69,7 @@ const LogoBackdrop = styled.div`
   z-index: 3;
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    top: -${(p: { scroll: number }): number => p.scroll}px;
+    position: absolute;
   }
 `;
 
@@ -81,8 +82,8 @@ interface HeaderProps {
 const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
   const [isDropDownShown, setIsDropDownShow] = useState(false);
   const [cookies, setCookie] = useCookies(["authToken"]);
-  const [previousScrollPosition, setPrevious] = useState(0);
-  const [scrollPos, setScrollPos] = useState(0);
+  const [scrolledDown, setScrolledDown] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const inputFileRef = useRef<HTMLInputElement>(null);
 
   const handleClick = (): void => {
@@ -122,20 +123,8 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
 
   useEffect(() => {
     const getHeaderScroll = (): void => {
-      const headerSize = 60;
-
-      const scrollAmount = window.scrollY - previousScrollPosition;
-      const newScrollPos = scrollPos + scrollAmount;
-
-      if (newScrollPos > headerSize) {
-        setScrollPos(headerSize);
-      } else if (newScrollPos < 0) {
-        setScrollPos(0);
-      } else {
-        setScrollPos(newScrollPos);
-      }
-
-      setPrevious(window.scrollY);
+      setScrolledDown(window.scrollY > lastScrollY);
+      setLastScrollY(window.scrollY);
     };
     window.addEventListener("scroll", getHeaderScroll, { passive: true });
     return () => {
@@ -143,12 +132,10 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
     };
   });
 
-  console.log(scrollPos);
-
   return (
-    <HeaderWrapper scroll={scrollPos}>
+    <HeaderWrapper scrolledDown={scrolledDown}>
       <FileUploadInput type="file" id="click-file-upload" onChange={uploadFiles} multiple ref={inputFileRef} />
-      <LogoBackdrop scroll={scrollPos}>
+      <LogoBackdrop>
         <Logo />
       </LogoBackdrop>
       <SearchBar search={search} setSearch={setSearch} />

@@ -14,7 +14,7 @@ const Button = styled.div`
   max-height: 38px;
 
   h6 {
-    margin-right: 2px;
+    margin-right: 5px;
   }
 
   ${(p: { isSelected: boolean; disabled: boolean; theme: BluJayTheme }): string => {

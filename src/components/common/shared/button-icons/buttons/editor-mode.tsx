@@ -13,7 +13,7 @@ const VideoSettingsButton: FC = () => {
   return (
     <ButtonIcon
       icon="bx bxs-edit"
-      textOn="Editor Mode"
+      textOn="Edit"
       selectedIcon="bx bxs-edit"
       hoverTextOn="Disable Editor Mode"
       confrimTextOn="Enabled!"

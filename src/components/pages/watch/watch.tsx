@@ -6,6 +6,7 @@ import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
+import ClipButton from "@client/components/common/shared/button-icons/buttons/clip";
 import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copy-link";
 import DownloadButton from "@client/components/common/shared/button-icons/buttons/download";
 import DropDown from "@client/components/common/shared/drop-down";
@@ -13,9 +14,11 @@ import FavoriteButton from "@client/components/common/shared/button-icons/button
 import Head from "next/head";
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import RequireAuthButton from "@client/components/common/shared/button-icons/buttons/require-auth";
+import ScrollContainer from "react-indiana-drag-scroll";
 import TheatreModeButton from "@client/components/common/shared/button-icons/buttons/theatre-mode";
 import TimeAgo from "react-timeago";
-import VideoSettingsButton from "@client/components/common/shared/button-icons/buttons/video-settings";
+import VideoOptionsButton from "@client/components/common/shared/button-icons/buttons/video-options";
+import VideoSettingsButton from "@client/components/common/shared/button-icons/buttons/editor-mode";
 import styled from "styled-components";
 
 const VideoContainer = styled.div`
@@ -56,15 +59,6 @@ const VideoWrapper = styled.div`
   line-height: 0;
 `;
 
-const Buttons = styled.span`
-  margin-left: auto;
-  display: flex;
-
-  & > * {
-    margin-left: 5px;
-  }
-`;
-
 const Overlay = styled.div`
   position: fixed;
   top: 0px;
@@ -91,7 +85,7 @@ const OverlayImage = styled.img`
 
 const PageOptions = styled.div`
   display: flex;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 `;
 
 const BackButton = styled(ButtonIcon)`
@@ -103,23 +97,36 @@ const PeviousVideoButton = styled(ButtonIcon)`
 `;
 
 const VideoDetailsWrapper = styled.div`
+  margin: 10px 0px 0px 10px;
   display: flex;
+  flex-wrap: wrap;
 `;
 
-const VideoDetails = styled.div``;
+const VideoDetails = styled.div`
+  margin-right: auto;
+  overflow: hidden;
+`;
 
 const VideoMetadata = styled.div`
   color: ${(p): string => p.theme.textContrastLight};
 `;
 
 const VideoOptions = styled.div`
-  margin-left: auto;
+  margin-top: 10px;
+  display: flex;
+`;
+
+const Buttons = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  & > * {
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
 `;
 
 const VideoName = styled.div`
   text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
 `;
 
 const MoreButton = styled.span`
@@ -329,6 +336,9 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
         </VideoWrapper>
         <VideoDetailsWrapper>
           <VideoDetails>
+            <VideoName>
+              <h4>{video.name}</h4>
+            </VideoName>
             <VideoMetadata>
               <h6>
                 {videoCategory} · <TimeAgo date={video.uploaded} /> · {video.views} views{"  "}
@@ -347,16 +357,18 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
               </VideoMetadata>
             )}
           </VideoDetails>
-          {/* <VideoOptions>
+          <VideoOptions>
             <Buttons>
               <FavoriteButton video={video} />
               <CopyLinkButton link={url} />
               <DownloadButton link={fullVideoURL} />
               <RequireAuthButton video={video} showText={true} />
+              <ClipButton />
               <TheatreModeButton />
               <VideoSettingsButton />
+              <VideoOptionsButton />
             </Buttons>
-          </VideoOptions> */}
+          </VideoOptions>
           <DropDown options={options} isShown={isDropDownShown} setIsShown={setIsDropDownShow} />
         </VideoDetailsWrapper>
       </VideoContainer>
