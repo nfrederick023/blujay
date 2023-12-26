@@ -1,3 +1,4 @@
+import { DropDownOption } from "@client/utils/types";
 import React, { FC, useEffect, useRef } from "react";
 import styled from "styled-components";
 
@@ -18,7 +19,8 @@ const DropDownBox = styled.div`
 
 const Option = styled.div`
   padding: 8px 8px 8px 15px;
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p): string => p.theme.text};
+  display: flex;
 
   &:hover {
     color: ${(p): string => p.theme.text};
@@ -27,10 +29,14 @@ const Option = styled.div`
   }
 `;
 
-interface DropDownOption {
-  text: string;
-  action: (e: React.MouseEvent) => void;
-}
+const Icon = styled.i`
+  font-size: 25px;
+  margin-right: 15px;
+`;
+
+const OptionText = styled.div`
+  padding-top: 2px;
+`;
 
 interface DropDownProps {
   options: DropDownOption[];
@@ -60,7 +66,8 @@ const DropDown: FC<DropDownProps> = ({ options, isShown, setIsShown }) => {
               {options.map((option, i) => {
                 return (
                   <Option key={i} onClick={option.action}>
-                    {option.text}
+                    {option.icon ? <Icon className={option.icon} /> : <></>}
+                    <OptionText>{option.text}</OptionText>
                   </Option>
                 );
               })}

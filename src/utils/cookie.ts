@@ -22,6 +22,8 @@ export const getCookieDefault = (name: CookieTypes): boolean | string | number =
       return 1;
     case "authToken":
       return "";
+    case "isEditor":
+      return false;
   }
 };
 

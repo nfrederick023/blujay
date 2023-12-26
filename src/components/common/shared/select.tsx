@@ -9,6 +9,10 @@ const SelectBoxWrapper = styled.div`
   width: 100%;
 `;
 
+const PointerWrapper = styled.div`
+  cursor: pointer;
+`;
+
 const SelectBox = styled.div`
   color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.textContrast};
   display: flex;
@@ -16,10 +20,10 @@ const SelectBox = styled.div`
 
   &:hover {
     color: ${(p): string => p.theme.text};
-    cursor: pointer;
   }
 
   color: ${(p): string => (p.isFocused ? `${p.theme.text}` : "")};
+  pointer-events: ${(p): string => (p.isFocused ? "none" : "auto")};
 `;
 
 const SelectedBox = styled.div`
@@ -69,12 +73,12 @@ interface SelectProps {
   isMulti?: boolean;
   isClearable?: boolean;
   defaultSelected?: string[];
+  postFix?: string;
   onChange: (options: SelectOptions) => void;
 }
 
-const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, defaultSelected, onChange }) => {
+const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, defaultSelected, postFix, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const handleAddOption = (option: string) => (e: React.MouseEvent) => {
     e.stopPropagation();
     let newOptions: string[];
@@ -108,20 +112,6 @@ const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, default
     setIsOpen(!isOpen);
   };
 
-  const mouseDown = (): void => {
-    setIsUnselectedFocus(true);
-  };
-
-  const mouseUp = (): void => {
-    setIsUnselectedFocus(false);
-  };
-
-  const onBlur = (): void => {
-    if (!isUnselectedFocus) {
-      setIsOpen(false);
-    }
-  };
-
   const unselectedOptions = options
     .filter((option) => !value.includes(option))
     .map((option) => {
@@ -130,49 +120,39 @@ const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, default
 
   return (
     <SelectBoxWrapper>
-      <SelectBox
-        tabIndex={0}
-        onClick={handleClick}
-        onMouseDown={mouseDown}
-        onMouseUp={mouseUp}
-        onBlur={onBlur}
-        isFocused={isOpen}
-      >
-        <SelectedBox>
-          {value.length ? (
-            <>
-              {value.map((selectedOption, i) => {
-                return (
-                  <SelectedOption key={i} isMulti={isMulti}>
-                    {selectedOption}
-                    {isMulti && (
-                      <SelectedIcon className="bx bx-x" onClick={handleRemoveOption(selectedOption)}></SelectedIcon>
-                    )}
-                  </SelectedOption>
-                );
-              })}
-            </>
-          ) : (
-            <PlaceHolderText>Select...</PlaceHolderText>
-          )}
-        </SelectedBox>
-        <RightIcons>
-          {isClearable && (
-            <ClearButton onClick={handleRemoveAll}>
-              <i className="bx bx-x"></i>
-            </ClearButton>
-          )}
-          <div>
-            <i className="bx bx-chevron-down"></i>
-          </div>
-        </RightIcons>
-      </SelectBox>
-
-      {isOpen && (
-        <div tabIndex={0} onMouseDown={mouseDown} onMouseUp={mouseUp} onBlur={onBlur}>
-          <DropDown options={unselectedOptions}></DropDown>
-        </div>
-      )}
+      <PointerWrapper>
+        <SelectBox tabIndex={0} onClick={handleClick} isFocused={isOpen}>
+          <SelectedBox>
+            {value.length ? (
+              <>
+                {value.map((selectedOption, i) => {
+                  return (
+                    <SelectedOption key={i} isMulti={isMulti}>
+                      {selectedOption + (postFix ?? "")}
+                      {isMulti && (
+                        <SelectedIcon className="bx bx-x" onClick={handleRemoveOption(selectedOption)}></SelectedIcon>
+                      )}
+                    </SelectedOption>
+                  );
+                })}
+              </>
+            ) : (
+              <PlaceHolderText>Select...</PlaceHolderText>
+            )}
+          </SelectedBox>
+          <RightIcons>
+            {isClearable && (
+              <ClearButton onClick={handleRemoveAll}>
+                <i className="bx bx-x"></i>
+              </ClearButton>
+            )}
+            <div>
+              <i className="bx bx-chevron-down"></i>
+            </div>
+          </RightIcons>
+        </SelectBox>
+      </PointerWrapper>
+      <DropDown isShown={isOpen} setIsShown={setIsOpen} options={unselectedOptions} />
     </SelectBoxWrapper>
   );
 };

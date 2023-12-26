@@ -99,7 +99,7 @@ export const fileExtensions = [...videoExtensions, ...imageExtensions] as const;
 export const videoMimeTypes = videoMimeTypeList.flatMap(mimeType => mimeType.name);
 export const imageMimeTypes = imageMimeTypeList.flatMap(mimeType => mimeType.name);
 export const fileMimeTypes = [...videoMimeTypes, ...imageMimeTypes] as const;
-export const cookieOptions = ["isTheaterMode", "videoVolume", "authToken", "isSidebarEnabled"] as const;
+export const cookieOptions = ["isTheaterMode", "videoVolume", "authToken", "isSidebarEnabled", "isEditor"] as const;
 export const queryField = ["name", "filename", "category", "description", "id"] as const;
 export const viewType = ["List View", "Grid View"] as const;
 export const sortOptions = ["Alphabetical", "Date Updated", "Date Uploaded", "File Size", "View Count"] as const;

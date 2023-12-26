@@ -1,6 +1,7 @@
 import { AliveScope } from "react-activation";
 import { CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
+import { KeepAliveProvider } from "react-next-keep-alive";
 import { Montserrat } from "next/font/google";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
@@ -115,6 +116,10 @@ const GlobalStyle = createGlobalStyle`
 const LayoutWrapper = styled.div`
   display: flex;
   width: calc(100vw - 5px);
+
+  @media (max-width: ${screenSizes.mobileScreenSize}px) {
+    width: unset;
+  }
 `;
 
 const CenterContent = styled.div`
@@ -125,6 +130,10 @@ const CenterContent = styled.div`
 
 const ContentWrapper = styled.div`
   margin: 10px 20px 20px 20px;
+
+  @media (max-width: ${screenSizes.mobileScreenSize}px) {
+    margin: 10px 10px 20px 10px;
+  }
 `;
 
 interface MyAppProps {
@@ -164,25 +173,25 @@ const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & 
             {router.pathname.includes("/login") ? (
               <Component {...pageProps} />
             ) : (
-              <AliveScope>
-                <GlobalUploadWrapper setFilesToUpload={setFilesToUpload}>
-                  <LoadBar />
-                  <Sidebar />
-                  <CenterContent>
-                    <BackToTop isProgressBarShown={isProgressBarShown} />
-                    <UploadProgress
-                      filesToUpload={filesToUpload}
-                      setFilesToUpload={setFilesToUpload}
-                      isProgressBarShown={isProgressBarShown}
-                      setIsProgressBarShown={setIsProgressBarShown}
-                    />
-                    <Header search={search} setSearch={setSearch} setFilesToUpload={setFilesToUpload} />
-                    <ContentWrapper>
+              <GlobalUploadWrapper setFilesToUpload={setFilesToUpload}>
+                <LoadBar />
+                <Sidebar />
+                <CenterContent>
+                  <BackToTop isProgressBarShown={isProgressBarShown} />
+                  <UploadProgress
+                    filesToUpload={filesToUpload}
+                    setFilesToUpload={setFilesToUpload}
+                    isProgressBarShown={isProgressBarShown}
+                    setIsProgressBarShown={setIsProgressBarShown}
+                  />
+                  <Header search={search} setSearch={setSearch} setFilesToUpload={setFilesToUpload} />
+                  <ContentWrapper>
+                    <KeepAliveProvider router={router}>
                       {search ? <SearchSlider search={search} /> : <Component {...pageProps} />}
-                    </ContentWrapper>
-                  </CenterContent>
-                </GlobalUploadWrapper>
-              </AliveScope>
+                    </KeepAliveProvider>
+                  </ContentWrapper>
+                </CenterContent>
+              </GlobalUploadWrapper>
             )}
           </LayoutWrapper>
         </VideoProvider>

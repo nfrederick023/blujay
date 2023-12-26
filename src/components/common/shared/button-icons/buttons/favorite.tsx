@@ -1,18 +1,18 @@
 import { Video } from "@client/utils/types";
-import { updateVideo } from "@client/utils/api";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import ButtonIcon from "../button-icon";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 
 interface FavoriteButtonProps {
   video: Video;
-  handleResponse: (res: Response, newVideo: Video) => unknown;
 }
 
-const FavoriteButton: FC<FavoriteButtonProps> = ({ video, handleResponse }) => {
-  const handleSetAsFavorite = async (): Promise<void> => {
+const FavoriteButton: FC<FavoriteButtonProps> = ({ video }) => {
+  const { updateVideo } = useContext(VideoContext);
+
+  const handleSetAsFavorite = (): void => {
     const newVideo: Video = { ...video, isFavorite: !video.isFavorite };
-    const res = await updateVideo(newVideo);
-    handleResponse(res, newVideo);
+    updateVideo(newVideo);
   };
 
   return (

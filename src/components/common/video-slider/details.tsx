@@ -1,4 +1,5 @@
 import { OrderType, SortType, Video } from "@client/utils/types";
+import { getVideoCategory } from "@client/utils/sortVideo";
 import { screenSizes } from "@client/utils/constants";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
@@ -118,8 +119,12 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, s
   const handleIsHoverTrueChange = async (): Promise<void> => {
     setIsHovering(true);
     if (videoRef.current) {
-      await videoRef.current.play();
-      setIsPlaying(true);
+      try {
+        await videoRef.current.play();
+        setIsPlaying(true);
+      } catch (e) {
+        //ignore "play was interrupted by call to pause" error, which can happen if we swipe over videos too fast
+      }
     }
   };
 
@@ -159,6 +164,8 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, s
     params = "?" + params;
   }
 
+  const videoCategory = video ? getVideoCategory(video, category) : "";
+
   return (
     <VideoDetailsWrapper ref={ref}>
       <Link href={"/watch/" + video?.id + params} draggable={false}>
@@ -195,7 +202,7 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, s
             <VideoNameWrapper>
               <h5>{video.name}</h5>
               <h6>
-                {video.category.length ? video.category : "All Videos"} · <TimeAgo date={video.updated} />
+                {videoCategory} · <TimeAgo date={video.updated} />
               </h6>
             </VideoNameWrapper>
           </VideoDetailsContainer>

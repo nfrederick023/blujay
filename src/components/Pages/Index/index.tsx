@@ -8,7 +8,7 @@ const IndexPage: FC = () => {
   const favoritedVideos = videos.filter((video) => video.isFavorite);
 
   return (
-    <KeepAlive>
+    <>
       <VideoSlider
         videos={videos}
         sliderType={"horizontal"}
@@ -23,7 +23,7 @@ const IndexPage: FC = () => {
         onlyFavorites
       />
       <VideoSlider videos={videos} sliderType={"verticle"} headerText={"All Videos"} intialSort={"Alphabetical"} />
-    </KeepAlive>
+    </>
   );
 };
 

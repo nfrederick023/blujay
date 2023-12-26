@@ -34,7 +34,7 @@ export const uploadVideo = async (file: File, onProgress: (progress: number) => 
   });
 };
 
-export const updateVideo = async (video: Video): Promise<Response> => {
+export const updateVideoAPI = async (video: Video): Promise<Response> => {
   const response = await fetch("/api/video", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },

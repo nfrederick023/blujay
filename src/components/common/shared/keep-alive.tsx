@@ -9,7 +9,11 @@ const KeepAlive: FC<KeepAliveProps> = ({ children }) => {
   const [keepAliveChildren, setKeepAliveChildren] = useState(<>{children}</>);
 
   useEffect(() => {
-    setKeepAliveChildren(<_KeepAlive saveScrollPosition="screen">{children}</_KeepAlive>);
+    setKeepAliveChildren(
+      <_KeepAlive saveScrollPosition="screen" cacheKey="UNIQUE_ID">
+        {children}
+      </_KeepAlive>
+    );
   }, []);
 
   return <>{keepAliveChildren}</>;

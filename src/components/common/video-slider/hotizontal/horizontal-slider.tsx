@@ -1,5 +1,6 @@
 import "react-indiana-drag-scroll/dist/style.css";
 import { OrderType, SortType, Video } from "@client/utils/types";
+import { screenSizes } from "@client/utils/constants";
 import { useRouter } from "next/router";
 import HorizontalSliderHeader from "./horizontal-header";
 import React, { FC, useEffect, useRef, useState } from "react";
@@ -29,6 +30,10 @@ const CarouselOverlay = styled.div`
   cursor: pointer;
   pointer-events: auto;
   visibility: hidden;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    display: none;
+  }
 `;
 
 const CarouselOverlayRight = styled(CarouselOverlay)`
@@ -74,22 +79,21 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
 }) => {
   const [isEnd, setIsEnd] = useState(false);
   const [isStart, setIsStart] = useState(true);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [videosDisplayed, setVideosDisplayed] = useState(36); // 36 is arbitrary
-  const [scroll, setScroll] = useState(0);
+  const [scrollMax, setScrollMax] = useState(false);
+  const [videosDisplayed, setVideosDisplayed] = useState(Math.min(videos.length, 36)); // 36 is arbitrary
   const draggingEl = useRef<HTMLElement>(null);
-
-  const router = useRouter();
-
-  if (!draggingEl.current?.scrollWidth) {
-    draggingEl.current?.scrollTo(scroll, 0);
-  }
 
   const incrementVideo = async (): Promise<void> => {
     if (draggingEl && draggingEl.current) {
       // 15 is the missing margin on the last displayed video
       const videoWidth = (draggingEl.current.scrollWidth + 15) / videosDisplayed;
-      await gracefullyScroll(40, draggingEl.current.scrollLeft + videoWidth);
+      const scrollLeft = draggingEl.current.scrollLeft;
+      const nextValue = Math.ceil(scrollLeft / videoWidth) * videoWidth - scrollLeft;
+      if (nextValue > 1) {
+        scrollAmount(Math.ceil(nextValue));
+      } else {
+        scrollAmount(Math.ceil(videoWidth));
+      }
     }
   };
 
@@ -97,82 +101,40 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
     if (draggingEl && draggingEl.current) {
       // 15 is the missing margin on the last displayed video
       const videoWidth = (draggingEl.current.scrollWidth + 15) / videosDisplayed;
-      await gracefullyScroll(-40, draggingEl.current.scrollLeft - videoWidth);
+      const scrollLeft = draggingEl.current.scrollLeft;
+      const nextValue = Math.floor(scrollLeft / videoWidth) * videoWidth - scrollLeft;
+      if (nextValue < -1) {
+        scrollAmount(Math.floor(nextValue));
+      } else {
+        scrollAmount(-Math.ceil(videoWidth));
+      }
     }
   };
 
   const resetScroll = async (): Promise<void> => {
-    if (draggingEl && draggingEl.current) {
-      await gracefullyScroll(-160, 0);
-    }
+    const amount = draggingEl.current?.scrollWidth ?? 0;
+    scrollAmount(-amount);
   };
 
   const maxScroll = async (): Promise<void> => {
-    setVideosDisplayed(videos.length);
-    if (draggingEl && draggingEl.current) {
-      await gracefullyScroll(160, draggingEl.current.scrollWidth - draggingEl.current.clientWidth);
+    setScrollMax(true);
+    if (videosDisplayed === videos.length) {
+      const amount = draggingEl.current?.scrollWidth ?? 0;
+      scrollAmount(amount);
     }
+    setVideosDisplayed(videos.length);
   };
 
-  const gracefullyScroll = async (speed: number, endPosition: number): Promise<void> => {
-    if (draggingEl && draggingEl.current && !isScrolling) {
-      setIsScrolling(true);
-      while (draggingEl.current.scrollLeft !== endPosition) {
-        // validate end position
-        if (endPosition < 0) {
-          draggingEl.current.scrollTo(0, 0);
-          break;
-        }
-
-        // validate end position
-        if (endPosition > draggingEl.current.scrollWidth - draggingEl.current.clientWidth) {
-          draggingEl.current.scrollTo(draggingEl.current.scrollWidth - draggingEl.current.clientWidth, 0);
-          break;
-        }
-
-        // are we increasing or decreasing?
-        if (draggingEl.current.scrollLeft < endPosition) {
-          // if increasing, is the next value greater than the end position?
-          if (draggingEl.current.scrollLeft + speed > endPosition) {
-            draggingEl.current.scrollTo(endPosition, 0);
-            break;
-          }
-        } else {
-          // if decreasing, is the next value less than the end position?
-          if (draggingEl.current.scrollLeft + speed < endPosition) {
-            draggingEl.current.scrollTo(endPosition, 0);
-            break;
-          }
-        }
-
-        draggingEl.current.scrollTo(draggingEl.current.scrollLeft + speed, 0);
-
-        await new Promise((res) => {
-          setTimeout(() => {
-            res("");
-          }, 10);
-        });
-      }
-      setIsScrolling(false);
-      onScroll();
-    }
+  const scrollAmount = (amount: number): void => {
+    draggingEl.current?.scrollBy({ left: amount, top: 0, behavior: "smooth" });
+    onScroll();
   };
 
   const onScroll = (): void => {
     if (draggingEl && draggingEl.current) {
-      if (!isStart && draggingEl.current.scrollLeft === 0) {
-        setIsStart(true);
-      }
-      if (isStart && draggingEl.current.scrollLeft !== 0) {
-        setIsStart(false);
-      }
       const endPosition = draggingEl.current.scrollWidth - draggingEl.current.clientWidth;
-      if (!isEnd && draggingEl.current.scrollLeft === endPosition) {
-        setIsEnd(true);
-      }
-      if (isEnd && draggingEl.current.scrollLeft !== endPosition) {
-        setIsEnd(false);
-      }
+      setIsStart(draggingEl.current.scrollLeft === 0);
+      setIsEnd(draggingEl.current.scrollLeft === endPosition);
     }
   };
 
@@ -186,17 +148,12 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
   };
 
   useEffect(() => {
-    const updateScroll = (): void => {
-      if (draggingEl && draggingEl.current) {
-        setScroll(draggingEl.current.scrollLeft);
-      }
-    };
-    router.events.on("routeChangeStart", updateScroll);
-
-    return () => {
-      router.events.off("routeChangeStart", updateScroll);
-    };
-  }, []);
+    if (scrollMax) {
+      setScrollMax(false);
+      const amount = draggingEl.current?.scrollWidth ?? 0;
+      scrollAmount(amount);
+    }
+  }, [videosDisplayed]);
 
   return (
     <>

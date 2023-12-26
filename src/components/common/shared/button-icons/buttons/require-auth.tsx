@@ -1,19 +1,19 @@
 import { Video } from "@client/utils/types";
-import { updateVideo } from "@client/utils/api";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import ButtonIcon from "../button-icon";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 
 interface RequireAuthButtonProps {
   video: Video;
-  handleResponse: (res: Response, newVideo: Video) => unknown;
   showText: boolean;
 }
 
-const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, handleResponse, showText }) => {
-  const handleSetVisibility = async (): Promise<void> => {
+const RequireAuthButton: FC<RequireAuthButtonProps> = ({ video, showText }) => {
+  const { updateVideo } = useContext(VideoContext);
+
+  const handleSetVisibility = (): void => {
     const newVideo: Video = { ...video, requireAuth: !video.requireAuth };
-    const res = await updateVideo(newVideo);
-    handleResponse(res, newVideo);
+    updateVideo(newVideo);
   };
 
   return (

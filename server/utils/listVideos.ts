@@ -19,28 +19,22 @@ ffmpeg.setFfmpegPath(pathToFfmpeg ?? "");
 export const listVideos = async (): Promise<Video[]> => {
   createVideoListBackup();
 
+  // grab all the videos, move unsupported videos to unsupported folder
   const libraryPath = getLibraryPath();
-  let videoFilePaths = await glob(`${libraryPath}/**/*.*`);
-  let validationFailed = false;
-
-  await Promise.all(videoFilePaths.map(async file => {
+  const videoFilePaths = await Promise.all((await glob(`${libraryPath}/*.*`)).filter(async file => {
     try {
       await validateVideo(file);
+      return file;
     } catch (e: unknown) {
-      validationFailed = true;
       console.warn("File Validation Failed: " + e + ". Marking file as unsupported.");
       markVideoUnsupported(file);
     }
   }));
 
-  if (validationFailed) {
-    videoFilePaths = await glob(`${libraryPath}/**/*.*`);
-  }
-
-
   cleanState(videoFilePaths);
 
   const videoDetails: Video[] = [];
+
   for (const filePath of videoFilePaths) {
     const videoState = await getCreateVideo(filePath);
     if (videoState) {
@@ -121,10 +115,10 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
   const videoStats = fs.statSync(filePath);
   const mimeType = mime.lookup(fileName) as string;
   const videoList = getVideoList();
-  let category = path.dirname(filePath).split("\\").pop() ?? "";
   const extentsion = fileName.split(".").pop() as Extentsions;
   let type: VideoType = "video";
   const views = 0;
+  const categories: string[] = [];
 
   if (imageExtensions.includes(extentsion)) {
     type = "image";
@@ -152,10 +146,9 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
     height = dimensions.height || 0;
   }
 
-  if (category === "library")
-    category = "";
 
-  const id = seedrandom(fileName + category + getUserPassword())().toString().split(".").pop() as string;
+
+  const id = seedrandom(fileName + getUserPassword())().toString().split(".").pop() as string;
   let thumbnailPath = path.join(getThumbnailsPath() + id + ".webp");
 
   // check if the video already is persisted within the state
@@ -165,7 +158,7 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
     thumbnailPath = path.join(getThumbnailsPath() + videoState.id + ".webp");
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.category !== category || videoState.views === undefined || videoState.type !== type || videoState.width !== width || videoState.height !== height) {
+    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.categories === undefined || videoState.views === undefined || videoState.type !== type || videoState.width !== width || videoState.height !== height) {
       const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
       const newVideoState: Video = {
         description: videoState.description,
@@ -181,7 +174,7 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
         fileName,
         filePath,
         thumbnailPath,
-        category,
+        categories,
         views,
         type,
         width,
@@ -208,7 +201,7 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
     requireAuth: false,
     isFavorite: false,
     mimeType,
-    category,
+    categories,
     id,
     views,
     type,

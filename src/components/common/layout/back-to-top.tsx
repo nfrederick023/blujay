@@ -8,7 +8,7 @@ const BackToTopWrapper = styled.div`
       if (p.isProgressBarShown) {
         return "90px";
       } else {
-        return "30px";
+        return "20px";
       }
     }
     return "-40px";
@@ -21,6 +21,7 @@ const BackToTopWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: center; /* Horizontal center alignment */
+  user-select: none;
 `;
 
 const BackToTopButton = styled.div`
@@ -30,14 +31,14 @@ const BackToTopButton = styled.div`
   border-radius: 25px;
   align-items: center;
   justify-content: center; /* Horizontal center alignment */
-  background-color: ${blujayTheme.highlightDark};
+  background-color: ${blujayTheme.highlightLight};
   padding-bottom: 1px;
   select: none;
   cursor: pointer;
   pointer-events: auto;
 
   &:hover {
-    background-color: ${blujayTheme.highlightLight};
+    border: 2px solid ${blujayTheme.text};
   }
 `;
 

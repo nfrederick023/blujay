@@ -54,7 +54,7 @@ export const sortVideos = (videos: Video[], sort?: SortType, order?: OrderType, 
   if (order === "Descending") sortedVideos.reverse();
 
   if (category) {
-    sortedVideos = sortedVideos.filter((video) => video.category.toLowerCase() === category?.toLowerCase());
+    sortedVideos = sortedVideos.filter((video) => video.categories.includes(category));
   }
 
   if (onlyFavorites) {
@@ -68,3 +68,18 @@ export const sortVideos = (videos: Video[], sort?: SortType, order?: OrderType, 
   return sortedVideos;
 };
 
+export const getVideoCategory = (video: Video, primaryCategory: string | undefined): string => {
+  let videoCategory = "All Videos";
+
+  if (primaryCategory) {
+    videoCategory = primaryCategory;
+  } else if (video.categories.length === 1) {
+    videoCategory = video.categories[0];
+
+    if (video.categories.length > 1) {
+      videoCategory = videoCategory + " and " + (video.categories.length - 1) + "More";
+    }
+  }
+
+  return videoCategory;
+};

@@ -1,5 +1,6 @@
 import { Video } from "@client/utils/types";
 import { VideoContext } from "./video-context";
+import { updateVideoAPI } from "@client/utils/api";
 import React, { FC, ReactNode, useState } from "react";
 export interface VideoProviderProps {
   children: ReactNode;
@@ -7,29 +8,22 @@ export interface VideoProviderProps {
 }
 
 const VideoProvider: FC<VideoProviderProps> = ({ children, intialVideos }) => {
-  const [videos, _setVideos] = useState<Video[]>(intialVideos);
-  const [touched, setTouched] = useState(false);
+  const [videos, setVideos] = useState<Video[]>(intialVideos);
 
-  const setVideos = (newVideos: Video[]): void => {
-    if (!touched) {
-      setTouched(true);
-      _setVideos(newVideos);
-    } else {
-      _setVideos(newVideos);
+  const updateVideo = async (newVideo: Video): Promise<void> => {
+    const res = await updateVideoAPI(newVideo);
+    if (res.ok) {
+      const listClone = [...videos];
+      const videoIndexToUpdate = videos.findIndex((video) => video.id === newVideo.id);
+      if (videoIndexToUpdate !== 1) {
+        const updatedVideo: Video = { ...videos[videoIndexToUpdate], ...updateVideo };
+        listClone[videoIndexToUpdate] = updatedVideo;
+        setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
+      }
     }
   };
 
-  const updateVideo = (newVideo: Video): void => {
-    const listClone = [...videos];
-    const videoIndexToUpdate = videos.findIndex((video) => video.id === newVideo.id);
-    if (videoIndexToUpdate !== 1) {
-      const updatedVideo: Video = { ...videos[videoIndexToUpdate], ...updateVideo };
-      listClone[videoIndexToUpdate] = updatedVideo;
-      setVideos([...videos.filter((video) => video.id !== newVideo.id), newVideo]);
-    }
-  };
-
-  return <VideoContext.Provider value={{ touched, videos, setVideos, updateVideo }}>{children}</VideoContext.Provider>;
+  return <VideoContext.Provider value={{ videos, updateVideo }}>{children}</VideoContext.Provider>;
 };
 
 export default VideoProvider;

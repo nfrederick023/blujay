@@ -60,13 +60,6 @@ const Library = styled.div`
   width: 100%;
 `;
 
-const LogoBackdrop = styled.div`
-  position: fixed;
-  left: 15px;
-  top: 0px;
-  z-index: 3;
-`;
-
 const Sidebar: FC = () => {
   const [cookies] = useCookies(["isTheaterMode", "isSidebarEnabled"]);
   const [selectedPath, setSelctedPath] = useState("");
@@ -78,7 +71,7 @@ const Sidebar: FC = () => {
   const selectedCategory = selectedPath.toLowerCase();
   const selectedPathRef = useRef<string>("");
   selectedPathRef.current = selectedPath;
-  const categories = [...new Set(videos.map((video) => video.category))]
+  const categories = [...new Set(videos.flatMap((video) => video.categories))]
     .filter((category) => category)
     .sort((a, b) => a.localeCompare(b));
 
@@ -112,9 +105,6 @@ const Sidebar: FC = () => {
 
   return (
     <>
-      <LogoBackdrop>
-        <Logo />
-      </LogoBackdrop>
       <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
         <SidebarContent>
           <Logo />

@@ -1,12 +1,14 @@
-import { OrderType, SortType, Video } from "@client/utils/types";
+import { DropDownOption, OrderType, SortType, Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
 import { booleanify } from "@client/utils/cookie";
-import { sortVideos } from "@client/utils/sortVideo";
+import { getVideoCategory, sortVideos } from "@client/utils/sortVideo";
+import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
 import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
 import CopyLinkButton from "@client/components/common/shared/button-icons/buttons/copy-link";
 import DownloadButton from "@client/components/common/shared/button-icons/buttons/download";
+import DropDown from "@client/components/common/shared/drop-down";
 import FavoriteButton from "@client/components/common/shared/button-icons/buttons/favorite";
 import Head from "next/head";
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
@@ -19,6 +21,10 @@ import styled from "styled-components";
 const VideoContainer = styled.div`
   margin: auto;
   max-width: ${(p: { isTheaterMode: boolean }): string => (p.isTheaterMode ? "75%" : "60%")};
+
+  @media (max-width: ${screenSizes.smallScreenSize}px) {
+    max-width: unset;
+  }
 `;
 
 const BlackOverlay = styled.div`
@@ -50,10 +56,6 @@ const VideoWrapper = styled.div`
   line-height: 0;
 `;
 
-const VideoDetails = styled.div`
-  color: ${(p): string => p.theme.textContrastLight};
-`;
-
 const Buttons = styled.span`
   margin-left: auto;
   display: flex;
@@ -61,17 +63,6 @@ const Buttons = styled.span`
   & > * {
     margin-left: 5px;
   }
-`;
-
-const VideoNameContainer = styled.div`
-  margin-top: 5px;
-  display: flex;
-`;
-
-const VideoName = styled.div`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
 `;
 
 const Overlay = styled.div`
@@ -111,6 +102,42 @@ const PeviousVideoButton = styled(ButtonIcon)`
   margin-right: 5px;
 `;
 
+const VideoDetailsWrapper = styled.div`
+  display: flex;
+`;
+
+const VideoDetails = styled.div``;
+
+const VideoMetadata = styled.div`
+  color: ${(p): string => p.theme.textContrastLight};
+`;
+
+const VideoOptions = styled.div`
+  margin-left: auto;
+`;
+
+const VideoName = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`;
+
+const MoreButton = styled.span`
+  cursor: pointer;
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+  }
+`;
+
+const LessButton = styled.span`
+  cursor: pointer;
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+  }
+`;
+
 interface WatchPageProps {
   domain: string;
 }
@@ -118,7 +145,8 @@ interface WatchPageProps {
 const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   const router = useRouter();
   const query = router.query;
-  const { videos, updateVideo } = useContext(VideoContext);
+  const { videos } = useContext(VideoContext);
+  const [isDropDownShown, setIsDropDownShow] = useState(false);
   const [currentVideoID, setCurrentVideoID] = useState(videos.find((_video) => _video.id === query.id)?.id);
   const video = videos.find((_video) => _video.id === currentVideoID);
 
@@ -130,6 +158,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   const [cookies] = useCookies(["videoVolume", "isTheaterMode"]);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
   const isTheaterMode = booleanify(cookies.isTheaterMode);
+  const [showMore, setShowMore] = useState(false);
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
 
   const sort = typeof query.sort === "string" ? (query.sort as SortType) : undefined;
@@ -141,6 +170,14 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   const videoIndex = sortedVideos.findIndex((_video) => _video.id === video.id);
   const nextVideo = sortedVideos[videoIndex + 1];
   const previousVideo = sortedVideos[videoIndex - 1];
+
+  const showMoreDetails = (): void => {
+    setShowMore(true);
+  };
+
+  const showLessDetails = (): void => {
+    setShowMore(false);
+  };
 
   const handleVolumeChange = (): void => {
     //
@@ -156,10 +193,6 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
 
   const setZoomedOut = (): void => {
     setIsZoomedIn(false);
-  };
-
-  const videoResponseUpdate = (res: Response, newVideo: Video): void => {
-    if (res.ok) updateVideo(newVideo);
   };
 
   const goToNextVideo = (): void => {
@@ -213,6 +246,9 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
     };
   }, [video]);
 
+  const options: DropDownOption[] = [{ text: "Settings", icon: "bx bx-log-out", action: (): void => {} }];
+  const videoCategory = getVideoCategory(video, category);
+
   return (
     <>
       <Head>
@@ -259,7 +295,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
       {isZoomedIn ? (
         <>
           <Overlay onClick={setZoomedOut}></Overlay>
-          <OverlayImage onClick={setZoomedOut} src={videoSrc} draggable={false}></OverlayImage>
+          <OverlayImage onClick={setZoomedOut} src={videoSrc + "?isPreview=true"} draggable={false}></OverlayImage>
         </>
       ) : (
         <></>
@@ -291,25 +327,38 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
             <Image ref={ref} src={videoSrc} onClick={setZoomedIn} draggable={false} />
           )}
         </VideoWrapper>
-        <VideoNameContainer>
-          <VideoName>
-            <h4>{video.name}</h4>
-          </VideoName>
-          <Buttons>
-            <FavoriteButton handleResponse={videoResponseUpdate} video={video} />
-            <CopyLinkButton link={url} />
-            <DownloadButton link={fullVideoURL} />
-            <RequireAuthButton handleResponse={videoResponseUpdate} video={video} showText={true} />
-            <TheatreModeButton />
-            <VideoSettingsButton />
-          </Buttons>
-        </VideoNameContainer>
-        <VideoDetails>
-          <h6>
-            {video.category ? <>{video.category} ·</> : <></>} <TimeAgo date={video.updated} /> · {video.views} views
-          </h6>
-        </VideoDetails>
-        {video.description && <div className="content">{video.description}</div>}
+        <VideoDetailsWrapper>
+          <VideoDetails>
+            <VideoMetadata>
+              <h6>
+                {videoCategory} · <TimeAgo date={video.uploaded} /> · {video.views} views{"  "}
+                {!showMore && <MoreButton onClick={showMoreDetails}>...show more</MoreButton>}
+              </h6>
+            </VideoMetadata>
+            {showMore && (
+              <VideoMetadata>
+                <h6>
+                  Filename: {video.fileName} <br />
+                  Dimensions: {video.width} x {video.height} <br />
+                  Uploaded: {new Date(video.uploaded).toDateString()} <br />
+                  Update: {new Date(video.updated).toDateString()} <br />
+                  {showMore && <LessButton onClick={showLessDetails}>...show less</LessButton>}
+                </h6>
+              </VideoMetadata>
+            )}
+          </VideoDetails>
+          {/* <VideoOptions>
+            <Buttons>
+              <FavoriteButton video={video} />
+              <CopyLinkButton link={url} />
+              <DownloadButton link={fullVideoURL} />
+              <RequireAuthButton video={video} showText={true} />
+              <TheatreModeButton />
+              <VideoSettingsButton />
+            </Buttons>
+          </VideoOptions> */}
+          <DropDown options={options} isShown={isDropDownShown} setIsShown={setIsDropDownShow} />
+        </VideoDetailsWrapper>
       </VideoContainer>
     </>
   );

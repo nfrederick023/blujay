@@ -21,7 +21,7 @@ export interface Video {
   readonly updated: number,
   readonly filePath: string,
   readonly thumbnailPath: string,
-  readonly category: string,
+  readonly categories: string[],
   readonly description: string,
   readonly requireAuth: boolean,
   readonly isFavorite: boolean,
@@ -57,6 +57,13 @@ export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
 
+export interface DropDownOption {
+  text: string;
+  icon?: string;
+  action: (e: React.MouseEvent) => void;
+}
+
+export type KeepAliveComponenet = (props?: unknown) => JSX.Element;
 export type Extentsions = typeof fileExtensions[number];
 export type CookieTypes = typeof cookieOptions[number]
 export type SortType = typeof sortOptions[number];

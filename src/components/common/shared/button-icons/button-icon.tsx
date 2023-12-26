@@ -1,4 +1,5 @@
 import { BluJayTheme } from "@client/utils/types";
+import { screenSizes } from "@client/utils/constants";
 import React, { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -84,6 +85,10 @@ const Box = styled.div`
   background: ${(p): string => p.theme.button};
   padding: 10px;
   border-radius: 8px;
+
+  @media (max-width: ${screenSizes.mobileScreenSize}px) {
+    display: none;
+  }
 `;
 
 const SelectedBox = styled(Box)`
@@ -182,7 +187,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   if (!isSelected && hoverTextOff) hoverText = hoverTextOff;
   if (!isSelected && textOff) _text = textOff;
 
-  const maxLength = Math.max(textOn?.length || 0, textOff?.length || 0) - 1;
+  const maxLength = Math.max(textOn?.length || 0, textOff?.length || 0);
 
   useEffect((): void => {
     setIsOffscreen(isElOffscreen());
@@ -197,6 +202,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
         onMouseLeave={handleMouseLeave}
         className={className}
         disabled={!!disabled}
+        tabIndex={0}
       >
         <>
           {_text ? (

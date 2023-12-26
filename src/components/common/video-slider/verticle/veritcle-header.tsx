@@ -57,7 +57,7 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
             onIcon="bx bx-sort-up"
             offIcon="bx bx-sort-down"
           />
-          <Select options={[...sortOptions]} onChange={handleSortChange} value={[sort + " " + order]} />
+          <Select options={[...sortOptions]} onChange={handleSortChange} value={[sort]} postFix={" " + order} />
         </SortSelect>
         <TypeSelect>
           <Select options={viewOptions} onChange={handleViewChange} value={[view]} />
