@@ -1,9 +1,8 @@
 import { Video } from "@client/utils/types";
-import { VideoContext } from "../../contexts/video-context";
 import CopyLinkButton from "../../shared/button-icons/buttons/copy-link";
 import DownloadButton from "../../shared/button-icons/buttons/download";
 import FavoriteButton from "../../shared/button-icons/buttons/favorite";
-import React, { FC, useContext, useState } from "react";
+import React, { FC, useState } from "react";
 import RequireAuthButton from "../../shared/button-icons/buttons/require-auth";
 import TimeAgo from "react-timeago";
 import VideoSearch from "./video-search";

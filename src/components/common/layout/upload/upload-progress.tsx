@@ -33,6 +33,10 @@ const UploadProgress: FC<UploadProgressProps> = ({
   };
 
   const upload = async (files: FileList): Promise<void> => {
+    if (uploadedFiles.length < 1 && !isProgressBarShown) {
+      setIsProgressBarShown(true);
+    }
+
     // do a simple client side file type check
     for (const file of files) {
       const ext = file.name.split(".").pop();

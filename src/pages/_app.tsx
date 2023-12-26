@@ -52,14 +52,6 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${(p): string => p.theme.textContrast};
   }
 
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    &::-webkit-scrollbar
-      {
-        width: 0px;
-        background-color: transparent;
-      }
-  }
-
   a:hover, a:visited, a:link, a:active
   {
       text-decoration: none; color: unset;

@@ -23,7 +23,7 @@ const SearchBarContent = styled.div`
 
   @media (max-width: ${screenSizes.smallScreenSize}px) {
     margin-left: 70px;
-    margin-right: 115px;
+    margin-right: 60px;
     max-width: 100%;
   }
 

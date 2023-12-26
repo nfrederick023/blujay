@@ -10,13 +10,17 @@ import router from "next/router";
 import styled from "styled-components";
 
 const HeaderWrapper = styled.div`
-  background-color: ${(p): string => p.theme.background};
+  background-color: ${(p: { theme: BluJayTheme; scroll: number }): string => p.theme.background};
   height: 60px;
   justify-content: center;
   display: flex;
   position: sticky;
   top: 0px;
   z-index: 2;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    top: -${(p): number => p.scroll}px;
+  }
 `;
 
 const CogDropDown = styled.div`
@@ -62,6 +66,10 @@ const LogoBackdrop = styled.div`
   left: 15px;
   top: 0px;
   z-index: 3;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    top: -${(p: { scroll: number }): number => p.scroll}px;
+  }
 `;
 
 interface HeaderProps {
@@ -73,6 +81,8 @@ interface HeaderProps {
 const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
   const [isDropDownShown, setIsDropDownShow] = useState(false);
   const [cookies, setCookie] = useCookies(["authToken"]);
+  const [previousScrollPosition, setPrevious] = useState(0);
+  const [scrollPos, setScrollPos] = useState(0);
   const inputFileRef = useRef<HTMLInputElement>(null);
 
   const handleClick = (): void => {
@@ -110,42 +120,35 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
   if (cookies.authToken) options.push({ text: "Logout", icon: "bx bx-log-out", action: handleLogout });
   else options.push({ text: "Login", icon: "bx bx-log-in", action: navigateToLogin });
 
-  const [scrollPos, setScrollPos] = useState(0);
-  const scrollPosRef = useRef(scrollPos);
-  scrollPosRef.current = scrollPos;
-  console.log(scrollPosRef.current);
-
   useEffect(() => {
-    const headerSize = -60;
-    let previousScrollPosition = 0;
-    let currentScrollPosition = 0;
-
     const getHeaderScroll = (): void => {
-      currentScrollPosition = window.scrollY;
-      const scrollAmount = currentScrollPosition - previousScrollPosition;
-      const newScrollPos = scrollPosRef.current + scrollAmount;
-      previousScrollPosition = currentScrollPosition;
+      const headerSize = 60;
 
-      if (newScrollPos < headerSize) {
+      const scrollAmount = window.scrollY - previousScrollPosition;
+      const newScrollPos = scrollPos + scrollAmount;
+
+      if (newScrollPos > headerSize) {
         setScrollPos(headerSize);
-      } else if (newScrollPos > 0) {
+      } else if (newScrollPos < 0) {
         setScrollPos(0);
       } else {
         setScrollPos(newScrollPos);
       }
+
+      setPrevious(window.scrollY);
     };
-
     window.addEventListener("scroll", getHeaderScroll, { passive: true });
-
     return () => {
       window.removeEventListener("scroll", getHeaderScroll);
     };
   });
 
+  console.log(scrollPos);
+
   return (
-    <HeaderWrapper>
+    <HeaderWrapper scroll={scrollPos}>
       <FileUploadInput type="file" id="click-file-upload" onChange={uploadFiles} multiple ref={inputFileRef} />
-      <LogoBackdrop>
+      <LogoBackdrop scroll={scrollPos}>
         <Logo />
       </LogoBackdrop>
       <SearchBar search={search} setSearch={setSearch} />

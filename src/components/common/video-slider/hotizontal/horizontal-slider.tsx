@@ -1,7 +1,6 @@
 import "react-indiana-drag-scroll/dist/style.css";
 import { OrderType, SortType, Video } from "@client/utils/types";
 import { screenSizes } from "@client/utils/constants";
-import { useRouter } from "next/router";
 import HorizontalSliderHeader from "./horizontal-header";
 import React, { FC, useEffect, useRef, useState } from "react";
 import ScrollContainer from "react-indiana-drag-scroll";
