@@ -1,47 +1,7 @@
 import { BluJayTheme, FileUpload } from "@client/utils/types";
+import Popup from "../../shared/popup";
 import React, { FC, useState } from "react";
 import styled from "styled-components";
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 5;
-  cursor: pointer;
-`;
-
-const PopupWrapper = styled.div`
-  z-index: 6;
-  position: fixed;
-  display: flex;
-  width: fill-available;
-  height: fill-available;
-  pointer-events: none;
-`;
-
-const PopupBox = styled.div`
-  pointer-events: auto;
-  margin: auto;
-  flex-wrap: wrap;
-  align-content: baseline;
-  width: 800px;
-  height: 510px;
-  background-color: ${(p): string => p.theme.backgroundContrast};
-  border-radius: 10px;
-  padding: 20px;
-  &::-webkit-scrollbar {
-    width: 1px;
-    background-color: rgba(0, 0, 0, 0);
-  }
-`;
-
-const CloseWrapper = styled.div`
-  width: 100%;
-  display: flex;
-`;
 
 const Header = styled.div`
   width: 100%;
@@ -50,6 +10,11 @@ const Header = styled.div`
   margin-bottom: 8px;
   padding-bottom: 8px;
   padding-right: 15px;
+`;
+
+const PopupContent = styled.div`
+  height: 510px;
+  width: 800px;
 `;
 
 const ItemWrapper = styled.div`
@@ -97,22 +62,6 @@ const ErrorWrapper = styled.div`
   text-overflow: ellipsis;
 `;
 
-const Icon = styled.i`
-  color: ${(p): string => p.theme.textContrast};
-  font-size: 28px;
-  margin-left: auto;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-    cursor: pointer;
-  }
-
-  &:before {
-    position: relative;
-    right: 7px;
-  }
-`;
-
 interface UploadProgressPopupProps {
   uploadedFiles: FileUpload[];
   closePopup: () => void;
@@ -143,44 +92,38 @@ const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, clos
     };
 
   return (
-    <>
-      <Overlay onClick={closePopup} />
-      <PopupWrapper>
-        <PopupBox>
-          <CloseWrapper>
-            <Icon onClick={closePopup} className="bx bx-x" />
-          </CloseWrapper>
-          <Header>
-            <Filename>
-              <h5>Filename</h5>
-            </Filename>
-            <Status>
-              <h5>Status</h5>
-            </Status>
-            <Progress>
-              <h5>Progress</h5>
-            </Progress>
-          </Header>
-          <ItemWrapper>
-            {uploadedFiles.map((file, i) => (
-              <Item
-                key={i}
-                onMouseOver={setItemOnHover(file)}
-                onMouseOut={removeItemOnHover}
-                onClick={showFullErrorMessage(file)}
-              >
-                <Filename>{file.filename}</Filename>
-                <Status hasFailed={file.uploadStatus === "FAILED"}>{file.uploadStatus}</Status>
-                <Progress>{formatPercentage(file)}</Progress>
-              </Item>
-            ))}
-          </ItemWrapper>
-          <ErrorWrapper>
-            {hoveredItem && hoveredItem.uploadStatus === "FAILED" ? <>Error: {`"${hoveredItem.error}"`}</> : <></>}
-          </ErrorWrapper>
-        </PopupBox>
-      </PopupWrapper>
-    </>
+    <Popup closePopup={closePopup}>
+      <PopupContent>
+        <Header>
+          <Filename>
+            <h5>Filename</h5>
+          </Filename>
+          <Status>
+            <h5>Status</h5>
+          </Status>
+          <Progress>
+            <h5>Progress</h5>
+          </Progress>
+        </Header>
+        <ItemWrapper>
+          {uploadedFiles.map((file, i) => (
+            <Item
+              key={i}
+              onMouseOver={setItemOnHover(file)}
+              onMouseOut={removeItemOnHover}
+              onClick={showFullErrorMessage(file)}
+            >
+              <Filename>{file.filename}</Filename>
+              <Status hasFailed={file.uploadStatus === "FAILED"}>{file.uploadStatus}</Status>
+              <Progress>{formatPercentage(file)}</Progress>
+            </Item>
+          ))}
+        </ItemWrapper>
+        <ErrorWrapper>
+          {hoveredItem && hoveredItem.uploadStatus === "FAILED" ? <>Error: {`"${hoveredItem.error}"`}</> : <></>}
+        </ErrorWrapper>
+      </PopupContent>
+    </Popup>
   );
 };
 

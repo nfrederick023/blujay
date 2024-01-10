@@ -1,11 +1,19 @@
+import { DeleteVideo, RenameFile, UpdateVideo } from "./video.dto";
 import { OrderType, QueryField, SortType, Video } from "@client/utils/types";
-import { UpdateVideo } from "./video.dto";
 import { UpdateVideoFailedException, VideoNotFoundException } from "./video.exceptions";
+import { deleteVideo as fsDeleteVideo, renameVideoFile as fsRenameVideoFile } from "@server/utils/config";
+import { generateVideoID, getVideoThumbnailPath, listVideos } from "@server/utils/listVideos";
 import { getVideoList, moveVideoToLibrary, setVideoList } from "@server/utils/config";
-import { listVideos } from "@server/utils/listVideos";
 import { sortVideos } from "@client/utils/sortVideo";
 import { validateVideo } from "@server/utils/validateVideo";
+import path from "path";
 
+
+export const getVideos = async (page: number, size: number, sort: SortType, order: OrderType, query: string, queryField: QueryField[]): Promise<Video[]> => {
+  const videoList = getVideoList();
+  const sortedVideoList = sortVideos(videoList, sort, order);
+  return sortedVideoList.slice(page * size, page * size + size);
+};
 
 export const validateFiles = async (filePath: string): Promise<void> => {
   await validateVideo(filePath);
@@ -13,7 +21,7 @@ export const validateFiles = async (filePath: string): Promise<void> => {
   await listVideos();
 };
 
-export const updateVideo = async (updateVideo: UpdateVideo): Promise<void> => {
+export const updateVideo = (updateVideo: UpdateVideo): void => {
   const videoList = getVideoList();
   const videoIndexToUpdate = videoList.findIndex(video => video.id === updateVideo.id);
 
@@ -31,8 +39,34 @@ export const updateVideo = async (updateVideo: UpdateVideo): Promise<void> => {
   }
 };
 
-export const getVideos = async (page: number, size: number, sort: SortType, order: OrderType, query: string, queryField: QueryField[]): Promise<Video[]> => {
+export const deletevideo = (deleteVideo: DeleteVideo): void => {
   const videoList = getVideoList();
-  const sortedVideoList = sortVideos(videoList, sort, order);
-  return sortedVideoList.slice(page * size, page * size + size);
+  const videoToDelete = videoList.find(video => video.id === deleteVideo.id);
+
+  if (!videoToDelete) {
+    throw new VideoNotFoundException();
+  }
+
+  fsDeleteVideo(videoToDelete.filePath);
+};
+
+export const renameFile = async (renameFile: RenameFile): Promise<Video> => {
+  const videoList = getVideoList();
+  const videoToRename = videoList.find(video => video.id === renameFile.id);
+
+  if (!videoToRename) {
+    throw new VideoNotFoundException();
+  }
+
+
+  const oldFilePath = videoToRename.filePath;
+  const newFilePath = path.dirname(oldFilePath) + "\\" + renameFile.newName + "." + videoToRename.extentsion;
+  fsRenameVideoFile(oldFilePath, newFilePath);
+  const id = generateVideoID(renameFile.newName);
+  const thumbnailPath = getVideoThumbnailPath(id);
+  const newVideo: Video = { ...videoToRename, filename: renameFile.newName, id, filePath: newFilePath, thumbnailPath };
+  const filteredVideoList: Video[] = [...videoList.filter(video => video.id !== renameFile.id), newVideo];
+  setVideoList(filteredVideoList);
+  await listVideos();
+  return newVideo;
 };

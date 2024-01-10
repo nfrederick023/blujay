@@ -1,8 +1,8 @@
-import { Body, Get, Param, Post, Put, Req, Res, ValidationPipe, createHandler } from "next-api-decorators";
-import { UpdateVideo } from "./video.dto";
+import { Body, Delete, Get, Param, Patch, Post, Put, Req, Res, ValidationPipe, createHandler } from "next-api-decorators";
+import { DeleteVideo, RenameFile, UpdateVideo } from "./video.dto";
 import { UploadFailedException } from "./video.exceptions";
 import { deleteVideo, getLibraryPath, getTempPath, getVideo, moveVideoToLibrary } from "@server/utils/config";
-import { getVideos, updateVideo } from "./video.service";
+import { deletevideo, getVideos, renameFile, updateVideo } from "./video.service";
 import { listVideos } from "@server/utils/listVideos";
 import { validateVideo } from "@server/utils/validateVideo";
 import multer, { diskStorage } from "multer";
@@ -11,6 +11,19 @@ import type { OrderType, QueryField, SortType, Video } from "@client/utils/types
 import type { Request, Response } from "express";
 
 class VideoController {
+
+  // mostly unused framework for video pagination, would be a nightmare to implement app wide right now
+  @Get()
+  public async GetVideos(
+    @Param("page") page?: number,
+    @Param("size") size?: number,
+    @Param("sort") sort?: SortType,
+    @Param("order") order?: OrderType,
+    @Param("query") query?: string,
+    @Param("queryField") queryField?: QueryField[]
+  ): Promise<Video[]> {
+    return await getVideos(page || 0, size || 5, sort || "Alphabetical", order || "Ascending", query || "", queryField || []);
+  }
 
   @Post()
   public async UploadVideo(@Req() req: Request, @Res() res: Response): Promise<void> {
@@ -71,21 +84,19 @@ class VideoController {
     }
   }
 
-  @Put()
-  public async UpdateVideo(@Body(ValidationPipe) req: UpdateVideo): Promise<void> {
-    await updateVideo(req);
+  @Delete()
+  public async DeleteVideo(@Body(ValidationPipe) req: DeleteVideo): Promise<void> {
+    deletevideo(req);
   }
 
-  @Get()
-  public async getVideoList(
-    @Param("page") page?: number,
-    @Param("size") size?: number,
-    @Param("sort") sort?: SortType,
-    @Param("order") order?: OrderType,
-    @Param("query") query?: string,
-    @Param("queryField") queryField?: QueryField[]
-  ): Promise<Video[]> {
-    return await getVideos(page || 0, size || 5, sort || "Alphabetical", order || "Ascending", query || "", queryField || []);
+  @Put()
+  public UpdateVideo(@Body(ValidationPipe) req: UpdateVideo): void {
+    updateVideo(req);
+  }
+
+  @Patch()
+  public async RenameFile(@Body(ValidationPipe) req: RenameFile): Promise<Video> {
+    return await renameFile(req);
   }
 }
 

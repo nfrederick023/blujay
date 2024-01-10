@@ -14,7 +14,7 @@ export interface BluJayTheme {
 }
 
 export interface Video {
-  readonly fileName: string,
+  readonly filename: string,
   readonly name: string,
   readonly size: number,
   readonly uploaded: number,
@@ -57,9 +57,12 @@ export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
 
+export type DropDownColor = "red" | "default";
+
 export interface DropDownOption {
   text: string;
   icon?: string;
+  color?: DropDownColor;
   action: (e: React.MouseEvent) => void;
 }
 

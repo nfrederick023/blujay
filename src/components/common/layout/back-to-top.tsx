@@ -51,8 +51,9 @@ const BackToTop: FC<BackToTopProps> = ({ isProgressBarShown }) => {
   const scrolledDown = useRef(false);
   scrolledDown.current = isScrolledDown;
 
-  const scrollToTop = (): void => {
-    window.scrollTo(0, 0);
+  const scrollToTop = (e: React.MouseEvent): void => {
+    e.preventDefault();
+    window.scrollBy({ left: 0, top: -window.scrollY, behavior: "smooth" });
   };
 
   const onScroll = (): void => {

@@ -46,7 +46,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
         updateVideo({ id: video.id, views: video.views + 1 });
       }
     } else {
-      const mimeType = mime.lookup(video.fileName) || "";
+      const mimeType = mime.lookup(video.extentsion) || "";
       // "Content-disposition": `attachment; filename=${video.fileName}`
       res.writeHead(200, { "Content-Type": mimeType });
       fs.createReadStream(video.filePath).pipe(res);

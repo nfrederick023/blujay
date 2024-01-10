@@ -6,6 +6,7 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import ScrollContainer from "react-indiana-drag-scroll";
 import VideoDetails from "../details";
 import styled from "styled-components";
+
 const CarouselWrapper = styled.div`
   width: 100%;
   container-type: inline-size;

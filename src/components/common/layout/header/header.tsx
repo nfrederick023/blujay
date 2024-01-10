@@ -19,42 +19,55 @@ const HeaderWrapper = styled.div`
   z-index: 2;
   transition: 250ms;
 
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+  /* @media (max-width: ${screenSizes.tabletScreenSize}px) {
     top: ${(p: { scrolledDown: boolean }): string => (p.scrolledDown ? "-60px" : "0px")};
-  }
-`;
-
-const CogDropDown = styled.div`
-  position: absolute;
-  width: 250px;
-  margin-right: 170px;
-  right: -150px;
-  top: 20px;
+  } */
 `;
 
 const IconContainer = styled.div`
-  position: fixed;
+  position: absolute;
+  right: 20px;
   display: flex;
   height: 58px;
-  left: calc(100vw - 20px);
-  transform: translate(-100%, 0);
-  cursor: pointer;
+  user-select: none;
 
-  @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    display: none;
+  @media (max-width: ${screenSizes.mobileScreenSize}px) {
+    right: 10px;
   }
 `;
 
+const CogWrapper = styled.div`
+  display: flex;
+`;
+
 const CogIcon = styled.i`
-  margin: auto 0px auto 15px;
+  margin: auto;
   color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
     p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
   pointer-events: ${(p): string => (p.isFocused ? "none" : "auto")};
   font-size: 32px;
   padding-bottom: 1px;
+  cursor: pointer;
 
   &:hover {
     color: ${(p): string => p.theme.text};
+  }
+`;
+
+const SearchIcon = styled.i`
+  margin: auto 15px auto 10px;
+  color: ${(p): string => p.theme.textContrast};
+  font-size: 32px;
+  padding-bottom: 1px;
+  display: none;
+  cursor: pointer;
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+  }
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    display: unset;
   }
 `;
 
@@ -140,17 +153,25 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
       </LogoBackdrop>
       <SearchBar search={search} setSearch={setSearch} />
       <IconContainer>
-        <CogIcon
-          isFocused={isDropDownShown}
-          onClick={handleClick}
-          className="bx bxs-user-circle"
-          draggable={false}
-          tabIndex={0}
-        />
+        <SearchIcon className="bx bx-search" draggable={false} tabIndex={0} />
+        <CogWrapper>
+          <CogIcon
+            isFocused={isDropDownShown}
+            onClick={handleClick}
+            className="bx bxs-user-circle"
+            draggable={false}
+            tabIndex={0}
+          />
+          <DropDown
+            options={options}
+            isShown={isDropDownShown}
+            setIsShown={setIsDropDownShow}
+            top={50}
+            left={32}
+            relativePosition="left"
+          />
+        </CogWrapper>
       </IconContainer>
-      <CogDropDown>
-        <DropDown options={options} isShown={isDropDownShown} setIsShown={setIsDropDownShow} />
-      </CogDropDown>
     </HeaderWrapper>
   );
 };

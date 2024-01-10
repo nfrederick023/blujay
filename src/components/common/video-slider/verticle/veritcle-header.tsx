@@ -9,8 +9,8 @@ import styled from "styled-components";
 const SortSelect = styled.div`
   margin-right: 15px;
   display: flex;
-  width: 290px;
-  min-width: 290px;
+  width: 190px;
+  min-width: 190px;
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     margin-top: 10px;
   }
@@ -57,7 +57,7 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
             onIcon="bx bx-sort-up"
             offIcon="bx bx-sort-down"
           />
-          <Select options={[...sortOptions]} onChange={handleSortChange} value={[sort]} postFix={" " + order} />
+          <Select options={[...sortOptions]} onChange={handleSortChange} value={[sort]} />
         </SortSelect>
         <TypeSelect>
           <Select options={viewOptions} onChange={handleViewChange} value={[view]} />

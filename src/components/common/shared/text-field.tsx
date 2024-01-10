@@ -1,9 +1,10 @@
 import { BluJayTheme } from "@client/utils/types";
-import React, { FC, KeyboardEvent, useRef, useState } from "react";
+import React, { FC, KeyboardEvent, ReactNode, useRef, useState } from "react";
 import styled from "styled-components";
 
 const TextFieldContent = styled.div`
   border: 1px solid ${(p): string => p.theme.textContrast};
+  background-color: ${(p): string => p.theme.background};
   border-radius: 5px;
   color: ${(p): string => p.theme.textContrast};
   display: flex;
@@ -35,26 +36,19 @@ const TextFieldInput = styled.input`
   }
 `;
 
-interface TextFieldProps {
-  onChange: (text: string) => void;
+interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onEnter?: () => void;
-  value: string;
-  placeholder: string;
-  inputType: "search" | "password" | "text";
   prefix?: string;
-  toggleIcon?: JSX.Element;
+  toggleIcon?: ReactNode;
+  innerRef?: React.RefObject<HTMLInputElement>;
 }
 
-const TextField: FC<TextFieldProps> = ({ onChange, onEnter, value, placeholder, prefix, inputType, toggleIcon }) => {
+const TextField: FC<TextFieldProps> = ({ prefix, toggleIcon, onEnter, innerRef, ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const input = useRef<HTMLInputElement>(null);
+  const input = innerRef ?? useRef<HTMLInputElement>(null);
 
   const handleClick = (): void => {
     input.current?.focus();
-  };
-
-  const handleInput = (e: React.FormEvent<HTMLInputElement>): void => {
-    onChange(e.currentTarget.value);
   };
 
   const onFocus = (): void => {
@@ -74,15 +68,8 @@ const TextField: FC<TextFieldProps> = ({ onChange, onEnter, value, placeholder, 
   return (
     <TextFieldContent onClick={handleClick} tabIndex={0} onFocus={onFocus} onBlur={onBlur} isFocused={isFocused}>
       {prefix}
-      <TextFieldInput
-        ref={input}
-        onChange={handleInput}
-        onKeyUp={handleKeyUp}
-        placeholder={placeholder}
-        value={value}
-        type={inputType}
-      />
-      <>{toggleIcon ? toggleIcon : {}}</>
+      <TextFieldInput ref={input} onKeyUp={handleKeyUp} {...props} />
+      {toggleIcon && toggleIcon}
     </TextFieldContent>
   );
 };

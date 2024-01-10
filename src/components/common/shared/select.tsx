@@ -14,7 +14,7 @@ const PointerWrapper = styled.div`
 `;
 
 const SelectBox = styled.div`
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.textContrast};
+  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.text};
   display: flex;
   user-select: none;
 
@@ -152,7 +152,7 @@ const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, default
           </RightIcons>
         </SelectBox>
       </PointerWrapper>
-      <DropDown isShown={isOpen} setIsShown={setIsOpen} options={unselectedOptions} />
+      <DropDown isShown={isOpen} setIsShown={setIsOpen} options={unselectedOptions} left={-10} top={10} />
     </SelectBoxWrapper>
   );
 };

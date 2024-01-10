@@ -98,6 +98,12 @@ export const deleteVideo = (path: string): void => {
   }
 };
 
+export const renameVideoFile = (path: string, newName: string): void => {
+  if (fs.existsSync(path)) {
+    fs.renameSync(path, newName);
+  }
+};
+
 export const getVideo = (path: string): Buffer | undefined => {
   if (fs.existsSync(path)) {
     return fs.readFileSync(path);

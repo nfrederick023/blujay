@@ -48,16 +48,12 @@ const Checkbox = styled.input`
 `;
 
 const CheckboxLabel = styled.label`
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p): string => p.theme.text};
   user-select: none;
   transtion: 0.2s;
   display: flex;
   margin: auto 0px auto 0px;
-
-  &:hover {
-    cursor: pointer;
-    color: ${(p): string => p.theme.text};
-  }
+  cursor: pointer;
 `;
 
 const FlexBox = styled.div`
@@ -86,8 +82,8 @@ const LoginPage: FC = () => {
     setIsRememberMe(!isRememberMe);
   };
 
-  const onPasswordChange = (password: string): void => {
-    setPassword(password);
+  const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setPassword(e.currentTarget.value);
   };
 
   const onIsPasswordShownChange = (e: MouseEvent): void => {
@@ -121,7 +117,7 @@ const LoginPage: FC = () => {
           value={password}
           onChange={onPasswordChange}
           placeholder="Password"
-          inputType={isPasswordShown ? "text" : "password"}
+          type={isPasswordShown ? "text" : "password"}
           onEnter={handleLogin}
           toggleIcon={
             <ToggleIcon

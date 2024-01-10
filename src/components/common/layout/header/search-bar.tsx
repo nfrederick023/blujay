@@ -22,14 +22,13 @@ const SearchBarContent = styled.div`
   }
 
   @media (max-width: ${screenSizes.smallScreenSize}px) {
-    margin-left: 70px;
-    margin-right: 60px;
+    margin-left: 215px;
+    margin-right: 70px;
     max-width: 100%;
   }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
-    margin-left: 70px;
-    margin-right: 20px;
+    display: none;
   }
 `;
 

@@ -28,9 +28,10 @@ const ProgressBarContent = styled.div`
 `;
 
 const IncompleteProgress = styled.div`
-  margin-top: 15px;
+  margin: 15px auto 0px auto;
   background-color: ${(p): string => p.theme.textContrast};
   width: 100%;
+  max-width: 90vw;
   border-radius: 30px;
   height: 4px;
 `;

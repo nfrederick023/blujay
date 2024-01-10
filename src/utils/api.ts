@@ -18,8 +18,8 @@ export const uploadVideo = async (file: File, onProgress: (progress: number) => 
             }
           }
 
-          // chrome returns no reponse on abort, the most likely reason for abort is becuase file already exists
-          // on firefox it works as expected
+          // chrome returns no reponse on abort for whatever reasion, the most likely reason for abort is
+          // becuase file already exists, so suggest that. Otherwise, on firefox it works as expected
           reject("Failed to Upload File: Does file already exist?");
         }
       }
@@ -34,11 +34,30 @@ export const uploadVideo = async (file: File, onProgress: (progress: number) => 
   });
 };
 
+export const renameFileAPI = async (id: string, newName: string): Promise<Response> => {
+  const response = await fetch("/api/video", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, newName }),
+  });
+  return response;
+};
+
+
 export const updateVideoAPI = async (video: Video): Promise<Response> => {
   const response = await fetch("/api/video", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(video),
+  });
+  return response;
+};
+
+export const deleteVideoAPI = async (id: string): Promise<Response> => {
+  const response = await fetch("/api/video", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
   });
   return response;
 };

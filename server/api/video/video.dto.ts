@@ -22,3 +22,16 @@ export class UpdateVideo {
   @IsNotEmpty()
   id: string;
 }
+
+export class DeleteVideo {
+  @IsNotEmpty()
+  id: string;
+}
+
+export class RenameFile {
+  @IsNotEmpty()
+  id: string;
+
+  @IsNotEmpty()
+  newName: string;
+}

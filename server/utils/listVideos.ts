@@ -102,6 +102,14 @@ const createThumbnails = async (videos: Video[]): Promise<Video[]> => {
   return (newVideoList);
 };
 
+export const generateVideoID = (filename: string): string => {
+  return seedrandom(filename + getUserPassword())().toString().split(".").pop() as string;
+};
+
+export const getVideoThumbnailPath = (id: string): string => {
+  return path.join(getThumbnailsPath() + id + ".webp");
+};
+
 // removes any videos in the videoList that are not found
 const cleanState = (videoFilePaths: string[]): void => {
   const videoList = getVideoList();
@@ -110,12 +118,13 @@ const cleanState = (videoFilePaths: string[]): void => {
 
 // gets a video from videoList, creates one if not found
 const getCreateVideo = async (filePath: string): Promise<Video | null> => {
-  const fileName = path.basename(filePath);
-  const name = path.parse(fileName).name;
+  const fullFilename = path.basename(filePath);
+  const filename = path.parse(fullFilename).name;
+  const name = path.parse(fullFilename).name;
   const videoStats = fs.statSync(filePath);
-  const mimeType = mime.lookup(fileName) as string;
+  const mimeType = mime.lookup(fullFilename) as string;
   const videoList = getVideoList();
-  const extentsion = fileName.split(".").pop() as Extentsions;
+  const extentsion = fullFilename.split(".").pop() as Extentsions;
   let type: VideoType = "video";
   const views = 0;
   const categories: string[] = [];
@@ -146,20 +155,18 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
     height = dimensions.height || 0;
   }
 
-
-
-  const id = seedrandom(fileName + getUserPassword())().toString().split(".").pop() as string;
-  let thumbnailPath = path.join(getThumbnailsPath() + id + ".webp");
+  const id = generateVideoID(filename);
+  let thumbnailPath = getVideoThumbnailPath(id);
 
   // check if the video already is persisted within the state
-  const videoState = videoList.find((video) => { return video.filePath === filePath; });
+  const videoState = videoList.find((video) => { return video.id === id; });
 
   if (videoState) {
     thumbnailPath = path.join(getThumbnailsPath() + videoState.id + ".webp");
 
     // reindex if any of the following values don't match for whatever reason
-    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.name !== name || videoState.categories === undefined || videoState.views === undefined || videoState.type !== type || videoState.width !== width || videoState.height !== height) {
-      const newVideoList = videoList.filter((video) => { return video.fileName !== fileName; });
+    if (videoState.mimeType !== mimeType || videoState.thumbnailPath !== thumbnailPath || videoState.extentsion !== extentsion || videoState.size !== videoStats.size || videoState.uploaded !== videoStats.mtime.getTime() || videoState.updated !== videoStats.birthtime.getTime() || videoState.filePath !== filePath || videoState.categories === undefined || videoState.views === undefined || videoState.type !== type || videoState.width !== width || videoState.height !== height) {
+      const newVideoList = videoList.filter((video) => { return video.filename !== filename; });
       const newVideoState: Video = {
         description: videoState.description,
         requireAuth: videoState.requireAuth,
@@ -171,7 +178,7 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
         mimeType,
         name,
         extentsion,
-        fileName,
+        filename,
         filePath,
         thumbnailPath,
         categories,
@@ -189,7 +196,7 @@ const getCreateVideo = async (filePath: string): Promise<Video | null> => {
 
   // if not, create the state video and add persist it
   const newVideoState: Video = {
-    fileName,
+    filename,
     name,
     size: videoStats.size,
     uploaded: videoStats.mtime.getTime(),

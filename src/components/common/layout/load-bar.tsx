@@ -21,8 +21,12 @@ const LoadBar: FC = () => {
   const startTansitionTime = loadDurationMS * intialPercentage * 0.01;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const isLoadingRef = useRef(false);
+  isLoadingRef.current = isLoading;
 
+  // don't show the loadbar on itial render
   if (!firstRender.current) {
+    // if loading is complete, fill the bar
     if (!isLoading && ref.current?.getAttribute("style") !== "") {
       ref.current?.setAttribute("style", "transition: 100ms; width: 100%;");
       setTimeout(() => {
@@ -30,11 +34,11 @@ const LoadBar: FC = () => {
       }, endTansitionTime);
     }
 
-    if (isLoading) {
+    if (isLoading && ref.current?.getAttribute("style") === "") {
       ref.current?.setAttribute("style", `transition: ${startTansitionTime}ms; width: ${intialPercentage}%;`);
 
       setTimeout(() => {
-        if (ref.current?.style.width !== "" && ref.current?.style.width !== "100%")
+        if (ref.current?.style.width !== "" && ref.current?.style.width !== "100%" && isLoadingRef.current)
           ref.current?.setAttribute("style", `transition: ${loadDurationMS * 5}ms; width: 90%;`);
       }, startTansitionTime);
     }

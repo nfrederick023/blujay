@@ -83,12 +83,12 @@ const GlobalUploadWrapper: FC<GlobalUploadWrapperProps> = ({ children, setFilesT
     stopDefaults(e);
   };
 
-  const onDrop = async (e: React.DragEvent): Promise<void> => {
+  const onDrop = (e: React.DragEvent): void => {
     stopDefaults(e);
     setIsDragFile(false);
 
     const files = e.dataTransfer.files;
-    await setFilesToUpload(files);
+    setFilesToUpload(files);
   };
 
   return (

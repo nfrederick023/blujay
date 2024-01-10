@@ -1,14 +1,13 @@
-import { AliveScope } from "react-activation";
 import { CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
 import { KeepAliveProvider } from "react-next-keep-alive";
 import { Montserrat } from "next/font/google";
+import { VideoProvider } from "@client/components/common/contexts/video-context";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
 import { useRouter } from "next/router";
 import App, { AppContext, AppInitialProps, AppProps } from "next/app";
 import BackToTop from "@client/components/common/layout/back-to-top";
-import GlobalFileUpload from "@client/components/common/layout/upload/upload-progress";
 import GlobalUploadWrapper from "@client/components/common/layout/upload/gobal-upload-wrapper";
 import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
@@ -17,7 +16,6 @@ import React, { ReactElement, useEffect, useState } from "react";
 import SearchSlider from "@client/components/common/video-slider/search-slider";
 import Sidebar from "@client/components/common/layout/sidebar/side-bar";
 import UploadProgress from "@client/components/common/layout/upload/upload-progress";
-import VideoProvider from "@client/components/common/contexts/video-provider";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
 const montserrat = Montserrat({
@@ -65,7 +63,6 @@ const GlobalStyle = createGlobalStyle`
   html, body {
     margin: 0px;
     font-size: 1.03em;
-
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -85,8 +82,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   h4 {
-    font-size: 1.6em;
-    font-weight: 575;
+    font-size: 22px;
+    font-weight: 600;
   }
 
   h5{

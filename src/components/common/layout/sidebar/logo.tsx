@@ -1,5 +1,4 @@
 import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import Gradient from "../../shared/gradient";
 import Link from "next/link";
@@ -16,17 +15,13 @@ const LogoContainer = styled.div`
 const LogoWrapper = styled.div`
   margin: auto;
   margin-top: 13px;
-
-  @media (max-width: ${screenSizes.smallScreenSize}px) {
-    ${(p: { isSidebarEnabled: boolean }): string => (p.isSidebarEnabled ? "" : "display: none;")}
-  }
 `;
 
 const Icon = styled.i`
   padding-top: 10px;
   padding-right: 8px;
   padding-left: 3px;
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p): string => p.theme.text};
 
   &:before {
     margin-top: 1px;
@@ -50,7 +45,7 @@ const Logo: FC = () => {
   return (
     <LogoContainer>
       <Icon className={"bx bx-menu bx-md"} onClick={handleIsCollapsedChange} />
-      <LogoWrapper isSidebarEnabled={isSidebarEnabled}>
+      <LogoWrapper>
         <Link href={"/"} draggable={false}>
           <Gradient type="text">
             <h1>BLU</h1>

@@ -63,10 +63,9 @@ const IconWithText = styled(Icon)`
 const Wrapper = styled.div`
   width: 0px;
   height: 0px;
-  right: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "-3px" : "0px")};
   position: relative;
   display: grid;
-  justify-content: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
+  right: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "-3px" : "0px")};
   justify-self: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
   z-index: 2;
 `;
@@ -78,13 +77,13 @@ const FlexBox = styled.div`
 
 const Box = styled.div`
   animation: fadein 0.5s;
-  right: 1px;
-
+  position: fixed;
   white-space: nowrap;
   margin-top: 19px;
   background: ${(p): string => p.theme.button};
   padding: 10px;
   border-radius: 8px;
+  justify-self: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
 
   @media (max-width: ${screenSizes.mobileScreenSize}px) {
     display: none;
@@ -217,12 +216,16 @@ const ButtonIcon: FC<ButtonIconProps> = ({
           )}
           {hoverText && !isPlaying && isHover && (
             <Wrapper isOffscreen={isOffscreen}>
-              <Box ref={hoverEl}>{hoverText}</Box>
+              <Box isOffscreen={isOffscreen} ref={hoverEl}>
+                {hoverText}
+              </Box>
             </Wrapper>
           )}
           {confirmText && isPlaying && (
             <Wrapper isOffscreen={isOffscreen}>
-              <SelectedBox onMouseOver={onHoverOverSelectedBox}>{confirmText}</SelectedBox>
+              <SelectedBox isOffscreen={isOffscreen} onMouseOver={onHoverOverSelectedBox}>
+                {confirmText}
+              </SelectedBox>
             </Wrapper>
           )}
         </>

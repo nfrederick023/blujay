@@ -2,7 +2,7 @@ import React, { FC, MouseEvent } from "react";
 import styled from "styled-components";
 
 const Icon = styled.i`
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p): string => p.theme.text};
   font-size: 1.25rem;
   display: flex;
   vertical-align: baseline;
