@@ -132,7 +132,7 @@ export const moveVideoFromTemp = (path: string): void => {
 };
 
 export const getConfig = (): Config => {
-  return JSON.parse(fs.readFileSync(getVideoListPath(), "utf-8")) as Config;
+  return JSON.parse(fs.readFileSync(getConfigPath(), "utf-8")) as Config;
 };
 
 export const createVideoListBackup = (): void => {

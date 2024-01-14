@@ -1,29 +1,26 @@
 import { NextPageContext } from "next";
 import { Video } from "@client/utils/types";
-import { randomBytes, scryptSync } from "crypto";
-
 import { getPrivateLibrary, getUserPassword } from "./config";
 import { listVideos } from "./listVideos";
+import { randomBytes, scryptSync } from "crypto";
 
-export const getProtectedVideoList = async (authToken: string): Promise<Video[]> => {
-  const videoList = await listVideos();
-  const authStatus = checkHashedPassword(authToken ?? "");
-
-  if (authStatus) return videoList;
-  else return videoList.filter((video) => !video.requireAuth);
-};
-
-export const authGuard = (ctx: NextPageContext, authToken: string): void => {
+export const getProtectedVideoList = async (ctx: NextPageContext, authToken: string): Promise<Video[]> => {
   const isAuthenticated = checkHashedPassword(authToken);
-  const isPrivateLibrary = getPrivateLibrary();
+  const videoList = await listVideos();
 
   if (!isAuthenticated) {
+    const isPrivateLibrary = getPrivateLibrary();
+
     if (authToken) ctx.res?.setHeader("Set-Cookie", "authToken=; path=/;");
     if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
       ctx.res?.writeHead(302, { Location: "/login" });
       ctx.res?.end();
+      return [];
     }
   }
+
+  if (isAuthenticated) return videoList;
+  else return videoList.filter((video) => !video.requireAuth);
 };
 
 export const checkHashedPassword = (hashedPassword: string): boolean => {

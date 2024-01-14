@@ -43,28 +43,20 @@ const CogWrapper = styled.div`
 const CogIcon = styled.i`
   margin: auto;
   color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
-    p.isFocused ? `${p.theme.text}` : `${p.theme.textContrast}`};
+    p.isFocused ? `${p.theme.text}` : `${p.theme.text}`};
   pointer-events: ${(p): string => (p.isFocused ? "none" : "auto")};
   font-size: 32px;
   padding-bottom: 1px;
   cursor: pointer;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-  }
 `;
 
 const SearchIcon = styled.i`
   margin: auto 15px auto 10px;
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p): string => p.theme.text};
   font-size: 32px;
   padding-bottom: 1px;
   display: none;
   cursor: pointer;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-  }
 
   @media (max-width: ${screenSizes.tabletScreenSize}px) {
     display: unset;

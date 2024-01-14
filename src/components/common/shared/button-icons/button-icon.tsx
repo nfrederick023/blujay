@@ -3,18 +3,29 @@ import { screenSizes } from "@client/utils/constants";
 import React, { FC, MouseEvent, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
+const ButtonWrapper = styled.div`
+  display: flex;
+
+  &:focus-visible {
+    outline: 0px;
+  }
+`;
+
 const Button = styled.div`
   user-select: none;
   border-radius: 8px;
   display: grid;
   white-space: pre;
   align-content: center;
-  min-width: 38px;
   min-height: 38px;
   max-height: 38px;
-
+  min-width: 38px;
   h6 {
     margin-right: 5px;
+  }
+
+  &:focus-visible {
+    outline: 0px;
   }
 
   ${(p: { isSelected: boolean; disabled: boolean; theme: BluJayTheme }): string => {
@@ -65,8 +76,7 @@ const Wrapper = styled.div`
   height: 0px;
   position: relative;
   display: grid;
-  right: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "-3px" : "0px")};
-  justify-self: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
+  justify-self: ${(p: { isOffscreen: OffScreenType }): string => (p.isOffscreen ? p.isOffscreen : "center")};
   z-index: 2;
 `;
 
@@ -83,7 +93,7 @@ const Box = styled.div`
   background: ${(p): string => p.theme.button};
   padding: 10px;
   border-radius: 8px;
-  justify-self: ${(p: { isOffscreen: boolean }): string => (p.isOffscreen ? "right" : "center")};
+  justify-self: ${(p: { isOffscreen: OffScreenType }): string => (p.isOffscreen ? p.isOffscreen : "center")};
 
   @media (max-width: ${screenSizes.mobileScreenSize}px) {
     display: none;
@@ -107,6 +117,8 @@ const SelectedBox = styled(Box)`
   }
   animation: fadeInOut 0.75s linear 1 forwards;
 `;
+
+type OffScreenType = "right" | "left" | undefined;
 
 interface ButtonIconProps {
   icon?: string;
@@ -138,7 +150,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   onClick,
 }) => {
   const [isHover, setIsHover] = useState(false);
-  const [isOffscreen, setIsOffscreen] = useState(false);
+  const [isOffscreen, setIsOffscreen] = useState<OffScreenType>();
   const [isPlaying, setIsPlaying] = useState(false);
   const hoverEl = useRef<HTMLDivElement>(null);
 
@@ -150,15 +162,18 @@ const ButtonIcon: FC<ButtonIconProps> = ({
     setIsHover(false);
   };
 
-  const isElOffscreen = (): boolean => {
-    let isOffscreen = false;
+  const isElOffscreen = (): OffScreenType => {
     if (hoverEl?.current) {
-      const marginSize = 30;
       const rect = hoverEl.current.getBoundingClientRect();
-      const viewWidth = Math.max(document.documentElement.clientWidth, window.innerWidth);
-      isOffscreen = rect.x + rect.width >= viewWidth - marginSize;
+
+      if (rect.x + rect.width >= window.innerWidth) {
+        return "right";
+      }
+
+      if (rect.x <= 0) {
+        return "left";
+      }
     }
-    return isOffscreen;
   };
 
   const handleClick = (e: MouseEvent): void => {
@@ -189,11 +204,12 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   const maxLength = Math.max(textOn?.length || 0, textOff?.length || 0);
 
   useEffect((): void => {
+    console.log(isElOffscreen());
     setIsOffscreen(isElOffscreen());
   }, [isHover]);
 
   return (
-    <>
+    <ButtonWrapper>
       <Button
         onClick={handleClick}
         isSelected={isSelected || false}
@@ -230,7 +246,7 @@ const ButtonIcon: FC<ButtonIconProps> = ({
           )}
         </>
       </Button>
-    </>
+    </ButtonWrapper>
   );
 };
 

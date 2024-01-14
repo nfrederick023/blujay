@@ -1,15 +1,13 @@
 import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
-import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
 import ButtonIcon from "../button-icon";
 import React, { FC } from "react";
-import styled from "styled-components";
 
-const TheatreModeButtonIcon = styled(ButtonIcon)`
-  @media (max-width: ${screenSizes.smallScreenSize}px) {
-    display: none;
-  }
-`;
+// const TheatreModeButtonIcon = styled(ButtonIcon)`
+//   @media (max-width: ${screenSizes.smallScreenSize}px) {
+//     display: none;
+//   }
+// `;
 
 const TheatreModeButton: FC = () => {
   const [cookies, setCookie] = useCookies(["isTheaterMode"]);
@@ -20,7 +18,7 @@ const TheatreModeButton: FC = () => {
   };
 
   return (
-    <TheatreModeButtonIcon
+    <ButtonIcon
       icon="bx bx-movie"
       selectedIcon="bx bx-movie"
       textOn="Theater Mode"

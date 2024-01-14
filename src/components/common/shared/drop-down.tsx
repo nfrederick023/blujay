@@ -7,7 +7,7 @@ const DropDownWrapper = styled.div`
 
   ${(p: { isVisible: boolean }): string => {
     if (!p.isVisible) {
-      return "overflow: hidden";
+      return "visibility: hidden; overflow: hidden;";
     }
     return "";
   }}
@@ -30,7 +30,6 @@ const DropDownBox = styled.div`
   background-color: ${(p: {
     theme: BluJayTheme;
     isBottomOffscreen: boolean;
-    isRightOffscreen: boolean;
     DropDownTop: number;
     DropDownLeft: number;
     relativePosition?: RelativePosition;
@@ -47,18 +46,12 @@ const DropDownBox = styled.div`
 
   ${(p): string => {
     let transform = "";
-    if (p.isRightOffscreen || p.relativePosition === "left") {
+    if (p.relativePosition === "left") {
       transform += " translateX(-100%)";
     }
-
-    if (p.isRightOffscreen) {
-      transform += ` translateX(-${p.DropDownLeft + 10}px)`;
-    }
-
     if (p.isBottomOffscreen) {
       transform += ` translateY(-100%) translateY(-${p.DropDownTop + 10}px)`;
     }
-
     if (transform) {
       return "transform: " + transform + ";";
     }
@@ -102,9 +95,7 @@ interface DropDownProps {
 
 const DropDown: FC<DropDownProps> = ({ options, isShown, top, left, relativePosition, setIsShown }) => {
   const dropDownRef = useRef<HTMLDivElement>(null);
-  const positionRef = useRef<HTMLDivElement>(null);
   const [isBottomOffscreen, setIsBottomOffscreen] = useState(false);
-  const [isRightOffscreen, setIsRightOffscreen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   const onBlur = (): void => {
@@ -112,68 +103,55 @@ const DropDown: FC<DropDownProps> = ({ options, isShown, top, left, relativePosi
   };
 
   useEffect(() => {
-    if (dropDownRef.current && positionRef.current && isShown) {
-      dropDownRef.current.focus();
-      const pageMargin = 10;
-
+    if (dropDownRef.current && isShown) {
       const dropDownRect = dropDownRef.current.getBoundingClientRect();
-      const positionRect = positionRef.current.getBoundingClientRect();
-      const bottomY = positionRect.y + dropDownRect.height + top;
-      let rightX = positionRect.x + dropDownRect.width + pageMargin + left;
-
-      if (relativePosition === "left") {
-        rightX = positionRect.x - dropDownRect.width + pageMargin + left;
-      }
+      const bottomY = dropDownRect.y + dropDownRect.height + top;
 
       if (bottomY > window.innerHeight) {
         setIsBottomOffscreen(true);
       }
 
-      if (rightX > window.innerWidth) {
-        setIsRightOffscreen(true);
-      }
-
       setIsVisible(true);
     } else {
       setIsVisible(false);
-      setIsRightOffscreen(false);
       setIsBottomOffscreen(false);
     }
   }, [isShown]);
 
+  useEffect(() => {
+    if (dropDownRef.current) {
+      dropDownRef.current.focus();
+    }
+  }, [isVisible]);
+
   return (
-    <DropDownWrapper isVisible={isVisible}>
-      {isShown ? (
-        <DropDownPositioning DropDownTop={top} DropDownLeft={left} ref={positionRef}>
-          <DropDownBox
-            tabIndex={0}
-            onBlur={onBlur}
-            ref={dropDownRef}
-            isBottomOffscreen={isBottomOffscreen}
-            isRightOffscreen={isRightOffscreen}
-            DropDownTop={top}
-            DropDownLeft={left}
-            relativePosition={relativePosition}
-          >
-            {options.length ? (
-              <>
-                {options.map((option, i) => {
-                  return (
-                    <Option key={i} onClick={option.action} color={option.color}>
-                      {option.icon ? <Icon className={option.icon} /> : <></>}
-                      <OptionText>{option.text}</OptionText>
-                    </Option>
-                  );
-                })}
-              </>
-            ) : (
-              <Option>No Options</Option>
-            )}
-          </DropDownBox>
-        </DropDownPositioning>
-      ) : (
-        <></>
-      )}
+    <DropDownWrapper isVisible={isVisible && isShown}>
+      <DropDownPositioning DropDownTop={top} DropDownLeft={left}>
+        <DropDownBox
+          tabIndex={0}
+          onBlur={onBlur}
+          ref={dropDownRef}
+          isBottomOffscreen={isBottomOffscreen}
+          DropDownTop={top}
+          DropDownLeft={left}
+          relativePosition={relativePosition}
+        >
+          {options.length ? (
+            <>
+              {options.map((option, i) => {
+                return (
+                  <Option key={i} onClick={option.action} color={option.color}>
+                    {option.icon ? <Icon className={option.icon} /> : <></>}
+                    <OptionText>{option.text}</OptionText>
+                  </Option>
+                );
+              })}
+            </>
+          ) : (
+            <Option>No Options</Option>
+          )}
+        </DropDownBox>
+      </DropDownPositioning>
     </DropDownWrapper>
   );
 };

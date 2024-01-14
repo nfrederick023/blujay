@@ -50,8 +50,14 @@ const VideoOptions = styled.div`
 
 const Buttons = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  & > * {
+  overflow-x: auto;
+  ::-webkit-scrollbar {
+    height: 0px;
+  }
+
+  margin-right: 5px;
+  height: 38px;
+  & > *:not(:last-child) {
     margin-right: 6px;
     margin-bottom: 6px;
   }
@@ -143,23 +149,41 @@ const WatchDetails: FC<WatchDetailsProps> = ({
     e.stopPropagation();
   };
 
-  const toggleEditingTitle = async (): Promise<void> => {
+  const toggleOnEditingTitle = async (): Promise<void> => {
+    setIsEditingTitle(true);
+  };
+
+  const toggleOffEditingTitle = async (): Promise<void> => {
     if (isEditingTitle && title !== video.name) {
       await updateVideo({ ...video, name: title });
     }
-    setIsEditingTitle(!isEditingTitle);
+    setIsEditingTitle(false);
   };
 
-  const toggleEditingFilename = async (): Promise<void> => {
+  const toggleOnEditingFilename = (): void => {
+    if (!showMore) {
+      setShowMore(true);
+    }
+    setIsEditingFilename(true);
+  };
+
+  const toggleOffEditingFilename = async (): Promise<void> => {
+    setIsEditingFilename(false);
     const confirmMessage = "Warning! Renaming the file will change the ID and URL. Are you sure you want to continue?";
     if (isEditingFilename && filename !== video.filename && confirm(confirmMessage)) {
       const newVideo = await renameFile(video, filename);
-
       if (newVideo) {
         navigateToVideo(newVideo.id);
       }
+    } else {
+      setFilename(video.filename);
     }
-    setIsEditingFilename(!isEditingFilename);
+  };
+
+  const blurFilenameTextFile = (): void => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   };
 
   const toggleEditingCategories = (): void => {
@@ -224,8 +248,8 @@ const WatchDetails: FC<WatchDetailsProps> = ({
   }, [isEditingTitle, isEditingFilename]);
 
   const options: DropDownOption[] = [
-    { text: "Change Title", icon: "bx bxs-edit-alt", action: toggleEditingTitle },
-    { text: "Change Filename", icon: "bx bxs-file", action: toggleEditingFilename },
+    { text: "Change Title", icon: "bx bxs-edit-alt", action: toggleOnEditingTitle },
+    { text: "Change Filename", icon: "bx bxs-file", action: toggleOnEditingFilename },
     { text: "Thumbnail Settings", icon: "bx bxs-image-alt", action: (): void => {} },
     { text: "Category Settings", icon: "bx bxs-category", action: toggleEditingCategories },
     { text: "Reset Views", icon: "bx bx-reset", action: resetViews },
@@ -244,12 +268,12 @@ const WatchDetails: FC<WatchDetailsProps> = ({
               value={title}
               type={"text"}
               placeholder={""}
-              onBlur={toggleEditingTitle}
-              onEnter={toggleEditingTitle}
+              onBlur={toggleOffEditingTitle}
+              onEnter={toggleOffEditingTitle}
               onKeyDown={stopPropgation}
             />
           ) : (
-            <VideoName onDoubleClick={toggleEditingTitle}>{video.name}</VideoName>
+            <VideoName onDoubleClick={toggleOnEditingTitle}>{video.name}</VideoName>
           )}
         </VideoNameWrapper>
         <SimpleMetadata>
@@ -279,13 +303,13 @@ const WatchDetails: FC<WatchDetailsProps> = ({
                       value={filename}
                       type={"text"}
                       placeholder={""}
-                      onBlur={toggleEditingFilename}
-                      onEnter={toggleEditingFilename}
+                      onBlur={toggleOffEditingFilename}
+                      onEnter={blurFilenameTextFile}
                       onKeyDown={stopPropgation}
                     />
                   </AbsoluteOverlay>
                 ) : (
-                  <span onDoubleClick={toggleEditingFilename}>{video.filename}</span>
+                  <span onDoubleClick={toggleOnEditingFilename}>{video.filename}</span>
                 )}
                 <br />
                 {video.width} x {video.height} <br />
@@ -307,25 +331,25 @@ const WatchDetails: FC<WatchDetailsProps> = ({
           <TheatreModeButton />
           <ButtonIcon icon="bx bxs-share" textOn="Share" />
           <ClipButton />
-          <CogWrapper>
-            <CogIcon
-              isFocused={isDropDownShown}
-              icon="bx bx-cog"
-              selectedIcon="bx bx-cog"
-              hoverTextOn="Options"
-              onClick={showDropDown}
-              isSelected={isDropDownShown}
-            />
-            <DropDown
-              options={options}
-              isShown={isDropDownShown}
-              setIsShown={setIsDropDownShow}
-              top={45}
-              left={38}
-              relativePosition="left"
-            />
-          </CogWrapper>
+          <CogIcon
+            isFocused={isDropDownShown}
+            icon="bx bx-cog"
+            selectedIcon="bx bx-cog"
+            hoverTextOn="Options"
+            onClick={showDropDown}
+            isSelected={isDropDownShown}
+          />
         </Buttons>
+        <CogWrapper>
+          <DropDown
+            options={options}
+            isShown={isDropDownShown}
+            setIsShown={setIsDropDownShow}
+            top={45}
+            left={0}
+            relativePosition="left"
+          />
+        </CogWrapper>
       </VideoOptions>
     </VideoDetailsWrapper>
   );

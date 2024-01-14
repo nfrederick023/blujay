@@ -79,7 +79,7 @@ const PageOptions = styled.div`
   margin-bottom: 10px;
 `;
 
-const BackButton = styled(ButtonIcon)`
+const BackButtonWrapper = styled.div`
   margin-right: auto;
 `;
 
@@ -220,7 +220,9 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
       )} */}
         <VideoContainer isTheaterMode={isTheaterMode}>
           <PageOptions>
-            <BackButton icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></BackButton>
+            <BackButtonWrapper>
+              <ButtonIcon icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></ButtonIcon>
+            </BackButtonWrapper>
             <PeviousVideoButton
               icon="bx bx-chevron-left"
               hoverTextOn="Previous"

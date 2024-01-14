@@ -9,9 +9,20 @@ import React, { FC, useContext, useEffect, useRef, useState } from "react";
 import SideBarButton from "./page-button";
 import styled from "styled-components";
 
+const SidebarBackground = styled.div`
+  position: fixed;
+  background: ${(p): string => p.theme.backgroundContrast};
+  min-height: 100vh;
+  min-width: 250px;
+  max-width: 250px;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    min-width: 100%;
+  }
+`;
+
 const SidebarWapper = styled.div`
   min-height: 100%;
-  background: ${(p): string => p.theme.backgroundContrast};
   min-width: 250px;
   max-width: 250px;
   user-select: none;
@@ -106,32 +117,31 @@ const Sidebar: FC = () => {
   const libraryURL = "library/" + encodeURIComponent(categories[0]).toLowerCase();
 
   return (
-    <>
-      <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
-        <SidebarContent>
-          <Logo />
-          <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} selectedURL={selectedURL} />
+    <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
+      <SidebarBackground />
+      <SidebarContent>
+        <Logo />
+        <SideBarButton title={"Home"} icon={"bx bx-home-alt-2 bx-sm"} url={""} selectedURL={selectedURL} />
 
-          <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} selectedURL={selectedURL} />
+        <SideBarButton title={"Favorites"} icon={"bx bx-heart bx-sm"} url={"favorites"} selectedURL={selectedURL} />
 
-          <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} selectedURL={selectedURL} />
+        <SideBarButton title={"All Videos"} icon={"bx bx-list-ul bx-sm"} url={"all"} selectedURL={selectedURL} />
 
-          <SideBarButton title={"Random"} icon={"bx bx-dice-6 bx-sm"} url={"random"} selectedURL={selectedURL} />
+        <SideBarButton title={"Random"} icon={"bx bx-dice-6 bx-sm"} url={"random"} selectedURL={selectedURL} />
 
-          {categories.length ? (
-            <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={libraryURL} selectedURL={selectedURL} />
-          ) : (
-            <></>
-          )}
+        {categories.length ? (
+          <SideBarButton title={"Library"} icon={"bx bx-folder bx-sm"} url={libraryURL} selectedURL={selectedURL} />
+        ) : (
+          <></>
+        )}
 
-          <Library>
-            {categories.map((dir, i) => {
-              return <CategoryButton key={i} category={dir} selectedCategory={selectedCategory} />;
-            })}
-          </Library>
-        </SidebarContent>
-      </SidebarWapper>
-    </>
+        <Library>
+          {categories.map((dir, i) => {
+            return <CategoryButton key={i} category={dir} selectedCategory={selectedCategory} />;
+          })}
+        </Library>
+      </SidebarContent>
+    </SidebarWapper>
   );
 };
 

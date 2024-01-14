@@ -35,6 +35,7 @@ const GlobalStyle = createGlobalStyle`
   ::-webkit-scrollbar
   {
     width: 5px;
+    height: 5px;
     -webkit-appearance: none;
     background-color: transparent;
   }
@@ -199,10 +200,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<MyAppProps & AppIni
     const cookies = new Cookies(cookieString);
     const authToken = cookies.get("authToken");
     const auth = await import("@server/utils/auth");
-    if (context.router.pathname !== "/login") {
-      auth.authGuard(context.ctx, authToken);
-    }
-    intialVideos = await auth.getProtectedVideoList(authToken);
+    intialVideos = await auth.getProtectedVideoList(context.ctx, authToken);
   } else {
     cookieString = document.cookie;
   }
