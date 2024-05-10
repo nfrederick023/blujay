@@ -1,5 +1,4 @@
 import { VideoContext } from "@client/components/common/contexts/video-context";
-import KeepAlive from "@client/components/common/shared/keep-alive";
 import React, { FC, useContext } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 

@@ -33,13 +33,13 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
     return;
   }
 
-  if (!fs.existsSync(video.thumbnailPath)) {
+  if (!fs.existsSync(video.thumbnailFilepath)) {
     res.statusCode = 404;
     res.end(JSON.stringify("Thumbnail not found in file path!"));
     return;
   }
 
-  res.writeHead(200, { "Content-Type": "image/webp", "Content-disposition": `attachment; filename=UTF-8 ${video.id}.webp` });
+  res.writeHead(200, { "Content-Type": "image/webp", "Content-disposition": `filename=${video.id}.webp` });
   fs.createReadStream(`${getThumbnailsPath()}${video.id}.webp`).pipe(res);
 
   return;

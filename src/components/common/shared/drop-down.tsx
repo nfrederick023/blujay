@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 const DropDownWrapper = styled.div`
   position: absolute;
+  width: inherit;
 
   ${(p: { isVisible: boolean }): string => {
     if (!p.isVisible) {
@@ -15,11 +16,13 @@ const DropDownWrapper = styled.div`
 
 const DropDownPositioning = styled.div`
   position: relative;
+  width: inherit;
   top: ${(p: { DropDownTop: number; DropDownLeft: number }): number => p.DropDownTop}px;
   left: ${(p: { DropDownTop: number; DropDownLeft: number }): number => p.DropDownLeft}px;
 `;
 
 const DropDownBox = styled.div`
+  width: inherit;
   position: absolute;
   padding: 10px 0px 10px 0px;
   max-height: 300px;
@@ -33,12 +36,26 @@ const DropDownBox = styled.div`
     DropDownTop: number;
     DropDownLeft: number;
     relativePosition?: RelativePosition;
+    hasBorder?: boolean;
   }): string => p.theme.backgroundContrast};
   z-index: 2;
   user-select: none;
   ::-webkit-scrollbar {
     display: none;
   }
+
+  ${(p): string => {
+    if (p.hasBorder) {
+      return `
+        border-radius: 0px;
+        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 15px;
+        border: 1px solid ${p.theme.textContrast};
+        margin-top: 5px;
+      `;
+    }
+    return "";
+  }}
 
   @media screen and (max-height: 150px) {
     max-height: 10px;
@@ -90,13 +107,23 @@ interface DropDownProps {
   top: number;
   left: number;
   relativePosition?: RelativePosition;
+  hasBorder?: boolean;
   setIsShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DropDown: FC<DropDownProps> = ({ options, isShown, top, left, relativePosition, setIsShown }) => {
+const DropDown: FC<DropDownProps> = ({ options, isShown, top, left, relativePosition, hasBorder, setIsShown }) => {
   const dropDownRef = useRef<HTMLDivElement>(null);
   const [isBottomOffscreen, setIsBottomOffscreen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+
+  const blurOnClick = (
+    func: (e: React.MouseEvent<Element, MouseEvent>) => void
+  ): ((e: React.MouseEvent<Element, MouseEvent>) => void) => {
+    return (e: React.MouseEvent<Element, MouseEvent>): void => {
+      setIsShown(false);
+      func(e);
+    };
+  };
 
   const onBlur = (): void => {
     setIsShown(false);
@@ -135,12 +162,13 @@ const DropDown: FC<DropDownProps> = ({ options, isShown, top, left, relativePosi
           DropDownTop={top}
           DropDownLeft={left}
           relativePosition={relativePosition}
+          hasBorder={hasBorder}
         >
           {options.length ? (
             <>
               {options.map((option, i) => {
                 return (
-                  <Option key={i} onClick={option.action} color={option.color}>
+                  <Option key={i} onClick={blurOnClick(option.action)} color={option.color}>
                     {option.icon ? <Icon className={option.icon} /> : <></>}
                     <OptionText>{option.text}</OptionText>
                   </Option>

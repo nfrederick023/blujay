@@ -107,6 +107,8 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   const onlyFavorites = typeof query.onlyFavorites === "string";
   const category = typeof query.category === "string" ? query.category : undefined;
   const sortedVideos = sortVideos(videos, sort, order, search, onlyFavorites, category);
+  const touchStart = useRef<number | null>(null);
+  const touchEnd = useRef<number | null>(null);
 
   const videoIndex = sortedVideos.findIndex((_video) => _video.id === video?.id);
   const nextVideo = sortedVideos[videoIndex + 1];
@@ -179,6 +181,31 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   //   setIsViewThumbnail(false);
   // };
 
+  // the required distance between touchStart and touchEnd to be detected as a swipe
+
+  const onTouchStart = (e: React.TouchEvent): void => {
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchMove = (e: React.TouchEvent): void => {
+    touchEnd.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = (): void => {
+    const minSwipeDistance = 50;
+    if (!touchStart.current || !touchEnd.current) return;
+    const distance = touchStart.current - touchEnd.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNextVideo();
+    }
+    if (isRightSwipe) {
+      goToPreviousVideo();
+    }
+  };
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -200,7 +227,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
     const currentUrl = `${domain}/watch/${video.id}`;
 
     return (
-      <>
+      <div>
         <WatchMeta video={video} fullThumbSrc={fullThumbSrc} fullVideoSrc={fullVideoSrc} />
         {isZoomedIn ? (
           <>
@@ -221,7 +248,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
         <VideoContainer isTheaterMode={isTheaterMode}>
           <PageOptions>
             <BackButtonWrapper>
-              <ButtonIcon icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack}></ButtonIcon>
+              <ButtonIcon icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack} />
             </BackButtonWrapper>
             <PeviousVideoButton
               icon="bx bx-chevron-left"
@@ -242,9 +269,20 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
                 playsInline
                 onVolumeChange={handleVolumeChange}
                 draggable={false}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
               />
             ) : (
-              <Image ref={ref} src={videoSrc} onClick={toggleZoom} draggable={false} />
+              <Image
+                ref={ref}
+                src={videoSrc}
+                onClick={toggleZoom}
+                draggable={false}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              />
             )}
           </VideoWrapper>
           <WatchDetails
@@ -256,7 +294,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
             navigateToVideo={navigateToVideo}
           />
         </VideoContainer>
-      </>
+      </div>
     );
   } else {
     return <></>;

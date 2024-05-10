@@ -37,6 +37,7 @@ const PopupBox = styled.div`
   background-color: ${(p): string => p.theme.backgroundContrast};
   border-radius: 10px;
   padding: 20px;
+
   &::-webkit-scrollbar {
     width: 1px;
     background-color: rgba(0, 0, 0, 0);
@@ -45,6 +46,7 @@ const PopupBox = styled.div`
 
 const CloseWrapper = styled.div`
   width: 100%;
+  margin-bottom: 10px;
   display: flex;
 `;
 

@@ -3,7 +3,7 @@ import { DeleteVideo, RenameFile, UpdateVideo } from "./video.dto";
 import { UploadFailedException } from "./video.exceptions";
 import { deleteVideo, getLibraryPath, getTempPath, getVideo, moveVideoToLibrary } from "@server/utils/config";
 import { deletevideo, getVideos, renameFile, updateVideo } from "./video.service";
-import { listVideos } from "@server/utils/listVideos";
+import { reindexVideoList } from "@server/utils/video-service";
 import { validateVideo } from "@server/utils/validateVideo";
 import multer, { diskStorage } from "multer";
 import path from "path";
@@ -72,7 +72,7 @@ class VideoController {
       try {
         await validateVideo(file.path);
         moveVideoToLibrary(file.path);
-        await listVideos();
+        await reindexVideoList();
       } catch (e) {
         // the file won't be deleted from temp if Multer was successful
         deleteVideo(file.path);

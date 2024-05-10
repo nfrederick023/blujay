@@ -14,24 +14,25 @@ export interface BluJayTheme {
 }
 
 export interface Video {
-  readonly filename: string,
-  readonly name: string,
-  readonly size: number,
-  readonly uploaded: number,
-  readonly updated: number,
-  readonly filePath: string,
-  readonly thumbnailPath: string,
-  readonly categories: string[],
-  readonly description: string,
-  readonly requireAuth: boolean,
-  readonly isFavorite: boolean,
-  readonly id: string,
-  readonly mimeType: string
-  readonly extentsion: Extentsions;
-  readonly views: number;
-  readonly type: VideoType;
-  readonly height: number;
-  readonly width: number;
+  filename: string,
+  size: number,
+  uploaded: number,
+  updated: number,
+  name: string,
+  filepath: string,
+  thumbnailFilename: string,
+  thumbnailFilepath: string,
+  categories: string[],
+  description: string,
+  requireAuth: boolean,
+  isFavorite: boolean,
+  id: string,
+  mimeType: string
+  extentsion: Extentsions;
+  views: number;
+  type: VideoType;
+  height: number;
+  width: number;
 }
 
 export interface Thumbnail {
@@ -76,3 +77,4 @@ export type ViewType = "List View" | "Grid View";
 export type SliderType = "verticle" | "horizontal";
 export type VideoType = "video" | "image" | "gif";
 export type CookieObject = { [key: string]: string };
+export type Dimensions = { height: number, width: number };

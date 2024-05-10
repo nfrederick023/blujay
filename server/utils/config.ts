@@ -1,5 +1,5 @@
 import { Config, Thumbnail, Video } from "../../src/utils/types";
-import fs from "fs";
+import fs, { Stats } from "fs";
 
 export const getUserPassword = (): string => {
   return (getConfig()).password;
@@ -66,6 +66,10 @@ export const getBackupVideoListPath = (): string => {
   const dir = getBackupPath() + "video_list.json";
   checkCreateJSON(dir, "[]");
   return dir;
+};
+
+export const getThumbnailList = (): string[] => {
+  return fs.readdirSync(getThumbnailsPath());
 };
 
 export const getConfigPath = (): string => {
@@ -148,6 +152,12 @@ export const getDirListOfLibrarySubfolders = (): string[] => {
   return (fs.readdirSync(getLibraryPath(), { withFileTypes: true }))
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name);
+};
+
+export const getFileStat = (filepath: string): Stats | undefined => {
+  if (fs.existsSync(filepath)) {
+    return fs.statSync(filepath);
+  }
 };
 
 const checkCreateJSON = <T extends string>(dir: string, defaultValue: T): string => {

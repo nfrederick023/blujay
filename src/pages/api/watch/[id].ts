@@ -32,7 +32,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       return;
     }
 
-    if (!fs.existsSync(video.filePath)) {
+    if (!fs.existsSync(video.filepath)) {
       res.statusCode = 404;
       res.end(JSON.stringify("Video not found in file path!"));
       return;
@@ -47,9 +47,8 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       }
     } else {
       const mimeType = mime.lookup(video.extentsion) || "";
-      // "Content-disposition": `attachment; filename=${video.fileName}`
       res.writeHead(200, { "Content-Type": mimeType });
-      fs.createReadStream(video.filePath).pipe(res);
+      fs.createReadStream(video.filepath).pipe(res);
 
       // count as a view if it's not a preview
       if (!isPreview) {
@@ -78,7 +77,7 @@ const serveVideo = (req: NextApiRequest, res: NextApiResponse, video: Video): vo
     "Content-Type": video.mimeType
   };
   res.writeHead(206, headers);
-  const stream = fs.createReadStream(video.filePath, {
+  const stream = fs.createReadStream(video.filepath, {
     start,
     end
   });

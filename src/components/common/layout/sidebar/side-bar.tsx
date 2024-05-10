@@ -79,7 +79,6 @@ const Sidebar: FC = () => {
   const isSidebarEnabled = booleanify(cookies.isSidebarEnabled);
   const [, setCookie] = useCookies();
   const router = useRouter();
-  const selectedCategory = selectedPath.toLowerCase();
   const selectedPathRef = useRef("");
   const selectedCookieRef = useRef(cookies);
   selectedPathRef.current = selectedPath;
@@ -114,7 +113,7 @@ const Sidebar: FC = () => {
     };
   }, []);
 
-  const libraryURL = "library/" + encodeURIComponent(categories[0]).toLowerCase();
+  const libraryURL = "library/" + encodeURIComponent(categories[0]);
 
   return (
     <SidebarWapper isSidebarEnabled={isSidebarEnabled}>
@@ -137,7 +136,7 @@ const Sidebar: FC = () => {
 
         <Library>
           {categories.map((dir, i) => {
-            return <CategoryButton key={i} category={dir} selectedCategory={selectedCategory} />;
+            return <CategoryButton key={i} category={dir} selectedCategory={selectedPath} />;
           })}
         </Library>
       </SidebarContent>

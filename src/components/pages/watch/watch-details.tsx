@@ -17,6 +17,7 @@ import TheatreModeButton from "@client/components/common/shared/button-icons/but
 import TimeAgo from "react-timeago";
 import prettyBytes from "pretty-bytes";
 import styled from "styled-components";
+import ThumnailPopup from "./popups/thumbnail-popup";
 
 const VideoDetailsWrapper = styled.div`
   margin: 10px 0px 0px 0px;
@@ -250,15 +251,16 @@ const WatchDetails: FC<WatchDetailsProps> = ({
   const options: DropDownOption[] = [
     { text: "Change Title", icon: "bx bxs-edit-alt", action: toggleOnEditingTitle },
     { text: "Change Filename", icon: "bx bxs-file", action: toggleOnEditingFilename },
-    { text: "Thumbnail Settings", icon: "bx bxs-image-alt", action: (): void => {} },
-    { text: "Category Settings", icon: "bx bxs-category", action: toggleEditingCategories },
+    { text: "Thumbnail Settings", icon: "bx bxs-image-alt", action: toggleEditingThumbnail },
+    { text: "Edit Category", icon: "bx bxs-category", action: toggleEditingCategories },
     { text: "Reset Views", icon: "bx bx-reset", action: resetViews },
     { text: "Delete", icon: "bx bx-trash", action: deletevideo, color: "red" },
   ];
 
   return (
     <VideoDetailsWrapper>
-      {isEditingCategories && <CategoryPopup togglePopup={toggleEditingCategories} />}
+      {isEditingCategories && <CategoryPopup togglePopup={toggleEditingCategories} selectedVideo={video} />}
+      {isEditingThumbnail && <ThumnailPopup togglePopup={toggleEditingThumbnail} selectedVideo={video} />}
       <VideoDetails>
         <VideoNameWrapper>
           {isEditingTitle ? (
@@ -330,7 +332,6 @@ const WatchDetails: FC<WatchDetailsProps> = ({
           <RequireAuthButton video={video} showText={true} />
           <TheatreModeButton />
           <ButtonIcon icon="bx bxs-share" textOn="Share" />
-          <ClipButton />
           <CogIcon
             isFocused={isDropDownShown}
             icon="bx bx-cog"

@@ -5,6 +5,9 @@ import { Montserrat } from "next/font/google";
 import { VideoProvider } from "@client/components/common/contexts/video-context";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
+import { reindexThumbnails } from "@server/utils/thumbnail-service";
+import { reindexVideoList } from "@server/utils/video-service";
+import { testIndex } from "@server/utils/validateVideo";
 import { useRouter } from "next/router";
 import App, { AppContext, AppInitialProps, AppProps } from "next/app";
 import BackToTop from "@client/components/common/layout/back-to-top";
@@ -196,6 +199,8 @@ MyApp.getInitialProps = async (context: AppContext): Promise<MyAppProps & AppIni
   let cookieString: string | undefined;
   let intialVideos: Video[] = [];
   if (typeof window === "undefined") {
+    const indexVideosAndThumbnails = await import("@server/utils/intial-config");
+    await indexVideosAndThumbnails.default();
     cookieString = context.ctx.req?.headers.cookie;
     const cookies = new Cookies(cookieString);
     const authToken = cookies.get("authToken");

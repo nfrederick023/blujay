@@ -204,7 +204,6 @@ const ButtonIcon: FC<ButtonIconProps> = ({
   const maxLength = Math.max(textOn?.length || 0, textOff?.length || 0);
 
   useEffect((): void => {
-    console.log(isElOffscreen());
     setIsOffscreen(isElOffscreen());
   }, [isHover]);
 

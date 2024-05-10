@@ -1,12 +1,11 @@
 import { NextPageContext } from "next";
 import { Video } from "@client/utils/types";
-import { getPrivateLibrary, getUserPassword } from "./config";
-import { listVideos } from "./listVideos";
+import { getPrivateLibrary, getUserPassword, getVideoList } from "./config";
 import { randomBytes, scryptSync } from "crypto";
 
 export const getProtectedVideoList = async (ctx: NextPageContext, authToken: string): Promise<Video[]> => {
   const isAuthenticated = checkHashedPassword(authToken);
-  const videoList = await listVideos();
+  const videoList = getVideoList();
 
   if (!isAuthenticated) {
     const isPrivateLibrary = getPrivateLibrary();

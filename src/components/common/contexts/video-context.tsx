@@ -1,6 +1,6 @@
 import { Video } from "@client/utils/types";
 import { deleteVideoAPI, renameFileAPI, updateVideoAPI } from "@client/utils/api";
-import React, { FC, ReactNode, createContext, use, useEffect, useState } from "react";
+import React, { FC, ReactNode, createContext, useState } from "react";
 
 type VideoContextType = {
   videos: Video[];

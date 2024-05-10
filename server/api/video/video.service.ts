@@ -2,12 +2,11 @@ import { DeleteVideo, RenameFile, UpdateVideo } from "./video.dto";
 import { OrderType, QueryField, SortType, Video } from "@client/utils/types";
 import { UpdateVideoFailedException, VideoNotFoundException } from "./video.exceptions";
 import { deleteVideo as fsDeleteVideo, renameVideoFile as fsRenameVideoFile } from "@server/utils/config";
-import { generateVideoID, getVideoThumbnailPath, listVideos } from "@server/utils/listVideos";
 import { getVideoList, moveVideoToLibrary, setVideoList } from "@server/utils/config";
+import { reindexVideoList } from "@server/utils/video-service";
 import { sortVideos } from "@client/utils/sortVideo";
 import { validateVideo } from "@server/utils/validateVideo";
 import path from "path";
-
 
 export const getVideos = async (page: number, size: number, sort: SortType, order: OrderType, query: string, queryField: QueryField[]): Promise<Video[]> => {
   const videoList = getVideoList();
@@ -18,7 +17,7 @@ export const getVideos = async (page: number, size: number, sort: SortType, orde
 export const validateFiles = async (filePath: string): Promise<void> => {
   await validateVideo(filePath);
   moveVideoToLibrary(filePath);
-  await listVideos();
+  await reindexVideoList();
 };
 
 export const updateVideo = (updateVideo: UpdateVideo): void => {
@@ -47,7 +46,7 @@ export const deletevideo = (deleteVideo: DeleteVideo): void => {
     throw new VideoNotFoundException();
   }
 
-  fsDeleteVideo(videoToDelete.filePath);
+  fsDeleteVideo(videoToDelete.filepath);
 };
 
 export const renameFile = async (renameFile: RenameFile): Promise<Video> => {
@@ -58,15 +57,13 @@ export const renameFile = async (renameFile: RenameFile): Promise<Video> => {
     throw new VideoNotFoundException();
   }
 
-
-  const oldFilePath = videoToRename.filePath;
+  const oldFilePath = videoToRename.filepath;
   const newFilePath = path.dirname(oldFilePath) + "\\" + renameFile.newName + "." + videoToRename.extentsion;
   fsRenameVideoFile(oldFilePath, newFilePath);
-  const id = generateVideoID(renameFile.newName);
-  const thumbnailPath = getVideoThumbnailPath(id);
-  const newVideo: Video = { ...videoToRename, filename: renameFile.newName, id, filePath: newFilePath, thumbnailPath };
+
+  const newVideo: Video = { ...videoToRename, filename: renameFile.newName, filepath: newFilePath };
   const filteredVideoList: Video[] = [...videoList.filter(video => video.id !== renameFile.id), newVideo];
   setVideoList(filteredVideoList);
-  await listVideos();
+  await reindexVideoList();
   return newVideo;
 };
