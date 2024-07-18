@@ -1,5 +1,5 @@
 import { Config, Thumbnail, Video } from "../../src/utils/types";
-import fs from "fs-extra";
+import fs, { Stats } from "fs";
 
 export const getUserPassword = (): string => {
   return (getConfig()).password;
@@ -13,43 +13,63 @@ export const getThumnailSettings = (): Thumbnail => {
   return (getConfig()).thumbnailSettings;
 };
 
-export const getPath = (): string => {
-  const dir = "/blujay" as string | undefined;
+export const getDataPath = (): string => {
+  const dir = "/data/" as string | undefined;
   if (dir)
     return checkCreateDir(dir);
   throw ("Required: \"path\" configuration property not found!");
 };
 
+export const getPath = (): string => {
+  const dir = getDataPath() + "blujay/";
+  return checkCreateDir(dir);
+};
+
 export const getAssetsPath = (): string => {
-  const dir = getPath() + "/config/";
+  const dir = getPath() + "config/";
   return checkCreateDir(dir);
 };
 
 export const getBackupPath = (): string => {
-  const dir = getAssetsPath() + "/backups/";
+  const dir = getAssetsPath() + "backups/";
   return checkCreateDir(dir);
 };
 
 export const getThumbnailsPath = (): string => {
-  const dir = getPath() + "/thumbnails/";
+  const dir = getPath() + "thumbnails/";
   return checkCreateDir(dir);
 };
 
 export const getLibraryPath = (): string => {
-  const dir = getPath() + "/library/";
+  const dir = getPath() + "library/";
   return checkCreateDir(dir);
 };
 
+export const getUnsupportedPath = (): string => {
+  const dir = getAssetsPath() + "unsupported/";
+  return checkCreateDir(dir);
+};
+
+export const getTempPath = (): string => {
+  const dir = getAssetsPath() + "temp/";
+  return checkCreateDir(dir);
+};
+
+
 export const getVideoListPath = (): string => {
   const dir = getAssetsPath() + "video_list.json";
-  checkCreateJSON(dir, []);
+  checkCreateJSON(dir, "[]");
   return dir;
 };
 
 export const getBackupVideoListPath = (): string => {
   const dir = getBackupPath() + "video_list.json";
-  checkCreateJSON(dir, []);
+  checkCreateJSON(dir, "[]");
   return dir;
+};
+
+export const getThumbnailList = (): string[] => {
+  return fs.readdirSync(getThumbnailsPath());
 };
 
 export const getConfigPath = (): string => {
@@ -64,25 +84,64 @@ export const getConfigPath = (): string => {
     }
   };
 
-  checkCreateJSON(dir, defaultConfig);
+  checkCreateJSON(dir, JSON.stringify(defaultConfig));
   return dir;
 };
 
 export const setVideoList = (list: Video[]): void => {
-  fs.writeJSONSync(getVideoListPath(), list);
+  fs.writeFileSync(getVideoListPath(), JSON.stringify(list), "utf-8");
 };
 
 export const getVideoList = (): Video[] => {
-  return fs.readJSONSync(getVideoListPath()) as Video[];
+  return JSON.parse(fs.readFileSync(getVideoListPath(), "utf-8")) as Video[];
+};
+
+export const deleteVideo = (path: string): void => {
+  if (fs.existsSync(path)) {
+    fs.rmSync(path, { force: true });
+  }
+};
+
+export const renameVideoFile = (path: string, newName: string): void => {
+  if (fs.existsSync(path)) {
+    fs.renameSync(path, newName);
+  }
+};
+
+export const getVideo = (path: string): Buffer | undefined => {
+  if (fs.existsSync(path)) {
+    return fs.readFileSync(path);
+  }
+};
+
+export const moveVideoToLibrary = (path: string): void => {
+  if (fs.existsSync(path)) {
+    const filename = path.split("\\").pop();
+    fs.renameSync(path, getLibraryPath() + filename);
+  }
+};
+
+export const markVideoUnsupported = (path: string): void => {
+  if (fs.existsSync(path)) {
+    const filename = path.split("\\").pop();
+    fs.renameSync(path, getUnsupportedPath() + filename);
+  }
+};
+
+export const moveVideoFromTemp = (path: string): void => {
+  if (fs.existsSync(path)) {
+    const filename = path.split("\\").pop();
+    fs.renameSync(path, getUnsupportedPath() + filename);
+  }
 };
 
 export const getConfig = (): Config => {
-  return fs.readJSONSync(getConfigPath()) as Config;
+  return JSON.parse(fs.readFileSync(getConfigPath(), "utf-8")) as Config;
 };
 
 export const createVideoListBackup = (): void => {
   const videoList = getVideoList();
-  fs.writeJSONSync(getBackupVideoListPath(), videoList);
+  fs.writeFileSync(getBackupVideoListPath(), JSON.stringify(videoList), "utf-8");
 };
 
 export const deleteThumbnail = (thumbnailName: string): void => {
@@ -95,14 +154,20 @@ export const getDirListOfLibrarySubfolders = (): string[] => {
     .map(dirent => dirent.name);
 };
 
-const checkCreateJSON = <T>(dir: string, defaultValue: T): string => {
+export const getFileStat = (filepath: string): Stats | undefined => {
+  if (fs.existsSync(filepath)) {
+    return fs.statSync(filepath);
+  }
+};
+
+const checkCreateJSON = <T extends string>(dir: string, defaultValue: T): string => {
   if (!fs.existsSync(dir))
-    fs.writeJSONSync(dir, defaultValue);
+    fs.writeFileSync(dir, defaultValue, "utf-8");
   return dir;
 };
 
 const checkCreateDir = (dir: string): string => {
-  if (!fs.existsSync(dir) || !fs.pathExistsSync(dir))
+  if (!fs.existsSync(dir) || !fs.existsSync(dir))
     fs.mkdirSync(dir);
   return dir;
 };

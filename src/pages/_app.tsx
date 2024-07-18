@@ -1,183 +1,216 @@
-import { AppProps } from "next/app";
-import { AuthStatus, BluJayTheme, CookieTypes, Video } from "../utils/types";
+import { CookieTypes, Video } from "../utils/types";
 import { Cookies, CookiesProvider } from "react-cookie";
-import { ReactElement, useState } from "react";
-import { darkTheme, lightTheme } from "@client/utils/theme";
+import { KeepAliveProvider } from "react-next-keep-alive";
+import { Montserrat } from "next/font/google";
+import { VideoProvider } from "@client/components/common/contexts/video-context";
+import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
-import { getVideoList } from "@server/utils/config";
-import App from "next/app";
+import { reindexThumbnails } from "@server/utils/thumbnail-service";
+import { reindexVideoList } from "@server/utils/video-service";
+import { testIndex } from "@server/utils/validateVideo";
+import { useRouter } from "next/router";
+import App, { AppContext, AppInitialProps, AppProps } from "next/app";
+import BackToTop from "@client/components/common/layout/back-to-top";
+import GlobalUploadWrapper from "@client/components/common/layout/upload/gobal-upload-wrapper";
+import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
-import React from "react";
-import Sidebar from "@client/components/common/layout/sidebar/sidebar";
-import VideoSlider from "@client/components/common/video-slider/video-slider";
-import cookies from "next-cookies";
-import getAuthStatus from "../../server/utils/auth";
+import LoadBar from "@client/components/common/layout/load-bar";
+import React, { ReactElement, useEffect, useState } from "react";
+import SearchSlider from "@client/components/common/video-slider/search-slider";
+import Sidebar from "@client/components/common/layout/sidebar/side-bar";
+import UploadProgress from "@client/components/common/layout/upload/upload-progress";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
+const montserrat = Montserrat({
+  subsets: ["latin"],
+});
+
 const GlobalStyle = createGlobalStyle`
-html {
-  font-family: 'Montserrat';
-  background-color: ${(p): string => p.theme.background};
-  color: ${(p): string => p.theme.text};
-}
+  html {
+    background-color: ${(p): string => p.theme.background};
+    color: ${(p): string => p.theme.text};
+  }
+  body{
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 
-// fixes sidebar positioning somehow 
-* {
-   box-sizing: border-box;
-}
+  ::-webkit-scrollbar
+  {
+    width: 5px;
+    height: 5px;
+    -webkit-appearance: none;
+    background-color: transparent;
+  }
 
-// prevents content shift on scrollbar
-body {
-  width: calc(100vw - 15px);
-}
+  ::-webkit-scrollbar-track-piece
+  {
+   display:none;
+  }
 
-html, body {
-  margin: 0px;
-}
+  ::-webkit-scrollbar-thumb
+  {
+    border-radius: 8px;
+    background-color: ${(p): string => p.theme.textContrast};
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  display: inline;
-  margin: 0px;
-}
+  a:hover, a:visited, a:link, a:active
+  {
+      text-decoration: none; color: unset;
+  }
 
-h1 {
-  line-height: 75%;
-  font-size: 1.9em;
-  font-weight: 900;
-}
+  // fixes sidebar positioning somehow 
+  * {
+    box-sizing: border-box;
+  }
 
-h2 {
-  font-size: 1.7em;
-  font-weight: 700;
-}
+  html, body {
+    margin: 0px;
+    font-size: 1.03em;
+  }
 
-h4 {
-  font-size: 1.6em;
-  font-weight: 575;
+  h1, h2, h3, h4, h5, h6 {
+    display: inline;
+    margin: 0px;
+  }
 
-}
+  h1 {
+    line-height: 100%;
+    font-size: 1.9em;
+    font-weight: 900;
+  }
 
-h5{
-  font-size: 1em;
-  font-weight: 500;
-}
+  h2 {
+    font-size: 1.9em;
+    font-weight: 725;
+  }
 
-h6{
-  font-size: 0.83em;
-  font-weight: 500;
-}
+  h4 {
+    font-size: 22px;
+    font-weight: 600;
+  }
 
-input, textarea, select { 
-  font-family:inherit; 
-  font-size: inherit; 
-}
+  h5{
+    font-size: 1em;
+    font-weight: 500;
+  }
+
+  h6{
+    font-size: 0.83em;
+    font-weight: 500;
+  }
+
+  input, textarea, select { 
+    font-family:inherit; 
+    font-size: inherit; 
+  }
 `;
 
 const LayoutWrapper = styled.div`
   display: flex;
+  width: calc(100vw - 5px);
+
+  @media (max-width: ${screenSizes.mobileScreenSize}px) {
+    width: unset;
+  }
+`;
+
+const CenterContent = styled.div`
+  max-width: ${screenSizes.largeScreenSize}px;
+  margin: 0 auto 0 auto;
+  width: 100%;
 `;
 
 const ContentWrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  margin: 20px;
-  overflow: hidden;
+  margin: 10px 20px 20px 20px;
+
+  @media (max-width: ${screenSizes.mobileScreenSize}px) {
+    margin: 10px 10px 20px 10px;
+  }
 `;
 
-type NextAppComponentType = typeof App;
-interface ExtendedAppProps extends AppProps {
-  authStatus: AuthStatus;
-  videos: Video[];
-  theme: BluJayTheme;
+interface MyAppProps {
+  intialVideos: Video[];
+  cookieString: string | undefined;
 }
 
-const MyApp: Omit<NextAppComponentType, "origGetInitialProps"> = ({
-  Component,
-  pageProps,
-  theme,
-  videos,
-}: ExtendedAppProps): ReactElement => {
+const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & MyAppProps): ReactElement => {
+  //TODO: move this state call into a component that doesn't rerender EVERYTHING
   const [search, setSearch] = useState("");
+  const [isProgressBarShown, setIsProgressBarShown] = useState(false);
+  const [filesToUpload, setFilesToUpload] = useState<FileList | null>(null);
+  const router = useRouter();
 
-  // assign default values to cookies if not set
-  // get all cookies and set default if none
-  const _cookies = new Cookies();
-  const allCookieTypes: CookieTypes[] = [
-    "authToken",
-    "isDarkMode",
-    "theaterMode",
-    "videoVolume",
-  ];
-
+  const cookies = new Cookies(cookieString);
+  // assign default values to cookies if not set, get all cookies and set default if none
+  const allCookieTypes: CookieTypes[] = ["authToken", "isTheaterMode", "videoVolume", "isSidebarEnabled"];
   allCookieTypes.forEach((cookieType) => {
-    if (!_cookies.get(cookieType))
-      _cookies.set(
-        cookieType,
-        getCookieDefault(cookieType),
-        getCookieSetOptions()
-      );
+    if (!cookies.get(cookieType)) cookies.set(cookieType, getCookieDefault(cookieType), getCookieSetOptions());
   });
 
-  const categories = [...new Set(videos.map((video) => video.category))].filter(
-    (category) => category
-  );
+  useEffect(() => {
+    if (search) {
+      setSearch("");
+    }
+  }, [router.asPath]);
 
-  const searchResults = videos.filter((video) =>
-    video.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  console.log(search);
   return (
-    <>
-      <title>title</title>
-      <CookiesProvider cookies={_cookies}>
-        <ThemeProvider theme={theme}>
+    <CookiesProvider cookies={cookies}>
+      <ThemeProvider theme={blujayTheme}>
+        <VideoProvider intialVideos={intialVideos}>
           <GlobalStyle />
-          <LayoutWrapper>
-            <Sidebar categories={categories} />
-            <ContentWrapper>
-              <Header search={search} setSearch={setSearch} />
-              {search ? (
-                <VideoSlider
-                  videos={searchResults}
-                  sliderType={"verticle"}
-                  headerText={"Search Results"}
-                />
-              ) : (
-                <Component {...pageProps} />
-              )}
-            </ContentWrapper>
+          <Head>
+            <title>Blujay</title>
+          </Head>
+          <LayoutWrapper className={montserrat.className}>
+            {router.pathname.includes("/login") ? (
+              <Component {...pageProps} />
+            ) : (
+              <GlobalUploadWrapper setFilesToUpload={setFilesToUpload}>
+                <LoadBar />
+                <Sidebar />
+                <CenterContent>
+                  <BackToTop isProgressBarShown={isProgressBarShown} />
+                  <UploadProgress
+                    filesToUpload={filesToUpload}
+                    setFilesToUpload={setFilesToUpload}
+                    isProgressBarShown={isProgressBarShown}
+                    setIsProgressBarShown={setIsProgressBarShown}
+                  />
+                  <Header search={search} setSearch={setSearch} setFilesToUpload={setFilesToUpload} />
+                  <ContentWrapper>
+                    <KeepAliveProvider router={router}>
+                      {search ? <SearchSlider search={search} /> : <Component {...pageProps} />}
+                    </KeepAliveProvider>
+                  </ContentWrapper>
+                </CenterContent>
+              </GlobalUploadWrapper>
+            )}
           </LayoutWrapper>
-        </ThemeProvider>
-      </CookiesProvider>
-    </>
+        </VideoProvider>
+      </ThemeProvider>
+    </CookiesProvider>
   );
 };
 
-MyApp.getInitialProps = async (initialProps): Promise<ExtendedAppProps> => {
-  const { ctx } = initialProps;
-  const videos = getVideoList();
+MyApp.getInitialProps = async (context: AppContext): Promise<MyAppProps & AppInitialProps> => {
+  const ctx = await App.getInitialProps(context);
 
-  // auth stuff
-  const authToken = cookies(ctx)?.authToken;
-  const authStatus = getAuthStatus(authToken);
-  const theme = cookies(ctx)?.isDarkMode === "true" ? darkTheme : lightTheme;
-
-  // if there's a token, the user is not authenticated, and authentication is required
-  // then redirect to login and reset
-  if (authToken && authStatus === AuthStatus.notAuthenticated && ctx.res) {
-    ctx.res.setHeader("Set-Cookie", "authToken=; Max-Age=0");
-    ctx.res.setHeader("Location", "/login");
+  let cookieString: string | undefined;
+  let intialVideos: Video[] = [];
+  if (typeof window === "undefined") {
+    const indexVideosAndThumbnails = await import("@server/utils/intial-config");
+    await indexVideosAndThumbnails.default();
+    cookieString = context.ctx.req?.headers.cookie;
+    const cookies = new Cookies(cookieString);
+    const authToken = cookies.get("authToken");
+    const auth = await import("@server/utils/auth");
+    intialVideos = await auth.getProtectedVideoList(context.ctx, authToken);
+  } else {
+    cookieString = document.cookie;
   }
 
-  // get the remaining app props...
-  const appInitialProps = (await App.getInitialProps(initialProps)) as AppProps;
-  return {
-    authStatus,
-    videos,
-    theme,
-    ...appInitialProps,
-  };
+  return { ...ctx, intialVideos, cookieString };
 };
 
 export default MyApp;

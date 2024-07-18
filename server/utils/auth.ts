@@ -1,23 +1,32 @@
+import { NextPageContext } from "next";
+import { Video } from "@client/utils/types";
+import { getPrivateLibrary, getUserPassword, getVideoList } from "./config";
 import { randomBytes, scryptSync } from "crypto";
 
-import { AuthStatus } from "../../src/utils/types";
-import { getUserPassword } from "./config";
+export const getProtectedVideoList = async (ctx: NextPageContext, authToken: string): Promise<Video[]> => {
+  const isAuthenticated = checkHashedPassword(authToken);
+  const videoList = getVideoList();
 
-const getAuthStatus = (token: string | undefined): AuthStatus => {
-  if (isTokenValid(token))
-    return AuthStatus.authenticated;
-  return AuthStatus.notAuthenticated;
+  if (!isAuthenticated) {
+    const isPrivateLibrary = getPrivateLibrary();
+
+    if (authToken) ctx.res?.setHeader("Set-Cookie", "authToken=; path=/;");
+    if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
+      ctx.res?.writeHead(302, { Location: "/login" });
+      ctx.res?.end();
+      return [];
+    }
+  }
+
+  if (isAuthenticated) return videoList;
+  else return videoList.filter((video) => !video.requireAuth);
 };
 
-export const isTokenValid = (authToken: string | undefined): boolean => {
-  return checkHashedPassword("default", authToken ?? "");
-};
-
-export const checkHashedPassword = (user: string, hashedPassword: string): boolean => {
+export const checkHashedPassword = (hashedPassword: string): boolean => {
   const configPassword = getUserPassword();
 
   if (!configPassword) {
-    return false;
+    return true;
   }
 
   const salt = hashedPassword.slice(64);
@@ -29,5 +38,3 @@ export const hashPassword = async (password: string): Promise<string> => {
   const salt = randomBytes(16).toString("hex");
   return scryptSync(password, salt, 32).toString("hex") + salt;
 };
-
-export default getAuthStatus;

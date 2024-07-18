@@ -1,46 +1,37 @@
 import { OrderType, SortType, ViewType } from "@client/utils/types";
+import { screenSizes, sortOptions } from "@client/utils/constants";
 import React, { FC } from "react";
 import Select from "../../shared/select";
 import SliderHeader from "../header";
+import ToggleIcon from "../../shared/toggle-icon";
 import styled from "styled-components";
 
-const SortIcon = styled.i`
-  color: ${(p): string => p.theme.textContrast};
-  font-size: 1.25rem;
-  vertical-align: baseline;
-  margin-left: auto;
-  margin-right: 5px;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-    cursor: pointer;
+const SortSelect = styled.div`
+  margin-right: 15px;
+  display: flex;
+  width: 190px;
+  min-width: 190px;
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    margin-top: 10px;
   }
 `;
 
-const SortSelect = styled.div`
-  display: flex;
-  width: 260px;
-`;
-
 const TypeSelect = styled.div`
-  width: 130px;
-  margin-left: 10px;
+  width: 110px;
+  min-width: 110px;
   display: flex;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    margin-top: 10px;
+  }
 `;
 
 const viewOptions: ViewType[] = ["Grid View", "List View"];
-const sortOptions: SortType[] = [
-  "Alphabetical",
-  "Date Created",
-  "Date Updated",
-  "File Size",
-  "View Count",
-];
 
 interface VeticleSliderHeaderProps {
   handleSortChange: (sort: string) => void;
   handleIsAscendingChange: () => void;
-  handleViewChange: () => void;
+  handleViewChange: (view: string) => void;
   headerText: string;
   order: OrderType;
   sort: SortType;
@@ -55,33 +46,21 @@ const VeticleSliderHeader: FC<VeticleSliderHeaderProps> = ({
   order,
   sort,
   view,
-}: VeticleSliderHeaderProps) => {
+}) => {
   return (
     <>
-      <SliderHeader headerText={headerText}>
+      <SliderHeader headerText={headerText} sliderType="verticle">
         <SortSelect>
-          <SortIcon
+          <ToggleIcon
             onClick={handleIsAscendingChange}
-            className={
-              order === "Ascending" ? "bx bx-sort-up" : "bx bx-sort-down"
-            }
+            isToggled={order === "Ascending"}
+            onIcon="bx bx-sort-up"
+            offIcon="bx bx-sort-down"
           />
-          <Select
-            options={sortOptions}
-            onChange={handleSortChange}
-            value={[sort + " " + order]}
-          />
+          <Select options={[...sortOptions]} onChange={handleSortChange} value={[sort]} />
         </SortSelect>
         <TypeSelect>
-          <SortIcon
-            onClick={handleViewChange}
-            className={view ? "bx bx-grid-small" : "bx bx-list-ul"}
-          />
-          <Select
-            options={viewOptions}
-            onChange={handleViewChange}
-            value={[view]}
-          />
+          <Select options={viewOptions} onChange={handleViewChange} value={[view]} />
         </TypeSelect>
       </SliderHeader>
     </>

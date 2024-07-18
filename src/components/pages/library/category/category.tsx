@@ -1,30 +1,26 @@
-import { Video } from "@client/utils/types";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import VideoSlider from "@client/components/common/video-slider/video-slider";
 
-interface CategoryPageProps {
-  videos: Video[];
-}
-
-const CategoryPage: FC<CategoryPageProps> = ({ videos }: CategoryPageProps) => {
+const CategoryPage: FC = () => {
   const router = useRouter();
+  const { videos } = useContext(VideoContext);
   const { category } = router.query;
 
-  const categoryVideos = videos.filter((video) => {
-    if (!Array.isArray(category))
-      return video.category.toLowerCase() === category?.toLowerCase();
-  });
+  if (!category || Array.isArray(category)) {
+    router.push("/404");
+    return <></>;
+  }
 
-  const cateogryName = categoryVideos[0]?.category ?? category;
-
-  return (
-    <VideoSlider
-      videos={categoryVideos}
-      sliderType={"verticle"}
-      headerText={cateogryName}
-    />
+  const categoryVideos = videos.filter((video) =>
+    video.categories.map((cate) => cate.toLowerCase()).includes(category.toLowerCase())
   );
+
+  const cateogryName =
+    categoryVideos[0].categories.find((cate) => cate.toLowerCase() === cate.toLowerCase()) ?? category;
+
+  return <VideoSlider videos={categoryVideos} sliderType={"verticle"} headerText={cateogryName} category={category} />;
 };
 
 export default CategoryPage;

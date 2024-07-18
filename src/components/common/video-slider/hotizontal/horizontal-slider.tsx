@@ -1,116 +1,192 @@
-import { Video } from "@client/utils/types";
+import "react-indiana-drag-scroll/dist/style.css";
+import { OrderType, SortType, Video } from "@client/utils/types";
+import { screenSizes } from "@client/utils/constants";
 import HorizontalSliderHeader from "./horizontal-header";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
+import ScrollContainer from "react-indiana-drag-scroll";
 import VideoDetails from "../details";
 import styled from "styled-components";
 
-const transitionTimeMS = 150;
-
 const CarouselWrapper = styled.div`
-  overflow: clip;
+  width: 100%;
+  container-type: inline-size;
+`;
+
+const Carousel = styled(ScrollContainer)`
+  div:last-child {
+    margin-right: 0px;
+  }
+  display: flex;
+  overflow: hidden;
+  transition: 250ms;
+  overflow-x: scroll;
+`;
+
+const CarouselOverlay = styled.div`
+  position: absolute;
+  display: flex;
+  z-index: 1;
+  height: calc(100% - 15px - 38px);
+  cursor: pointer;
+  pointer-events: auto;
+  visibility: hidden;
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    display: none;
+  }
+`;
+
+const CarouselOverlayRight = styled(CarouselOverlay)`
   width: 100%;
 `;
 
-const Carousel = styled.div`
-  > div {
-    transition: ${(p: { videoWidth: number; hubro: HubroTypes }): number => {
-      if (p.hubro === "pause") return 0;
-      return transitionTimeMS * 0.001;
-    }}s;
-
-    transform: ${(p): string => {
-      if (p.hubro === "forward") return "translateX(-100%)";
-      if (p.hubro === "backward") return "translateX(100%)";
-      return "";
-    }};
+const ChevronIcon = styled.div`
+  visibility: visible;
+  transition: 250ms;
+  margin: auto;
+  opacity: 0;
+  margin-left: 10px;
+  background-color: rgba(0, 0, 0, 0.75);
+  border-radius: 40px;
+  &:hover {
+    opacity: 1;
   }
-
-  & :not(:last-child) {
-    margin-right: 15px;
-  }
-  width: ${(p): number => 100 + p.videoWidth * 2}%;
-  left: -${(p): number => p.videoWidth}%;
-
-  position: relative;
-
-  display: flex;
 `;
 
-type HubroTypes = "pause" | "forward" | "backward";
+const ChevronIconRight = styled(ChevronIcon)`
+  margin: auto;
+  margin-right: 10px;
+`;
 
 interface HorizontalSliderProps {
   videos: Video[];
-  videosPerRow: number;
   headerText: string;
+  onlyFavorites?: boolean;
+  category?: string;
+  search?: string;
+  intialOrder?: OrderType;
+  intialSort?: SortType;
 }
 
 const HorizontalSlider: FC<HorizontalSliderProps> = ({
   videos,
   headerText,
-  videosPerRow,
-}: HorizontalSliderProps) => {
-  const [displayedVideos, setDisplayedVideos] = useState<JSX.Element[]>([]);
-  const [hubro, setHubro] = useState<HubroTypes>("pause");
-  const [displayedPosition, setDisplayedPosition] = useState(0);
-  const [position, setPosition] = useState(0);
+  onlyFavorites,
+  category,
+  search,
+  intialOrder,
+  intialSort,
+}) => {
+  const [isEnd, setIsEnd] = useState(false);
+  const [isStart, setIsStart] = useState(true);
+  const [scrollMax, setScrollMax] = useState(false);
+  const [videosDisplayed, setVideosDisplayed] = useState(Math.min(videos.length, 36)); // 36 is arbitrary
+  const draggingEl = useRef<HTMLElement>(null);
 
-  const videoWidth = 100 / videosPerRow;
-  const isMaxOffset = videosPerRow + position >= videos.length;
-
-  if (hubro === "pause" && displayedPosition !== position) {
-    setHubro(position < displayedPosition ? "backward" : "forward");
-
-    const interval = setInterval(() => {
-      setDisplayedPosition(position);
-      const newDisplay = [...displayedVideos];
-
-      if (position < displayedPosition) {
-        const newVideo = videos[displayedPosition - 2];
-        const newVideoEl = (
-          <VideoDetails key={newVideo?.id || "0"} video={newVideo} />
-        );
-
-        newDisplay.pop();
-        newDisplay.unshift(newVideoEl);
+  const incrementVideo = async (): Promise<void> => {
+    if (draggingEl && draggingEl.current) {
+      // 15 is the missing margin on the last displayed video
+      const videoWidth = (draggingEl.current.scrollWidth + 15) / videosDisplayed;
+      const scrollLeft = draggingEl.current.scrollLeft;
+      const nextValue = Math.ceil(scrollLeft / videoWidth) * videoWidth - scrollLeft;
+      if (nextValue > 1) {
+        scrollAmount(Math.ceil(nextValue));
       } else {
-        const newVideo = videos[displayedVideos.length - 1 + displayedPosition];
-        const newVideoEl = (
-          <VideoDetails key={newVideo?.id || "1"} video={newVideo} />
-        );
-
-        newDisplay.splice(0, 1);
-        newDisplay.push(newVideoEl);
+        scrollAmount(Math.ceil(videoWidth));
       }
+    }
+  };
 
-      setDisplayedVideos(newDisplay);
-      setHubro("pause");
-      clearInterval(interval);
-    }, transitionTimeMS);
-  }
+  const decrementVideo = async (): Promise<void> => {
+    if (draggingEl && draggingEl.current) {
+      // 15 is the missing margin on the last displayed video
+      const videoWidth = (draggingEl.current.scrollWidth + 15) / videosDisplayed;
+      const scrollLeft = draggingEl.current.scrollLeft;
+      const nextValue = Math.floor(scrollLeft / videoWidth) * videoWidth - scrollLeft;
+      if (nextValue < -1) {
+        scrollAmount(Math.floor(nextValue));
+      } else {
+        scrollAmount(-Math.ceil(videoWidth));
+      }
+    }
+  };
 
-  if (videosPerRow + 2 !== displayedVideos.length) {
-    setDisplayedVideos(
-      [...new Array(videosPerRow + 2)].map((undef, i) => (
-        <VideoDetails
-          key={videos[i + displayedPosition - 1]?.id || i}
-          video={videos[i + displayedPosition - 1]}
-        />
-      ))
-    );
-  }
+  const resetScroll = async (): Promise<void> => {
+    const amount = draggingEl.current?.scrollWidth ?? 0;
+    scrollAmount(-amount);
+  };
+
+  const maxScroll = async (): Promise<void> => {
+    setScrollMax(true);
+    if (videosDisplayed === videos.length) {
+      const amount = draggingEl.current?.scrollWidth ?? 0;
+      scrollAmount(amount);
+    }
+    setVideosDisplayed(videos.length);
+  };
+
+  const scrollAmount = (amount: number): void => {
+    draggingEl.current?.scrollBy({ left: amount, top: 0, behavior: "smooth" });
+    onScroll();
+  };
+
+  const onScroll = (): void => {
+    if (draggingEl && draggingEl.current) {
+      const endPosition = draggingEl.current.scrollWidth - draggingEl.current.clientWidth;
+      setIsStart(draggingEl.current.scrollLeft === 0);
+      setIsEnd(draggingEl.current.scrollLeft === endPosition);
+    }
+  };
+
+  const addMoreVideos = (): void => {
+    const videosToAdd = 36;
+    if (videosDisplayed + videosToAdd > videos.length) {
+      setVideosDisplayed(videos.length);
+    } else {
+      setVideosDisplayed(videosDisplayed + 36);
+    }
+  };
+
+  useEffect(() => {
+    if (scrollMax) {
+      setScrollMax(false);
+      const amount = draggingEl.current?.scrollWidth ?? 0;
+      scrollAmount(amount);
+    }
+  }, [videosDisplayed]);
 
   return (
     <>
       <HorizontalSliderHeader
-        isMaxOffset={isMaxOffset}
-        displayedPosition={displayedPosition}
-        position={position}
-        setPosition={setPosition}
+        isEnd={isEnd}
+        isStart={isStart}
+        incrementVideo={incrementVideo}
+        decrementVideo={decrementVideo}
         headerText={headerText}
       />
       <CarouselWrapper>
-        <Carousel videoWidth={videoWidth} hubro={hubro}>
-          {displayedVideos}
+        <CarouselOverlay>
+          <ChevronIcon className={"bx bx-chevron-left bx-md"} onClick={resetScroll} />
+        </CarouselOverlay>
+        <CarouselOverlayRight>
+          <ChevronIconRight className={"bx bx-chevron-right bx-md"} onClick={maxScroll} />
+        </CarouselOverlayRight>
+        <Carousel
+          ref={draggingEl as React.ReactPortal & React.MutableRefObject<unknown>}
+          onEndScroll={addMoreVideos}
+          onScroll={onScroll}
+        >
+          {videos.slice(0, videosDisplayed).map((video, i) => (
+            <VideoDetails
+              key={i}
+              video={video}
+              category={category}
+              onlyFavorites={onlyFavorites}
+              search={search}
+              sort={intialSort}
+              order={intialOrder}
+            />
+          ))}
         </Carousel>
       </CarouselWrapper>
     </>

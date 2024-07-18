@@ -4,14 +4,14 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import { Video } from "@client/utils/types";
+import { checkHashedPassword } from "@server/utils/auth";
 import { getThumbnailsPath, getVideoList } from "@server/utils/config";
-import { isTokenValid } from "@server/utils/auth";
 import fs from "fs";
 
 const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
 
-  const videoId = req.query.id;
-
+  const getID = req.query.id as string;
+  const videoId: string = getID.split(".")[0];
   const videoList = getVideoList();
   const video: Video | undefined = videoList.find((video: Video) => { return video.id === videoId; });
 
@@ -27,23 +27,22 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
     return;
   }
 
-  if (video.requireAuth && !(isTokenValid(req.cookies.authToken))) {
+  if (video.requireAuth && !(checkHashedPassword(req.cookies.authToken ?? ""))) {
     res.statusCode = 401;
     res.end(JSON.stringify("Unauthorized"));
     return;
   }
 
-  if (!fs.existsSync(video.thumbnailPath)) {
+  if (!fs.existsSync(video.thumbnailFilepath)) {
     res.statusCode = 404;
     res.end(JSON.stringify("Thumbnail not found in file path!"));
     return;
   }
 
-  res.writeHead(200, { "Content-Type": "image/jpeg", "Content-disposition": `attachment; filename=${video.name}.jpeg` });
-  fs.createReadStream(`${getThumbnailsPath()}${video.name}.jpg`).pipe(res);
+  res.writeHead(200, { "Content-Type": "image/webp", "Content-disposition": `filename=${video.id}.webp` });
+  fs.createReadStream(`${getThumbnailsPath()}${video.id}.webp`).pipe(res);
+
   return;
-
-
 });
 
 export default useAuth;

@@ -1,4 +1,5 @@
 import { BluJayTheme } from "@client/utils/types";
+import DropDown from "./drop-down";
 import React, { FC, useState } from "react";
 import styled from "styled-components";
 
@@ -8,48 +9,21 @@ const SelectBoxWrapper = styled.div`
   width: 100%;
 `;
 
+const PointerWrapper = styled.div`
+  cursor: pointer;
+`;
+
 const SelectBox = styled.div`
-  color: ${(p): string => p.theme.textContrast};
+  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.text};
   display: flex;
   user-select: none;
 
   &:hover {
     color: ${(p): string => p.theme.text};
-    cursor: pointer;
   }
 
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
-    p.isFocused ? `${p.theme.text}` : ""};
-`;
-
-const UnselectedBox = styled.div`
-  position: absolute;
-  max-height: 250px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: 1s;
-  width: 110%;
-  padding: 5px;
-  background-color: ${(p): string => p.theme.background};
-  border-left: 3px solid ${(p): string => p.theme.highlightLight};
-  z-index: 2;
-  left: -20px;
-
-  &:hover {
-    border-left: 3px solid ${(p): string => p.theme.highlightDark};
-  }
-`;
-
-const UnselectedOption = styled.div`
-  padding: 5px;
-  color: ${(p): string => p.theme.textContrast};
-  transition: 0.15s;
-
-  &:hover {
-    color: ${(p): string => p.theme.text};
-    cursor: pointer;
-    border-radius: 5px;
-  }
+  color: ${(p): string => (p.isFocused ? `${p.theme.text}` : "")};
+  pointer-events: ${(p): string => (p.isFocused ? "none" : "auto")};
 `;
 
 const SelectedBox = styled.div`
@@ -59,31 +33,25 @@ const SelectedBox = styled.div`
 `;
 
 const SelectedOption = styled.div`
-  font-size: 85%;
-
   border: ${(p: { isMulti: boolean | undefined; theme: BluJayTheme }): string =>
-    p.isMulti
-      ? `1px solid ${p.theme.textContrast};`
-      : "border: 0px; font-size: 1rem;"};
+    p.isMulti ? `1px solid ${p.theme.textContrast};` : "0px solid"};
 `;
 
 const SelectedIcon = styled.i`
-  font-size: 110%;
   padding-top: 1px;
-  margin-right: 3px;
 
   ::before {
     vertical-align: baseline;
   }
 `;
 
-const RightIcons = styled.i`
+const RightIcons = styled.div`
   text-align: right;
   display: flex;
+  max-height: 20px;
 
   i {
     font-size: 1.25rem;
-    vertical-align: baseline;
   }
 `;
 
@@ -105,19 +73,12 @@ interface SelectProps {
   isMulti?: boolean;
   isClearable?: boolean;
   defaultSelected?: string[];
+  postFix?: string;
   onChange: (options: SelectOptions) => void;
 }
 
-const Select: FC<SelectProps> = ({
-  options,
-  value,
-  isMulti,
-  isClearable,
-  defaultSelected,
-  onChange,
-}: SelectProps) => {
+const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, defaultSelected, postFix, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isUnselectedFocus, setIsUnselectedFocus] = useState(false);
   const handleAddOption = (option: string) => (e: React.MouseEvent) => {
     e.stopPropagation();
     let newOptions: string[];
@@ -133,9 +94,7 @@ const Select: FC<SelectProps> = ({
 
   const handleRemoveOption = (option: string) => (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newOptions = [
-      ...value.filter((selectedOption) => selectedOption !== option),
-    ];
+    const newOptions = [...value.filter((selectedOption) => selectedOption !== option)];
     onChange(newOptions as SelectOptions);
   };
 
@@ -144,11 +103,7 @@ const Select: FC<SelectProps> = ({
     if (isMulti) {
       onChange([] as string[] as SelectOptions);
     } else {
-      onChange(
-        defaultSelected
-          ? (defaultSelected as SelectOptions)
-          : ("Select..." as SelectOptions)
-      );
+      onChange(defaultSelected ? (defaultSelected as SelectOptions) : ("Select..." as SelectOptions));
     }
   };
 
@@ -157,87 +112,47 @@ const Select: FC<SelectProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const mouseDown = (): void => {
-    setIsUnselectedFocus(true);
-  };
-
-  const mouseUp = (): void => {
-    setIsUnselectedFocus(false);
-  };
-
-  const onBlur = (): void => {
-    if (!isUnselectedFocus) {
-      setIsOpen(false);
-    }
-  };
-
-  const unselectedOptions = options.filter((option) => !value.includes(option));
+  const unselectedOptions = options
+    .filter((option) => !value.includes(option))
+    .map((option) => {
+      return { text: option, action: handleAddOption(option) };
+    });
 
   return (
     <SelectBoxWrapper>
-      <SelectBox
-        tabIndex={0}
-        onClick={handleClick}
-        onMouseDown={mouseDown}
-        onMouseUp={mouseUp}
-        onBlur={onBlur}
-        isFocused={isOpen}
-      >
-        <SelectedBox>
-          {value.length ? (
-            <>
-              {value.map((selectedOption, i) => {
-                return (
-                  <SelectedOption key={i} isMulti={isMulti}>
-                    {selectedOption}
-                    {isMulti && (
-                      <SelectedIcon
-                        className="bx bx-x"
-                        onClick={handleRemoveOption(selectedOption)}
-                      ></SelectedIcon>
-                    )}
-                  </SelectedOption>
-                );
-              })}
-            </>
-          ) : (
-            <PlaceHolderText>Select...</PlaceHolderText>
-          )}
-        </SelectedBox>
-        <RightIcons>
-          {isClearable && (
-            <ClearButton onClick={handleRemoveAll}>
-              <i className="bx bx-x"></i>
-            </ClearButton>
-          )}
-          <div>
-            <i className="bx bx-chevron-down"></i>
-          </div>
-        </RightIcons>
-      </SelectBox>
-
-      {isOpen && (
-        <UnselectedBox
-          tabIndex={0}
-          onMouseDown={mouseDown}
-          onMouseUp={mouseUp}
-          onBlur={onBlur}
-        >
-          {unselectedOptions.length ? (
-            <>
-              {unselectedOptions.map((option, i) => {
-                return (
-                  <UnselectedOption key={i} onClick={handleAddOption(option)}>
-                    {option}
-                  </UnselectedOption>
-                );
-              })}
-            </>
-          ) : (
-            <UnselectedOption>No Options</UnselectedOption>
-          )}
-        </UnselectedBox>
-      )}
+      <PointerWrapper>
+        <SelectBox tabIndex={0} onClick={handleClick} isFocused={isOpen}>
+          <SelectedBox>
+            {value.length ? (
+              <>
+                {value.map((selectedOption, i) => {
+                  return (
+                    <SelectedOption key={i} isMulti={isMulti}>
+                      {selectedOption + (postFix ?? "")}
+                      {isMulti && (
+                        <SelectedIcon className="bx bx-x" onClick={handleRemoveOption(selectedOption)}></SelectedIcon>
+                      )}
+                    </SelectedOption>
+                  );
+                })}
+              </>
+            ) : (
+              <PlaceHolderText>Select...</PlaceHolderText>
+            )}
+          </SelectedBox>
+          <RightIcons>
+            {isClearable && (
+              <ClearButton onClick={handleRemoveAll}>
+                <i className="bx bx-x"></i>
+              </ClearButton>
+            )}
+            <div>
+              <i className="bx bx-chevron-down"></i>
+            </div>
+          </RightIcons>
+        </SelectBox>
+      </PointerWrapper>
+      <DropDown isShown={isOpen} setIsShown={setIsOpen} options={unselectedOptions} left={-10} top={10} />
     </SelectBoxWrapper>
   );
 };

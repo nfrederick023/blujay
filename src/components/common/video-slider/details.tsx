@@ -1,11 +1,40 @@
-import { Video } from "@client/utils/types";
-import React, { FC, useState } from "react";
+import { OrderType, SortType, Video } from "@client/utils/types";
+import { getVideoCategory } from "@client/utils/sortVideo";
+import { screenSizes } from "@client/utils/constants";
+import Link from "next/link";
+import React, { FC, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
-import router from "next/router";
 import styled from "styled-components";
 
+// - ${(15 * (6 - 1)) / 6}px
 const VideoDetailsWrapper = styled.div`
-  width: 100%;
+  position: relative;
+  user-select: none;
+  margin-bottom: 15px;
+  margin-right: 15px;
+
+  @media (min-width: ${screenSizes.mediumScreenSize}px) {
+    min-width: calc((100cqw / 6) - ${(15 * (6 - 1)) / 6}px);
+    max-width: calc((100cqw / 6) - ${(15 * (6 - 1)) / 6}px);
+  }
+
+  @media (max-width: ${screenSizes.mediumScreenSize}px) {
+    min-width: calc((100cqw / 4) - ${(15 * (4 - 1)) / 4}px);
+    max-width: calc((100cqw / 4) - ${(15 * (4 - 1)) / 4}px);
+  }
+
+  @media (max-width: ${screenSizes.smallScreenSize}px) {
+    min-width: calc((100cqw / 2) - ${(15 * (2 - 1)) / 2}px);
+    max-width: calc((100cqw / 2) - ${(15 * (2 - 1)) / 2}px);
+  }
+
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    min-width: calc((100cqw / 1) - ${(15 * (1 - 1)) / 1}px);
+    max-width: calc((100cqw / 1) - ${(15 * (1 - 1)) / 1}px);
+  }
+`;
+
+const VideoDetailsContainer = styled.div`
   &:hover {
     cursor: pointer;
   }
@@ -15,11 +44,47 @@ const PlaceHolder = styled.div`
   width: 100%;
 `;
 
-const Thumbnail = styled.img`
+const thumbnailAttr = (p: { imageHeight: number }): unknown => ({
+  style: {
+    height: p.imageHeight,
+  },
+});
+
+const Overlay = styled.div`
+  height: 100%;
   width: 100%;
+  position: absolute;
+`;
+
+const Thumbnail = styled.img.attrs(thumbnailAttr)`
+  width: 100%;
+  aspect-ratio: 16/9;
   border-radius: 15px;
   object-fit: cover;
-  height: ${(p: { imageHeight: number }): number => p.imageHeight}px;
+`;
+
+const ImagePlayer = styled.img.attrs(thumbnailAttr)`
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 15px;
+  object-fit: cover;
+  position: absolute;
+
+  opacity: ${(p): string => {
+    return p.isPlaying ? "1" : "0";
+  }};
+`;
+
+const VideoPlayer = styled.video.attrs(thumbnailAttr)`
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 15px;
+  object-fit: cover;
+  position: absolute;
+  pointer-events: none;
+  opacity: ${(p): string => {
+    return p.isPlaying ? "1" : "0";
+  }};
 `;
 
 const VideoNameWrapper = styled.div`
@@ -38,45 +103,113 @@ const VideoNameWrapper = styled.div`
 
 interface VideoDetailsProps {
   video?: Video;
+  category?: string;
+  onlyFavorites?: boolean;
+  sort?: SortType;
+  order?: OrderType;
+  search?: string;
 }
 
-const VideoDetails: FC<VideoDetailsProps> = ({ video }: VideoDetailsProps) => {
-  const [ref, setRef] = useState<HTMLDivElement | null>();
+const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, sort, order, search }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // the purpose of this ref is to set the height of the image
-  // before we know the true height aka prevents some content flash
-  const imageHeight = ((ref?.offsetWidth || 0) / 1920) * 1080;
-
-  const navigateToVideo = (): void => {
-    router.push("/watch/" + video?.id);
+  const handleIsHoverTrueChange = async (): Promise<void> => {
+    setIsHovering(true);
+    if (videoRef.current) {
+      try {
+        await videoRef.current.play();
+        setIsPlaying(true);
+      } catch (e) {
+        //ignore "play was interrupted by call to pause" error, which can happen if we swipe over videos too fast
+      }
+    }
   };
 
-  return (
-    <VideoDetailsWrapper ref={setRef} onClick={navigateToVideo}>
-      {video ? (
-        <>
-          {ref ? (
-            <>
-              <Thumbnail
-                imageHeight={imageHeight}
-                src={"/api/thumb/" + encodeURIComponent(video.id)}
-              />
+  const handleIsHoverFalseChange = (): void => {
+    setIsHovering(false);
+  };
 
-              <VideoNameWrapper>
-                <h5>{video.name}</h5>
-                <h6>
-                  {video.category.length ? video.category : "All Videos"} ·{" "}
-                  <TimeAgo date={video.created} />
-                </h6>
-              </VideoNameWrapper>
-            </>
-          ) : (
-            <></>
-          )}
-        </>
-      ) : (
-        <PlaceHolder />
-      )}
+  if (!isHovering && isPlaying) {
+    videoRef.current?.pause();
+  }
+
+  const queryParams = new URLSearchParams({});
+
+  if (search) {
+    queryParams.append("search", search);
+  }
+
+  if (sort) {
+    queryParams.append("sort", sort);
+  }
+
+  if (order) {
+    queryParams.append("order", order);
+  }
+
+  if (category) {
+    queryParams.append("category", category);
+  }
+
+  if (onlyFavorites) {
+    queryParams.append("onlyFavorites", "true");
+  }
+
+  let params = queryParams.toString();
+
+  if (params) {
+    params = "?" + params;
+  }
+
+  const videoCategory = video ? getVideoCategory(video, category) : "";
+
+  return (
+    <VideoDetailsWrapper ref={ref}>
+      <Link href={"/watch/" + video?.id + params} draggable={false}>
+        {video ? (
+          <VideoDetailsContainer>
+            <Overlay onMouseEnter={handleIsHoverTrueChange} onMouseLeave={handleIsHoverFalseChange} />
+            {video.type === "video" && (
+              <VideoPlayer
+                ref={videoRef}
+                poster={"/api/thumb/" + encodeURIComponent(video.id)}
+                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
+                disablePictureInPicture
+                isPlaying={isHovering}
+                preload={"none"}
+                draggable={false}
+                muted
+                loop
+              />
+            )}
+            {video.type === "gif" && isHovering && (
+              <ImagePlayer
+                onMouseEnter={handleIsHoverTrueChange}
+                onMouseLeave={handleIsHoverFalseChange}
+                src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
+                draggable={false}
+                isPlaying={isHovering}
+              />
+            )}
+            <Thumbnail
+              onMouseEnter={handleIsHoverTrueChange}
+              src={"/api/thumb/" + encodeURIComponent(video.id)}
+              draggable={false}
+            />
+            <VideoNameWrapper>
+              <h5>{video.name}</h5>
+              <h6>
+                {videoCategory} · <TimeAgo date={video.updated} />
+              </h6>
+            </VideoNameWrapper>
+          </VideoDetailsContainer>
+        ) : (
+          <PlaceHolder />
+        )}
+      </Link>
     </VideoDetailsWrapper>
   );
 };

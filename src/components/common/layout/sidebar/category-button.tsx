@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import Link from "next/link";
 import React, { FC } from "react";
 import styled from "styled-components";
 
@@ -6,10 +6,7 @@ const CategoryButtonWrapper = styled.div`
   color: ${(p): string => p.theme.textContrast};
   padding: 7px;
   padding-left: 22px;
-
-  div {
-    transition: 0.1s;
-  }
+  margin-right: 20px;
 
   &:hover {
     div {
@@ -27,27 +24,21 @@ const SelectedCategory = styled.div`
 
 interface CategoryButtonProps {
   category: string;
+  selectedCategory: string;
 }
 
-const CategoryButton: FC<CategoryButtonProps> = ({
-  category,
-}: CategoryButtonProps) => {
-  const router = useRouter();
-  const categoryURL = ("/library/" + category).toLowerCase();
-  const navigateToCategory = (): void => {
-    router.push(categoryURL);
-  };
-  const isSelected = categoryURL === window.location.pathname.toLowerCase();
+const CategoryButton: FC<CategoryButtonProps> = ({ category, selectedCategory }) => {
+  const categoryURL = "/library/" + encodeURIComponent(category);
+  const isSelected = categoryURL === selectedCategory;
+
   return (
-    <CategoryButtonWrapper onClick={navigateToCategory}>
-      <CategoryButtonName>
-        {isSelected ? (
-          <SelectedCategory>{category}</SelectedCategory>
-        ) : (
-          <div>{category}</div>
-        )}
-      </CategoryButtonName>
-    </CategoryButtonWrapper>
+    <Link href={categoryURL} draggable={false}>
+      <CategoryButtonWrapper>
+        <CategoryButtonName>
+          {isSelected ? <SelectedCategory>{category}</SelectedCategory> : <div>{category}</div>}
+        </CategoryButtonName>
+      </CategoryButtonWrapper>
+    </Link>
   );
 };
 

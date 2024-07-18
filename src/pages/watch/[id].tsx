@@ -1,44 +1,20 @@
-import * as mime from "mime-types";
-import { GetServerSideProps, NextPage } from "next";
-import { Video } from "@client/utils/types";
-import { listVideos } from "@server/utils/listVideos";
+import { GetServerSideProps, NextPage, Redirect } from "next";
 import React from "react";
 import WatchPage from "@client/components/pages/watch/watch";
-import router from "next/router";
 
 interface WatchProps {
-  video?: Video;
-  url: string;
-  mimeType?: string;
+  domain: string;
 }
 
-const Watch: NextPage<WatchProps> = ({ video, url, mimeType }: WatchProps) => {
-  if (!video || !mimeType) {
-    router.push("/404");
-    return <></>;
-  }
-
-  return <WatchPage video={video} url={url} mimeType={mimeType}></WatchPage>;
+const Watch: NextPage<WatchProps> = ({ domain }: WatchProps) => {
+  return <WatchPage domain={domain} />;
 };
 
-export const getServerSideProps: GetServerSideProps<WatchProps> = async (
-  ctx
-) => {
-  const video = (await listVideos()).find((video) => {
-    return video.id === ctx.query.id;
-  });
-  const protocol = ctx.req?.headers?.["x-forwarded-proto"] || "http";
-  const hostname =
-    ctx.req?.headers?.["x-forwarded-host"] || ctx.req?.headers["host"];
-  const url = new URL(
-    ctx.req?.url ?? "",
-    `${protocol}://${hostname}`
-  ).toString();
-
-  const mimeType = video ? (mime.lookup(video.fileName) as string) : undefined;
-
-  // if no auth required
-  return { props: { video, url, mimeType } };
+export const getServerSideProps: GetServerSideProps<WatchProps | Redirect> = async (ctx) => {
+  const url = ctx.req.headers.host || "";
+  const protocol = ctx.req.headers["x-forwarded-proto"];
+  const domain = protocol + "://" + url;
+  return { props: { domain } };
 };
 
 export default Watch;

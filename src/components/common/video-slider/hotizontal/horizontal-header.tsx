@@ -2,10 +2,10 @@ import { BluJayTheme } from "@client/utils/types";
 import React, { FC } from "react";
 import SliderHeader from "../header";
 import styled from "styled-components";
-
 const ChevronIcon = styled.div`
   color: ${(p): string => p.theme.textContrast};
   font-size: 1.25rem;
+  transition: 0.2s;
   vertical-align: baseline;
   margin-left: auto;
   margin-right: 5px;
@@ -15,52 +15,35 @@ const ChevronIcon = styled.div`
     cursor: pointer;
   }
 
-  opacity: ${(p: { isEnabled: boolean; theme: BluJayTheme }): number =>
-    p.isEnabled ? 1 : 0.5};
+  opacity: ${(p: { isEnabled: boolean; theme: BluJayTheme }): number => (p.isEnabled ? 1 : 0.5)};
 
   &:hover {
-    color: ${(p): string =>
-      p.isEnabled ? p.theme.text : p.theme.textContrast};
+    color: ${(p): string => (p.isEnabled ? p.theme.text : p.theme.textContrast)};
     cursor: ${(p): string => (p.isEnabled ? "pointer" : "auto")};
   }
+
+  font-size: 1.5rem;
 `;
 
 interface HorizontalSliderHeaderProps {
-  setPosition: React.Dispatch<React.SetStateAction<number>>;
-  displayedPosition: number;
-  isMaxOffset: boolean;
-  position: number;
+  incrementVideo: () => void;
+  decrementVideo: () => void;
+  isStart: boolean;
+  isEnd: boolean;
   headerText: string;
 }
 
 const HorizontalSliderHeader: FC<HorizontalSliderHeaderProps> = ({
-  displayedPosition,
-  isMaxOffset,
-  setPosition,
+  isStart,
+  isEnd,
+  incrementVideo,
+  decrementVideo,
   headerText,
-  position,
-}: HorizontalSliderHeaderProps) => {
-  const handleIncrementOffset = (): void => {
-    if (!isMaxOffset && displayedPosition === position)
-      setPosition(position + 1);
-  };
-
-  const handleDecrementOffset = (): void => {
-    if (position && displayedPosition === position) setPosition(position - 1);
-  };
-
+}) => {
   return (
-    <SliderHeader headerText={headerText}>
-      <ChevronIcon
-        className={"bx bx-chevron-left"}
-        isEnabled={!!position}
-        onClick={handleDecrementOffset}
-      />
-      <ChevronIcon
-        className={"bx bx-chevron-right"}
-        isEnabled={!isMaxOffset}
-        onClick={handleIncrementOffset}
-      />
+    <SliderHeader headerText={headerText} sliderType="horizontal">
+      <ChevronIcon className={"bx bx-chevron-left"} isEnabled={!isStart} onClick={decrementVideo} />
+      <ChevronIcon className={"bx bx-chevron-right"} isEnabled={!isEnd} onClick={incrementVideo} />
     </SliderHeader>
   );
 };

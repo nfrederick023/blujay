@@ -1,63 +1,64 @@
 import Gradient from "../../shared/gradient";
+import Link from "next/link";
 import React, { FC } from "react";
 import styled from "styled-components";
 
 const ButtonWrapper = styled.div`
   width: 100%;
-  color: ${(p): string => p.theme.textContrast};
-  border-radius: 5px;
-  margin-left: 10px;
+  color: white;
+  margin-bottom: 5px;
   line-height: 5px;
 
-  height: 38px;
-
-  > span {
-    border-radius: 12px;
-    height: 34px;
+  span {
+    min-height: 40px;
+    max-height: 40px;
+    border-radius: 10px;
     align-items: center;
     display: flex;
     padding-left: 8px;
+    height: inherit;
   }
 `;
 
 const Icon = styled.i`
   padding-right: 10px;
-  vertical-align: middle;
 `;
 
-const WhiteColor = styled.div`
-  color: white;
+const Unselected = styled.span`
+  color: ${(p): string => p.theme.textContrast};
+
+  &:hover {
+    color: ${(p): string => p.theme.text};
+    cursor: pointer;
+  }
 `;
 
 interface SideBarButtonProps {
   title: string;
   icon: string;
   url: string;
+  selectedURL: string;
 }
 
-const SideBarButton: FC<SideBarButtonProps> = ({
-  title,
-  icon,
-  url,
-}: SideBarButtonProps) => {
-  const isSelected = window.location.pathname.split("/")[1] === url;
+const SideBarButton: FC<SideBarButtonProps> = ({ title, icon, url, selectedURL }) => {
+  const isSelected = selectedURL.includes("library") ? title === "Library" : selectedURL === url;
 
   return (
     <>
       <ButtonWrapper>
-        {isSelected ? (
-          <Gradient type="background">
-            <WhiteColor>
+        <Link href={"/" + url} draggable={false}>
+          {isSelected ? (
+            <Gradient type="background">
               <Icon className={icon} />
               {title}
-            </WhiteColor>
-          </Gradient>
-        ) : (
-          <span>
-            <Icon className={icon} />
-            {title}
-          </span>
-        )}
+            </Gradient>
+          ) : (
+            <Unselected>
+              <Icon className={icon} />
+              {title}
+            </Unselected>
+          )}
+        </Link>
       </ButtonWrapper>
     </>
   );

@@ -1,23 +1,11 @@
-import { GetServerSideProps, NextPage } from "next";
-import { Video } from "@client/utils/types";
-import { listVideos } from "@server/utils/listVideos";
+import { KeepAliveComponenet } from "@client/utils/types";
+import { NextPage } from "next";
+import { withKeepAlive } from "react-next-keep-alive";
 import IndexPage from "@client/components/pages/index";
 import React from "react";
 
-interface IndexProps {
-  videos: Video[];
-}
-
-const Index: NextPage<IndexProps> = ({ videos }: IndexProps) => {
-  return <IndexPage {...{ videos }} />;
+const Index: NextPage = () => {
+  return <IndexPage />;
 };
 
-export const getServerSideProps: GetServerSideProps<IndexProps> = async () => {
-  return {
-    props: {
-      videos: (await listVideos()).filter((video) => !video.requireAuth),
-    },
-  };
-};
-
-export default Index;
+export default withKeepAlive(Index as KeepAliveComponenet, "index_page");
