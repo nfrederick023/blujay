@@ -1,16 +1,19 @@
 import { cookieOptions, fileExtensions, orderOptions, sortOptions } from "./constants";
 
-export interface BluJayTheme {
+export interface BlujayTheme {
   readonly background: string;
   readonly backgroundContrast: string;
   readonly text: string;
   readonly textContrast: string;
   readonly textContrastLight: string;
   readonly highlightDark: string;
-  readonly highlightLight: string;
   readonly hightlightSilver: string;
+  readonly highlight: string;
+  readonly highlightLight: string;
   readonly error: string;
+  readonly errorLight: string;
   readonly button: string;
+  readonly buttonLight: string;
 }
 
 export interface Video {
@@ -58,18 +61,9 @@ export interface PublicConfig {
   readonly thumbnailSettings: Thumbnail;
 }
 
-export type DropDownColor = "red" | "default";
-
-export interface DropDownOption {
-  text: string;
-  icon?: string;
-  color?: DropDownColor;
-  action: (e: React.MouseEvent) => void;
-}
-
 export type KeepAliveComponenet = (props?: unknown) => JSX.Element;
 export type Extentsions = typeof fileExtensions[number];
-export type CookieTypes = typeof cookieOptions[number]
+export type CookieTypes = typeof cookieOptions[number];
 export type SortType = typeof sortOptions[number];
 export type OrderType = typeof orderOptions[number];
 export type QueryField = "name" | "filename" | "category" | "description" | "id";

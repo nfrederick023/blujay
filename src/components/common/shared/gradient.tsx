@@ -1,14 +1,14 @@
-import { BluJayTheme } from "@client/utils/types";
+import { BlujayTheme } from "@client/utils/types";
 import React, { FC } from "react";
 import styled from "styled-components";
 
 const GradientBackground = styled.span`
   background: linear-gradient(
     170deg,
-    ${(p: { color: Color; theme: BluJayTheme }): string =>
+    ${(p: { color: Color; theme: BlujayTheme }): string =>
         p.color === "blue" ? p.theme.highlightDark : p.theme.hightlightSilver}
       30%,
-    ${(p): string => (p.color === "blue" ? p.theme.highlightLight : "white")} 70%
+    ${(p): string => (p.color === "blue" ? p.theme.highlight : "white")} 70%
   );
   display: block;
 `;
@@ -16,10 +16,10 @@ const GradientBackground = styled.span`
 const GradientText = styled.span`
   background: linear-gradient(
     170deg,
-    ${(p: { color: Color; theme: BluJayTheme }): string =>
+    ${(p: { color: Color; theme: BlujayTheme }): string =>
         p.color === "blue" ? p.theme.highlightDark : p.theme.hightlightSilver}
       10%,
-    ${(p): string => (p.color === "blue" ? p.theme.highlightLight : "white")} 90%
+    ${(p): string => (p.color === "blue" ? p.theme.highlight : "white")} 90%
   );
   -webkit-background-clip: text;
   background-clip: text;

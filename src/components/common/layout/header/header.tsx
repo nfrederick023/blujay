@@ -1,8 +1,7 @@
-import { BluJayTheme, DropDownOption } from "@client/utils/types";
+import { BlujayTheme, DropDownOption } from "@client/utils/types";
 import { getCookieSetOptions } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
-import DropDown from "../../shared/drop-down";
 import Logo from "../sidebar/logo";
 import React, { FC, useEffect, useRef, useState } from "react";
 import SearchBar from "./search-bar";
@@ -10,7 +9,7 @@ import router from "next/router";
 import styled from "styled-components";
 
 const HeaderWrapper = styled.div`
-  background-color: ${(p: { theme: BluJayTheme; scrolledDown: boolean }): string => p.theme.background};
+  background-color: ${(p: { theme: BlujayTheme; scrolledDown: boolean }): string => p.theme.background};
   height: 60px;
   justify-content: center;
   display: flex;
@@ -42,7 +41,7 @@ const CogWrapper = styled.div`
 
 const CogIcon = styled.i`
   margin: auto;
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string =>
+  color: ${(p: { isFocused: boolean; theme: BlujayTheme }): string =>
     p.isFocused ? `${p.theme.text}` : `${p.theme.text}`};
   pointer-events: ${(p): string => (p.isFocused ? "none" : "auto")};
   font-size: 32px;
@@ -120,11 +119,11 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
   };
 
   const options: DropDownOption[] = [
-    { text: "Upload", icon: "bx bx-upload", action: triggerUpload },
-    { text: "Settings", icon: "bx bx-cog", action: navigateToSetings },
+    { text: "Upload", icon: "bx-upload", onClick: triggerUpload },
+    { text: "Settings", icon: "bx-cog", onClick: navigateToSetings },
   ];
-  if (cookies.authToken) options.push({ text: "Logout", icon: "bx bx-log-out", action: handleLogout });
-  else options.push({ text: "Login", icon: "bx bx-log-in", action: navigateToLogin });
+  if (cookies.authToken) options.push({ text: "Logout", icon: "bx-log-out", onClick: handleLogout });
+  else options.push({ text: "Login", icon: "bx-log-in", onClick: navigateToLogin });
 
   useEffect(() => {
     const getHeaderScroll = (): void => {
@@ -145,23 +144,23 @@ const Header: FC<HeaderProps> = ({ search, setSearch, setFilesToUpload }) => {
       </LogoBackdrop>
       <SearchBar search={search} setSearch={setSearch} />
       <IconContainer>
-        <SearchIcon className="bx bx-search" draggable={false} tabIndex={0} />
+        <SearchIcon className="bx-search" draggable={false} tabIndex={0} />
         <CogWrapper>
-          <CogIcon
+          {/* <CogIcon
             isFocused={isDropDownShown}
             onClick={handleClick}
-            className="bx bxs-user-circle"
+            className="bxs-user-circle"
             draggable={false}
             tabIndex={0}
-          />
-          <DropDown
+          /> */}
+          {/* <DropDown
             options={options}
             isShown={isDropDownShown}
             setIsShown={setIsDropDownShow}
             top={50}
             left={32}
             relativePosition="left"
-          />
+          /> */}
         </CogWrapper>
       </IconContainer>
     </HeaderWrapper>

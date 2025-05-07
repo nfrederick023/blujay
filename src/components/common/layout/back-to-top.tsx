@@ -8,7 +8,7 @@ const BackToTopWrapper = styled.div`
       if (p.isProgressBarShown) {
         return "90px";
       } else {
-        return "20px";
+        return "30px";
       }
     }
     return "-40px";
@@ -31,7 +31,7 @@ const BackToTopButton = styled.div`
   border-radius: 25px;
   align-items: center;
   justify-content: center; /* Horizontal center alignment */
-  background-color: ${blujayTheme.highlightLight};
+  background-color: ${blujayTheme.highlight};
   padding-bottom: 1px;
   select: none;
   cursor: pointer;
@@ -79,7 +79,7 @@ const BackToTop: FC<BackToTopProps> = ({ isProgressBarShown }) => {
   return (
     <BackToTopWrapper isProgressBarShown={isProgressBarShown} isScrolledDown={isScrolledDown}>
       <BackToTopButton onClick={scrollToTop}>
-        <h5>Back to Top</h5>
+        <b>Back to Top</b>
       </BackToTopButton>
     </BackToTopWrapper>
   );

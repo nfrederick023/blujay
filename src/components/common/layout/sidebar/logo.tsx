@@ -17,21 +17,21 @@ const LogoWrapper = styled.div`
   margin-top: 13px;
 `;
 
-const Icon = styled.i`
-  padding-top: 10px;
-  padding-right: 8px;
-  padding-left: 3px;
-  color: ${(p): string => p.theme.text};
-
-  &:before {
-    margin-top: 1px;
-    position: relative;
-  }
+const MenuButton = styled.button`
+  margin-right: 4px;
+  margin-top: 8px;
+  margin-bottom: 13px;
+  background-color: unset;
+  padding: 0px;
+  border: unset;
 
   &:hover {
-    color: ${(p): string => p.theme.text};
     cursor: pointer;
   }
+`;
+
+const Icon = styled.i`
+  color: ${(p): string => p.theme.text};
 `;
 
 const Logo: FC = () => {
@@ -44,7 +44,9 @@ const Logo: FC = () => {
 
   return (
     <LogoContainer>
-      <Icon className={"bx bx-menu bx-md"} onClick={handleIsCollapsedChange} />
+      <MenuButton onClick={handleIsCollapsedChange}>
+        <Icon className={"bx-menu bx-md"} />
+      </MenuButton>
       <LogoWrapper>
         <Link href={"/"} draggable={false}>
           <Gradient type="text">

@@ -37,7 +37,7 @@ const IncompleteProgress = styled.div`
 `;
 
 const CompleteProgress = styled.div`
-  background-color: ${(p): string => p.theme.highlightLight};
+  background-color: ${(p): string => p.theme.highlight};
   width: ${(p: { totalProgress: number }): string => `${p.totalProgress}`}%;
   transition: ${(p): string => (p.totalProgress === 0 ? "0s" : "1s")} ease-out;
   border-radius: 30px;
@@ -169,9 +169,9 @@ const UploadProgressBar: FC<UploadProgressBarProps> = ({
           <OpenButtonWrapper isClosed={!uploadedFiles.length || !isProgressBarShown}>
             <OpenButton>
               {!isProgressBarShown ? (
-                <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx bx-chevron-up" />
+                <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx-chevron-up" />
               ) : (
-                <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx bx-chevron-down" />
+                <OpenIcon tabIndex={0} onClick={toggleUploadBar} className="bx-chevron-down" />
               )}
             </OpenButton>
           </OpenButtonWrapper>

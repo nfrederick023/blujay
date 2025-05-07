@@ -5,9 +5,6 @@ import { Montserrat } from "next/font/google";
 import { VideoProvider } from "@client/components/common/contexts/video-context";
 import { blujayTheme, screenSizes } from "@client/utils/constants";
 import { getCookieDefault, getCookieSetOptions } from "../utils/cookie";
-import { reindexThumbnails } from "@server/utils/thumbnail-service";
-import { reindexVideoList } from "@server/utils/video-service";
-import { testIndex } from "@server/utils/validateVideo";
 import { useRouter } from "next/router";
 import App, { AppContext, AppInitialProps, AppProps } from "next/app";
 import BackToTop from "@client/components/common/layout/back-to-top";
@@ -16,20 +13,20 @@ import Head from "next/head";
 import Header from "@client/components/common/layout/header/header";
 import LoadBar from "@client/components/common/layout/load-bar";
 import React, { ReactElement, useEffect, useState } from "react";
-import SearchSlider from "@client/components/common/video-slider/search-slider";
+import SearchSlider from "@client/components/common/shared/video-slider/search-slider";
 import Sidebar from "@client/components/common/layout/sidebar/side-bar";
 import UploadProgress from "@client/components/common/layout/upload/upload-progress";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-});
+const montserrat = Montserrat({ subsets: ["cyrillic"] });
 
 const GlobalStyle = createGlobalStyle`
   html {
     background-color: ${(p): string => p.theme.background};
     color: ${(p): string => p.theme.text};
+    font-family: 'Montserrat', 'Montserrat Fallback', 'boxicons';
   }
+
   body{
     overflow-y: auto;
     overflow-x: hidden;
@@ -45,7 +42,7 @@ const GlobalStyle = createGlobalStyle`
 
   ::-webkit-scrollbar-track-piece
   {
-   display:none;
+   display: none;
   }
 
   ::-webkit-scrollbar-thumb
@@ -59,17 +56,15 @@ const GlobalStyle = createGlobalStyle`
       text-decoration: none; color: unset;
   }
 
-  // fixes sidebar positioning somehow 
   * {
     box-sizing: border-box;
   }
 
   html, body {
     margin: 0px;
-    font-size: 1.03em;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3{
     display: inline;
     margin: 0px;
   }
@@ -85,24 +80,18 @@ const GlobalStyle = createGlobalStyle`
     font-weight: 725;
   }
 
-  h4 {
-    font-size: 22px;
-    font-weight: 600;
-  }
-
-  h5{
+  h3 {
     font-size: 1em;
     font-weight: 500;
   }
-
-  h6{
-    font-size: 0.83em;
-    font-weight: 500;
+  
+  input, textarea, select, button, option  { 
+    font-family: inherit; 
+    font-size: inherit; 
   }
 
-  input, textarea, select { 
-    font-family:inherit; 
-    font-size: inherit; 
+  i {
+    font-style: normal;
   }
 `;
 
@@ -162,7 +151,7 @@ const MyApp = ({ Component, pageProps, intialVideos, cookieString }: AppProps & 
           <Head>
             <title>Blujay</title>
           </Head>
-          <LayoutWrapper className={montserrat.className}>
+          <LayoutWrapper className={montserrat.className + "bx"}>
             {router.pathname.includes("/login") ? (
               <Component {...pageProps} />
             ) : (
@@ -199,13 +188,10 @@ MyApp.getInitialProps = async (context: AppContext): Promise<MyAppProps & AppIni
   let cookieString: string | undefined;
   let intialVideos: Video[] = [];
   if (typeof window === "undefined") {
-    const indexVideosAndThumbnails = await import("@server/utils/intial-config");
-    await indexVideosAndThumbnails.default();
     cookieString = context.ctx.req?.headers.cookie;
-    const cookies = new Cookies(cookieString);
-    const authToken = cookies.get("authToken");
     const auth = await import("@server/utils/auth");
-    intialVideos = await auth.getProtectedVideoList(context.ctx, authToken);
+    intialVideos = await auth.getProtectedVideoList(context.ctx, new Cookies(cookieString).get("authToken") ?? "");
+    (await import("@server/utils/intial-config")).default();
   } else {
     cookieString = document.cookie;
   }

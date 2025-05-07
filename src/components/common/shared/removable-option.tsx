@@ -1,3 +1,4 @@
+import { TextSmall } from "./text-size";
 import React, { FC } from "react";
 import styled from "styled-components";
 
@@ -8,10 +9,11 @@ const OptionWrapper = styled.div`
   height: 32px;
   padding: 5px;
   margin: 5px;
-  max-width: 80%;
+  width: fit-content;
+  overflow: hidden;
 `;
 
-const ChevronWrapper = styled.div`
+const RemoveWrapper = styled.div`
   color: ${(p): string => p.theme.text};
   cursor: pointer;
   border-left: 1px solid ${(p): string => p.theme.text};
@@ -19,10 +21,13 @@ const ChevronWrapper = styled.div`
   margin-left: 10px;
 `;
 
-const ChevronIcon = styled.i`
+const RemoveIcon = styled.i`
   margin-top: -1px;
+  height: 24px;
 `;
-const OptionText = styled.h6`
+
+const OptionText = styled(TextSmall)`
+  color: ${(p): string => p.theme.text};
   margin-left: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -30,7 +35,7 @@ const OptionText = styled.h6`
 `;
 
 interface RemovableOptionProps {
-  onRemove: () => void;
+  onRemove: (...args: unknown[]) => void;
   optionText: string;
 }
 
@@ -38,9 +43,9 @@ const RemovableOption: FC<RemovableOptionProps> = ({ onRemove, optionText }) => 
   return (
     <OptionWrapper>
       <OptionText>{optionText}</OptionText>
-      <ChevronWrapper onClick={onRemove}>
-        <ChevronIcon className="bx bx-x bx-sm" />
-      </ChevronWrapper>
+      <RemoveWrapper onClick={onRemove}>
+        <RemoveIcon className="bx-x bx-sm" tabIndex={0} />
+      </RemoveWrapper>
     </OptionWrapper>
   );
 };

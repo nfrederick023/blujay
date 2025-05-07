@@ -73,11 +73,11 @@ export const getVideoCategory = (video: Video, primaryCategory: string | undefin
 
   if (primaryCategory) {
     videoCategory = primaryCategory;
-  } else if (video.categories.length === 1) {
+  } else if (video.categories.length > 0) {
     videoCategory = video.categories[0];
 
     if (video.categories.length > 1) {
-      videoCategory = videoCategory + " and " + (video.categories.length - 1) + "More";
+      videoCategory = videoCategory + " and " + (video.categories.length - 1) + " More";
     }
   }
 

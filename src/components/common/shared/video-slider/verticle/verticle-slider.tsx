@@ -2,7 +2,6 @@ import { OrderType, SortType, Video, ViewType } from "@client/utils/types";
 import { screenSizes } from "@client/utils/constants";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useBottomScrollListener } from "react-bottom-scroll-listener";
-import ListView from "./list-view";
 import React, { FC, useEffect, useState } from "react";
 import VeticleSliderHeader from "./veritcle-header";
 import VideoDetails from "../details";
@@ -60,7 +59,6 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
 }) => {
   const [sort, setSort] = useState<SortType>(intialSort || "Alphabetical");
   const [order, setOrder] = useState<OrderType>(intialOrder || "Ascending");
-  const [view, setView] = useState<ViewType>("Grid View");
   const [videosDisplayed, setVideosDisplayed] = useState(36); // 36 is arbitrary
 
   const bottomScrollCallback = (): void => {
@@ -87,11 +85,6 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
     else setOrder("Ascending");
   };
 
-  const handleViewChange = (newView: string): void => {
-    if (newView === "List View") setView("List View");
-    else setView("Grid View");
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -101,30 +94,24 @@ const VerticleSlider: FC<VerticleSliderProps> = ({
     <>
       <VeticleSliderHeader
         headerText={headerText}
-        handleViewChange={handleViewChange}
         handleIsAscendingChange={handleIsAscendingChange}
         handleSortChange={handleSortChange}
         sort={sort}
         order={order}
-        view={view}
       />
-      {view === "Grid View" ? (
-        <VerticleSliderWrapper>
-          {sortedVideos.slice(0, videosDisplayed).map((video, i) => (
-            <VideoDetails
-              key={i}
-              video={video}
-              sort={sort}
-              order={order}
-              category={category}
-              onlyFavorites={onlyFavorites}
-              search={search}
-            />
-          ))}
-        </VerticleSliderWrapper>
-      ) : (
-        <ListView videos={sortedVideos} />
-      )}
+      <VerticleSliderWrapper>
+        {sortedVideos.slice(0, videosDisplayed).map((video, i) => (
+          <VideoDetails
+            key={i}
+            video={video}
+            sort={sort}
+            order={order}
+            category={category}
+            onlyFavorites={onlyFavorites}
+            search={search}
+          />
+        ))}
+      </VerticleSliderWrapper>
     </>
   );
 };

@@ -10,8 +10,14 @@ export const getProtectedVideoList = async (ctx: NextPageContext, authToken: str
   if (!isAuthenticated) {
     const isPrivateLibrary = getPrivateLibrary();
 
+    const url: string = ctx.req?.url ?? "";
+
     if (authToken) ctx.res?.setHeader("Set-Cookie", "authToken=; path=/;");
-    if (isPrivateLibrary && !((ctx.req?.url ?? "") === "/login")) {
+
+    const isPublicVideo = false;
+    //const videoId = url.match(/\/watch\/(\d+)/)?.[1];
+    //const isPublicVideo = videoId && videoList.find((video) => video.id === videoId)?.requireAuth === false;
+    if (!isPublicVideo && isPrivateLibrary && !(url === "/login")) {
       ctx.res?.writeHead(302, { Location: "/login" });
       ctx.res?.end();
       return [];

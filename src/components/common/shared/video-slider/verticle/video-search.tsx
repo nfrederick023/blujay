@@ -1,6 +1,6 @@
-import { BluJayTheme, Video } from "@client/utils/types";
+import { BlujayTheme, Video } from "@client/utils/types";
 import React, { FC, useEffect, useState } from "react";
-import Select from "../../shared/select";
+import Select from "@client/components/common/shared/select";
 import styled from "styled-components";
 
 const PageButtonContainer = styled.div`
@@ -21,12 +21,12 @@ const PageButton = styled.div`
   user-select: none;
   &:hover {
     cursor: pointer;
-    border: 2px solid ${(p): string => p.theme.highlightLight};
+    border: 2px solid ${(p): string => p.theme.highlight};
     color: ${(p): string => p.theme.text};
   }
-  ${(p: { isSelected: boolean; theme: BluJayTheme }): string =>
+  ${(p: { isSelected: boolean; theme: BlujayTheme }): string =>
     p.isSelected
-      ? `border: 2px solid ${p.theme.highlightLight}; color: ${p.theme.text}; background-color: ${p.theme.highlightLight}`
+      ? `border: 2px solid ${p.theme.highlight}; color: ${p.theme.text}; background-color: ${p.theme.highlight}`
       : ""};
 `;
 

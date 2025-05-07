@@ -1,30 +1,30 @@
 import { Video } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
-import ButtonIcon from "../button-icon";
+import ButtonIcon from "../button";
 import React, { FC, useContext } from "react";
 
 interface FavoriteButtonProps {
   video: Video;
 }
 
-const FavoriteButton: FC<FavoriteButtonProps> = ({ video }) => {
+const FavoriteButton: FC<FavoriteButtonProps> = (props) => {
   const { updateVideo } = useContext(VideoContext);
 
   const handleSetAsFavorite = (): void => {
-    const newVideo: Video = { ...video, isFavorite: !video.isFavorite };
-    updateVideo(newVideo);
+    updateVideo({ ...props.video, isFavorite: !props.video.isFavorite });
   };
 
   return (
     <ButtonIcon
-      icon="bx bx-heart"
-      selectedIcon="bx bxs-heart"
+      icon="bx-heart"
+      selectedIcon="bxs-heart"
       onClick={handleSetAsFavorite}
-      isSelected={video.isFavorite}
-      hoverTextOn="Remove as Favorite"
-      hoverTextOff="Add as Favorite"
-      confrimTextOn="Added!"
-      confrimTextOff="Removed!"
+      isSelected={props.video.isFavorite}
+      text="Add as Favorite"
+      textSelected="Remove as Favorite"
+      confrimText="Removed!"
+      confrimTextSelected="Added!"
+      isCondensed="condensed"
     />
   );
 };

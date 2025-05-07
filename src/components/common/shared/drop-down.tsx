@@ -1,186 +1,248 @@
-import { BluJayTheme, DropDownColor, DropDownOption } from "@client/utils/types";
-import React, { FC, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import { screenSizes } from "@client/utils/constants";
+import ButtonIcon, { BaseButtonCSSProps, baseButtonCSS } from "./button/button";
+import Input from "./input";
+import React, { ChangeEvent, FC, KeyboardEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import styled, { RuleSet, css } from "styled-components";
 
-const DropDownWrapper = styled.div`
-  position: absolute;
-  width: inherit;
-
-  ${(p: { isVisible: boolean }): string => {
-    if (!p.isVisible) {
-      return "visibility: hidden; overflow: hidden;";
+const Select = styled.div`
+  @media (max-width: ${screenSizes.tabletScreenSize}px) {
+    &,
+    button {
+      width: 100%;
     }
-    return "";
-  }}
+  }
 `;
 
-const DropDownPositioning = styled.div`
+const OptionWrapper = styled.div`
   position: relative;
-  width: inherit;
-  top: ${(p: { DropDownTop: number; DropDownLeft: number }): number => p.DropDownTop}px;
-  left: ${(p: { DropDownTop: number; DropDownLeft: number }): number => p.DropDownLeft}px;
+  margin: 0px 2px 0px 2px;
 `;
 
-const DropDownBox = styled.div`
-  width: inherit;
+const OptionContainer = styled.div`
   position: absolute;
-  padding: 10px 0px 10px 0px;
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  text-wrap: nowrap;
-  border-radius: 15px;
-  background-color: ${(p: {
-    theme: BluJayTheme;
-    isBottomOffscreen: boolean;
-    DropDownTop: number;
-    DropDownLeft: number;
-    relativePosition?: RelativePosition;
-    hasBorder?: boolean;
-  }): string => p.theme.backgroundContrast};
-  z-index: 2;
-  user-select: none;
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  ${(p): string => {
-    if (p.hasBorder) {
-      return `
-        border-radius: 0px;
-        border-bottom-right-radius: 15px;
-        border-bottom-left-radius: 15px;
-        border: 1px solid ${p.theme.textContrast};
-        margin-top: 5px;
-      `;
-    }
-    return "";
-  }}
-
-  @media screen and (max-height: 150px) {
-    max-height: 10px;
-  }
-
-  ${(p): string => {
-    let transform = "";
-    if (p.relativePosition === "left") {
-      transform += " translateX(-100%)";
-    }
-    if (p.isBottomOffscreen) {
-      transform += ` translateY(-100%) translateY(-${p.DropDownTop + 10}px)`;
-    }
-    if (transform) {
-      return "transform: " + transform + ";";
-    }
-    return "";
-  }}
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  background-color: ${(p): string => p.theme.button};
 `;
 
-const Option = styled.div`
-  padding: 8px 30px 8px 15px;
-  color: ${(p: { theme: BluJayTheme; color?: DropDownColor }): string =>
-    p.color === "red" ? p.theme.error : p.theme.text};
-  font-weight: ${(p): string => (p.color === "red" ? "450" : "400")};
-  display: flex;
+const Option = styled.div<{ isSelected?: boolean; isDisabled?: boolean; focused?: boolean }>`
+  ${(p): RuleSet<object> => {
+    const focused = css`
+      cursor: pointer;
+      border-radius: 8px;
+      outline-offset: -2px;
+      outline: solid 1px white;
+    `;
 
-  &:hover {
-    color: ${(p): string => p.theme.text};
-    background-color: ${(p): string => (p.color === "red" ? p.theme.error : p.theme.highlightLight)};
-    cursor: pointer;
-  }
+    return css`
+      user-select: none;
+      padding: 8px;
+      color: ${p.theme.text};
+      ${p.isSelected && `background-color: ${p.theme.highlight}`};
+      ${p.isDisabled && "pointer-events: none;"};
+
+      ${p.focused && focused};
+
+      &:hover {
+        cursor: pointer;
+        border-radius: 8px;
+        filter: brightness(2);
+      }
+
+      &:not(:has(i, input)) {
+        padding-left: 14px;
+      }
+
+      &:has(input) {
+        cursor: auto;
+      }
+    `;
+  }}
 `;
 
 const Icon = styled.i`
-  font-size: 25px;
-  margin-right: 15px;
+  padding-right: 4px;
 `;
 
-const OptionText = styled.div`
-  padding-top: 2px;
-`;
+type DropDownBase = { text: string };
+type DropDownMenu = DropDownBase & { icon?: string; onClick: () => void };
+type DropDownSelect = DropDownBase & { icon?: string };
+type DropDownMulti = DropDownBase & { selected?: boolean };
 
-type RelativePosition = "left" | "right";
-
-interface DropDownProps {
-  options: DropDownOption[];
-  isShown: boolean;
-  top: number;
-  left: number;
-  relativePosition?: RelativePosition;
-  hasBorder?: boolean;
-  setIsShown: React.Dispatch<React.SetStateAction<boolean>>;
+interface DropDownPropsBase {
+  text: string;
+  icon?: string;
+  isDisabled?: boolean;
 }
 
-const DropDown: FC<DropDownProps> = ({ options, isShown, top, left, relativePosition, hasBorder, setIsShown }) => {
-  const dropDownRef = useRef<HTMLDivElement>(null);
-  const [isBottomOffscreen, setIsBottomOffscreen] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+interface DropDownMenuProps extends DropDownPropsBase {
+  options: DropDownMenu[];
+  type: "menu";
+}
 
-  const blurOnClick = (
-    func: (e: React.MouseEvent<Element, MouseEvent>) => void
-  ): ((e: React.MouseEvent<Element, MouseEvent>) => void) => {
-    return (e: React.MouseEvent<Element, MouseEvent>): void => {
-      setIsShown(false);
-      func(e);
-    };
+interface DropDownSelectProps extends DropDownPropsBase {
+  options: DropDownSelect[];
+  type?: "select";
+  selected: DropDownSelect;
+  onChange: (value: DropDownSelect) => void;
+}
+
+interface DropDownMultiSelectProps extends DropDownPropsBase {
+  options: DropDownMulti[];
+  type: "multiselect";
+  onChange: (value: DropDownMulti[]) => void;
+}
+
+type DropDownProps = DropDownMultiSelectProps | DropDownSelectProps | DropDownMenuProps;
+type SelectType = DropDownMulti[] | DropDownSelect | undefined;
+type DropDownOptions = DropDownProps["options"][number];
+
+const DropDown: FC<DropDownProps> = (props) => {
+  const isSelectType = props.type === "select" || !props.type;
+  const isMultiType = props.type === "multiselect";
+  const isMenuType = props.type === "menu";
+
+  const baseSelect = isSelectType ? props.selected : isMultiType ? props.options.filter((o) => !o.selected) : undefined;
+  const [selected, setSelected] = useState<SelectType>(baseSelect);
+  const [isOpen, setIsOpen] = useState(false);
+  const [focusIndex, setFocusIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const selectRef = useRef<HTMLButtonElement>(null);
+
+  const isSelect = isSelectType && ((val: SelectType): val is DropDownSelect => true)(selected);
+  const isMulti = isMultiType && ((val: SelectType): val is DropDownMulti[] => true)(selected);
+  const isMenu = isMenuType && ((val: SelectType): val is undefined => true)(selected);
+
+  const selectOption = (value: string): void => {
+    const option = props.options.find((o) => value === o.text);
+    if (option) {
+      isMulti &&
+        setSelected(isSelected(option) ? selected.filter((s) => s !== option) : [...new Set([...selected, option])]);
+      isMenu && (option as DropDownMenu).onClick();
+      isSelect && setSelected(option);
+    }
   };
 
-  const onBlur = (): void => {
-    setIsShown(false);
+  const handleSelectClick = (): void => {
+    setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    if (dropDownRef.current && isShown) {
-      const dropDownRect = dropDownRef.current.getBoundingClientRect();
-      const bottomY = dropDownRect.y + dropDownRect.height + top;
+  const handleSelectBlur = (): void => {
+    setFocusIndex(-1);
+    setIsOpen(false);
+  };
 
-      if (bottomY > window.innerHeight) {
-        setIsBottomOffscreen(true);
-      }
+  const handleOnChange = (event: ChangeEvent<HTMLButtonElement>): void => {
+    selectOption(event.currentTarget.value);
+  };
 
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-      setIsBottomOffscreen(false);
+  const preventClose = (event: KeyboardEvent<HTMLOptionElement> | MouseEvent<HTMLOptionElement>): void => {
+    if (isMulti) {
+      event.preventDefault();
+      selectOption(event.currentTarget.value);
     }
-  }, [isShown]);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === " " || event.key === "Enter") {
+      setFocusIndex(0);
+    }
+
+    if (event.key === "Escape") {
+      handleSelectBlur();
+    }
+
+    if (event.key === "ArrowUp" && focusIndex > 0) {
+      setFocusIndex(focusIndex - 1);
+    }
+
+    if (event.key === "ArrowDown" && focusIndex < props.options.length - 1) {
+      setFocusIndex(focusIndex + 1);
+    }
+  };
+
+  const handleInputKeydown = (event: KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key === "Tab") {
+      forceCloseDropDown();
+    }
+
+    if (event.key === "ArrowDown") {
+      const sibling = event?.currentTarget.parentElement?.parentElement?.nextSibling as HTMLOptionElement;
+      sibling.focus();
+    }
+  };
+
+  const isSelected = (option: DropDownOptions): boolean => {
+    return (isMulti && selected?.includes(option as DropDownMulti)) || selected === option;
+  };
+
+  const forceCloseDropDown = (): void => {
+    const oldSize = selectRef.current?.size;
+    selectRef.current && (selectRef.current.size = 0);
+    setTimeout(() => {
+      selectRef.current && oldSize && (selectRef.current.size = oldSize);
+    }, 1);
+  };
+
+  let text = props.text;
+  let icon = props.icon;
+
+  if (isSelect) {
+    text = selected?.text;
+    icon = selected?.icon;
+  }
+
+  if (isMulti && selected.length) {
+    text = props.text + ": " + (selected.length > 1 ? selected.length + " selected" : selected[0].text);
+  }
 
   useEffect(() => {
-    if (dropDownRef.current) {
-      dropDownRef.current.focus();
-    }
-  }, [isVisible]);
+    isMulti || (isSelect && props.onChange(selected));
+  }, [selected]);
 
   return (
-    <DropDownWrapper isVisible={isVisible && isShown}>
-      <DropDownPositioning DropDownTop={top} DropDownLeft={left}>
-        <DropDownBox
-          tabIndex={0}
-          onBlur={onBlur}
-          ref={dropDownRef}
-          isBottomOffscreen={isBottomOffscreen}
-          DropDownTop={top}
-          DropDownLeft={left}
-          relativePosition={relativePosition}
-          hasBorder={hasBorder}
-        >
-          {options.length ? (
-            <>
-              {options.map((option, i) => {
-                return (
-                  <Option key={i} onClick={blurOnClick(option.action)} color={option.color}>
-                    {option.icon ? <Icon className={option.icon} /> : <></>}
-                    <OptionText>{option.text}</OptionText>
-                  </Option>
-                );
-              })}
-            </>
-          ) : (
-            <Option>No Options</Option>
-          )}
-        </DropDownBox>
-      </DropDownPositioning>
-    </DropDownWrapper>
+    <Select>
+      <ButtonIcon
+        text={props.text}
+        icon={props.icon}
+        disabled={props.isDisabled}
+        onClick={handleSelectClick}
+        onBlur={handleSelectBlur}
+        onKeyDown={handleKeyDown}
+        isSelected={isOpen}
+        showChevron
+      ></ButtonIcon>
+      {isOpen && (
+        <OptionWrapper>
+          <OptionContainer>
+            {/* <Option>
+          <Input ref={inputRef} onKeyDown={handleInputKeydown} placeholder="Add tag"></Input>
+        </Option> */}
+            {props.options.length ? (
+              props.options.map((option, i) => (
+                <Option
+                  key={i}
+                  focused={i === focusIndex}
+                  // onMouseUp={preventClose}
+                  // onKeyDown={handleKeyDown}
+                  isSelected={isSelected(option)}
+                >
+                  {isMulti ? (
+                    <Icon className={selected.includes(option) ? "bx-checkbox-checked" : "bx-checkbox"} />
+                  ) : (
+                    <Icon className={(option as DropDownMenu | DropDownSelect).icon} />
+                  )}
+                  {option.text}
+                </Option>
+              ))
+            ) : (
+              <Option focused>No Options</Option>
+            )}
+          </OptionContainer>
+        </OptionWrapper>
+      )}
+    </Select>
   );
 };
 

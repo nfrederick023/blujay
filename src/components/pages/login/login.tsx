@@ -2,10 +2,10 @@ import { getCookieSetOptions } from "@client/utils/cookie";
 import { login } from "@client/utils/api";
 import { screenSizes } from "@client/utils/constants";
 import { useCookies } from "react-cookie";
-import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
+import ButtonIcon from "@client/components/common/shared/button/button";
 import Gradient from "@client/components/common/shared/gradient";
+import Input from "@client/components/common/shared/input";
 import React, { FC, MouseEvent, useState } from "react";
-import TextField from "@client/components/common/shared/text-field";
 import ToggleIcon from "@client/components/common/shared/toggle-icon";
 import router from "next/router";
 import styled from "styled-components";
@@ -113,17 +113,18 @@ const LoginPage: FC = () => {
         </Logo>
         {hasLoginFailed ? <LoginFailedMessage>Login Failed!</LoginFailedMessage> : <LoginFailedMessage />}
 
-        <TextField
+        <Input
+          label="Password:"
           value={password}
           onChange={onPasswordChange}
-          placeholder="Password"
+          placeholder="Enter Password"
           type={isPasswordShown ? "text" : "password"}
           onEnter={handleLogin}
           toggleIcon={
             <ToggleIcon
               isToggled={isPasswordShown}
-              onIcon="bx bxs-show"
-              offIcon="bx bxs-hide"
+              onIcon="bxs-show"
+              offIcon="bxs-hide"
               onClick={onIsPasswordShownChange}
             />
           }
@@ -131,10 +132,10 @@ const LoginPage: FC = () => {
         <FlexBox>
           <CheckboxLabel>
             <Checkbox type={"checkbox"} checked={isRememberMe} onChange={onIsRememberMe} />
-            <h6>Remeber Me</h6>
+            <div>Remeber Me</div>
           </CheckboxLabel>
           <LoginButton>
-            <ButtonIcon textOn="Login " icon="bx bx-log-in" onClick={handleLogin} />
+            <ButtonIcon text="Login " icon="bx-log-in" onClick={handleLogin} />
           </LoginButton>
         </FlexBox>
       </LoginPageWrapper>

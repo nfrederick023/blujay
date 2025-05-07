@@ -1,15 +1,9 @@
 import { booleanify, getCookieSetOptions } from "@client/utils/cookie";
 import { useCookies } from "react-cookie";
-import ButtonIcon from "../button-icon";
+import ButtonIcon from "../button";
 import React, { FC } from "react";
 
-// const TheatreModeButtonIcon = styled(ButtonIcon)`
-//   @media (max-width: ${screenSizes.smallScreenSize}px) {
-//     display: none;
-//   }
-// `;
-
-const TheatreModeButton: FC = () => {
+const TheatreButton: FC = () => {
   const [cookies, setCookie] = useCookies(["isTheaterMode"]);
   const isTheaterMode = booleanify(cookies.isTheaterMode);
 
@@ -19,17 +13,17 @@ const TheatreModeButton: FC = () => {
 
   return (
     <ButtonIcon
-      icon="bx bx-movie"
-      selectedIcon="bx bx-movie"
-      textOn="Theater Mode"
+      icon="bx-movie"
+      selectedIcon="bx-movie"
       isSelected={isTheaterMode}
-      hoverTextOn="Close Theatre Mode"
-      hoverTextOff="Open Theatre Mode"
-      confrimTextOn="Opened!"
-      confrimTextOff="Closed!"
+      text="Open Theatre Mode"
+      textSelected="Close Theatre Mode"
+      confrimText="Closed!"
+      confrimTextSelected="Opened!"
+      isCondensed="condensed"
       onClick={handleSetViewMode}
     />
   );
 };
 
-export default TheatreModeButton;
+export default TheatreButton;

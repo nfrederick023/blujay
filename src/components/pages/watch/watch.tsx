@@ -1,20 +1,21 @@
-import { OrderType, SortType, Video } from "@client/utils/types";
+import { OrderType, SortType } from "@client/utils/types";
 import { VideoContext } from "@client/components/common/contexts/video-context";
 import { booleanify } from "@client/utils/cookie";
 import { screenSizes } from "@client/utils/constants";
 import { sortVideos } from "@client/utils/sortVideo";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/router";
-import ButtonIcon from "@client/components/common/shared/button-icons/button-icon";
+import BackButton from "@client/components/common/shared/button/buttons/back";
+import ButtonIcon from "@client/components/common/shared/button/button";
+import NavButton from "@client/components/common/shared/button/buttons/nav";
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
-import Router from "next/router";
 import WatchDetails from "./watch-details";
 import WatchMeta from "./watch-meta";
 import styled from "styled-components";
 
-const VideoContainer = styled.div`
+const VideoContainer = styled.div<{ isTheaterMode: boolean }>`
   margin: auto;
-  max-width: ${(p: { isTheaterMode: boolean }): string => (p.isTheaterMode ? "75%" : "60%")};
+  max-width: ${(p): string => (p.isTheaterMode ? "75%" : "55%")};
 
   @media (max-width: ${screenSizes.smallScreenSize}px) {
     max-width: unset;
@@ -25,7 +26,7 @@ const BlackOverlay = styled.div`
   position: absolute;
   background: black;
   width: 120vw;
-  height: 100%;
+  height: calc(100cqw / 16 * 9);
   z-index: -1;
 `;
 
@@ -40,6 +41,7 @@ const Image = styled.img`
   cursor: zoom-in;
   width: 100%;
   height: calc(100cqw / 16 * 9);
+  user-select: none;
 `;
 
 const VideoWrapper = styled.div`
@@ -83,15 +85,11 @@ const BackButtonWrapper = styled.div`
   margin-right: auto;
 `;
 
-const PeviousVideoButton = styled(ButtonIcon)`
-  margin-right: 5px;
-`;
-
 interface WatchPageProps {
   domain: string;
 }
 
-const WatchPage: FC<WatchPageProps> = ({ domain }) => {
+const WatchPage: FC<WatchPageProps> = () => {
   const router = useRouter();
   const query = router.query;
   const { videos } = useContext(VideoContext);
@@ -99,6 +97,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   const video = videos.find((_video) => _video.id === currentVideoID);
   const [cookies] = useCookies(["videoVolume", "isTheaterMode"]);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
+  const [currentDomain, setCurrentDomain] = useState<undefined | string>();
   const isTheaterMode = booleanify(cookies.isTheaterMode);
   const ref = useRef<HTMLVideoElement & HTMLImageElement>(null);
   const sort = typeof query.sort === "string" ? (query.sort as SortType) : undefined;
@@ -116,10 +115,6 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
 
   const handleVolumeChange = (): void => {
     //
-  };
-
-  const goBack = (): void => {
-    router.back();
   };
 
   const toggleZoom = (): void => {
@@ -164,12 +159,14 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
 
   const handleKeyDown = (e: KeyboardEvent): void => {
     const key = e.key;
-    if (key === "ArrowRight") {
-      goToNextVideo();
-    }
+    if (document.activeElement === document.body || document.activeElement === ref.current) {
+      if (key === "ArrowRight") {
+        goToNextVideo();
+      }
 
-    if (key === "ArrowLeft") {
-      goToPreviousVideo();
+      if (key === "ArrowLeft") {
+        goToPreviousVideo();
+      }
     }
   };
 
@@ -193,7 +190,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
   };
 
   const onTouchEnd = (): void => {
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 10;
     if (!touchStart.current || !touchEnd.current) return;
     const distance = touchStart.current - touchEnd.current;
     const isLeftSwipe = distance > minSwipeDistance;
@@ -206,7 +203,19 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
       goToPreviousVideo();
     }
   };
+
   useEffect(() => {
+    if (typeof query.id === "string") {
+      setCurrentVideoID(query.id);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    // conditions if a video is deleted
+    if (currentVideoID && !video) {
+      goToNextExistingVideo();
+    }
+
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -217,46 +226,33 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
     if (!video) {
       router.replace("/404");
     }
+
+    setCurrentDomain(window.location.origin);
   }, []);
 
   if (video) {
     const videoSrc = `/api/watch/${video.id}.${video.extentsion}`;
     const thumbSrc = `/api/thumb/${video.id}.${video.extentsion}`;
-    const fullVideoSrc = `${domain}${videoSrc}`;
-    const fullThumbSrc = `${domain}${thumbSrc}`;
-    const currentUrl = `${domain}/watch/${video.id}`;
+    const fullVideoSrc = `${currentDomain}${videoSrc}`;
+    const fullThumbSrc = `${currentDomain}${thumbSrc}`;
+    const currentUrl = `${currentDomain}/watch/${video.id}`;
 
     return (
-      <div>
-        <WatchMeta video={video} fullThumbSrc={fullThumbSrc} fullVideoSrc={fullVideoSrc} />
-        {isZoomedIn ? (
+      <>
+        {currentDomain && <WatchMeta video={video} fullThumbSrc={fullThumbSrc} fullVideoSrc={fullVideoSrc} />}
+        {isZoomedIn && (
           <>
             <Overlay onClick={toggleZoom}></Overlay>
             <OverlayImage onClick={toggleZoom} src={videoSrc + "?isPreview=true"} draggable={false}></OverlayImage>
           </>
-        ) : (
-          <></>
         )}
-        {/* {isViewThumbnail ? (
-        <>
-          <Overlay onClick={setUnviewThumbnail}></Overlay>
-          <OverlayImage onClick={setUnviewThumbnail} src={thumbSrc} draggable={false}></OverlayImage>
-        </>
-      ) : (
-        <></>
-      )} */}
         <VideoContainer isTheaterMode={isTheaterMode}>
           <PageOptions>
             <BackButtonWrapper>
-              <ButtonIcon icon="bx bx-arrow-back" hoverTextOn="Go Back" onClick={goBack} />
+              <BackButton />
             </BackButtonWrapper>
-            <PeviousVideoButton
-              icon="bx bx-chevron-left"
-              hoverTextOn="Previous"
-              onClick={goToPreviousVideo}
-              disabled={!previousVideo}
-            />
-            <ButtonIcon icon="bx bx-chevron-right" hoverTextOn="Next" onClick={goToNextVideo} disabled={!nextVideo} />
+            <NavButton onClick={goToPreviousVideo} isDisabled={!previousVideo} type="previous" />
+            <NavButton onClick={goToNextVideo} isDisabled={!nextVideo} />
           </PageOptions>
           <VideoWrapper>
             {isTheaterMode && <BlackOverlay />}
@@ -282,6 +278,7 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
+                tabIndex={0}
               />
             )}
           </VideoWrapper>
@@ -290,11 +287,10 @@ const WatchPage: FC<WatchPageProps> = ({ domain }) => {
             currentUrl={currentUrl}
             category={category}
             fullVideoSrc={fullVideoSrc}
-            goToNextExistingVideo={goToNextExistingVideo}
             navigateToVideo={navigateToVideo}
           />
         </VideoContainer>
-      </div>
+      </>
     );
   } else {
     return <></>;

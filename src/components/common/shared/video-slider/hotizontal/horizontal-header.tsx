@@ -1,4 +1,4 @@
-import { BluJayTheme } from "@client/utils/types";
+import { BlujayTheme } from "@client/utils/types";
 import React, { FC } from "react";
 import SliderHeader from "../header";
 import styled from "styled-components";
@@ -15,7 +15,7 @@ const ChevronIcon = styled.div`
     cursor: pointer;
   }
 
-  opacity: ${(p: { isEnabled: boolean; theme: BluJayTheme }): number => (p.isEnabled ? 1 : 0.5)};
+  opacity: ${(p: { isEnabled: boolean; theme: BlujayTheme }): number => (p.isEnabled ? 1 : 0.5)};
 
   &:hover {
     color: ${(p): string => (p.isEnabled ? p.theme.text : p.theme.textContrast)};
@@ -42,8 +42,8 @@ const HorizontalSliderHeader: FC<HorizontalSliderHeaderProps> = ({
 }) => {
   return (
     <SliderHeader headerText={headerText} sliderType="horizontal">
-      <ChevronIcon className={"bx bx-chevron-left"} isEnabled={!isStart} onClick={decrementVideo} />
-      <ChevronIcon className={"bx bx-chevron-right"} isEnabled={!isEnd} onClick={incrementVideo} />
+      <ChevronIcon className={"bx-chevron-left"} isEnabled={!isStart} onClick={decrementVideo} />
+      <ChevronIcon className={"bx-chevron-right"} isEnabled={!isEnd} onClick={incrementVideo} />
     </SliderHeader>
   );
 };

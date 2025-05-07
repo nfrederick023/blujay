@@ -1,4 +1,4 @@
-import { RouterEvent, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import React, { FC, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -9,7 +9,7 @@ const BlueBar = styled.div`
   position: fixed;
   width: 0%;
   height: 2px;
-  background-color: ${(p): string => p.theme.highlightLight};
+  background-color: ${(p): string => p.theme.highlight};
   border-radius: 5px;
   z-index: 5;
 `;

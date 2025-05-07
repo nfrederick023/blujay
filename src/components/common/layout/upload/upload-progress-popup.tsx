@@ -1,4 +1,4 @@
-import { BluJayTheme, FileUpload } from "@client/utils/types";
+import { BlujayTheme, FileUpload } from "@client/utils/types";
 import Popup from "../../shared/popup";
 import React, { FC, useState } from "react";
 import styled from "styled-components";
@@ -52,7 +52,7 @@ const Status = styled.div`
   margin-left: auto;
   text-align: left;
   min-width: 140px;
-  color: ${(p: { hasFailed?: boolean; theme: BluJayTheme }): string => (p.hasFailed ? p.theme.error : "")};
+  color: ${(p: { hasFailed?: boolean; theme: BlujayTheme }): string => (p.hasFailed ? p.theme.error : "")};
 `;
 
 const ErrorWrapper = styled.div`
@@ -96,13 +96,13 @@ const UploadProgressPopup: FC<UploadProgressPopupProps> = ({ uploadedFiles, clos
       <PopupContent>
         <Header>
           <Filename>
-            <h5>Filename</h5>
+            <b>Filename</b>
           </Filename>
           <Status>
-            <h5>Status</h5>
+            <b>Status</b>
           </Status>
           <Progress>
-            <h5>Progress</h5>
+            <b>Progress</b>
           </Progress>
         </Header>
         <ItemWrapper>

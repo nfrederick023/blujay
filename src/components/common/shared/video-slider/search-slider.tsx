@@ -1,4 +1,4 @@
-import { VideoContext } from "../contexts/video-context";
+import { VideoContext } from "@client/components/common/contexts/video-context";
 import React, { FC, useContext } from "react";
 import VideoSlider from "./video-slider";
 

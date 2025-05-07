@@ -1,5 +1,4 @@
-import { BluJayTheme } from "@client/utils/types";
-import DropDown from "./drop-down";
+import { BlujayTheme } from "@client/utils/types";
 import React, { FC, useState } from "react";
 import styled from "styled-components";
 
@@ -14,7 +13,7 @@ const PointerWrapper = styled.div`
 `;
 
 const SelectBox = styled.div`
-  color: ${(p: { isFocused: boolean; theme: BluJayTheme }): string => p.theme.text};
+  color: ${(p: { isFocused: boolean; theme: BlujayTheme }): string => p.theme.text};
   display: flex;
   user-select: none;
 
@@ -33,7 +32,7 @@ const SelectedBox = styled.div`
 `;
 
 const SelectedOption = styled.div`
-  border: ${(p: { isMulti: boolean | undefined; theme: BluJayTheme }): string =>
+  border: ${(p: { isMulti: boolean | undefined; theme: BlujayTheme }): string =>
     p.isMulti ? `1px solid ${p.theme.textContrast};` : "0px solid"};
 `;
 
@@ -130,7 +129,7 @@ const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, default
                     <SelectedOption key={i} isMulti={isMulti}>
                       {selectedOption + (postFix ?? "")}
                       {isMulti && (
-                        <SelectedIcon className="bx bx-x" onClick={handleRemoveOption(selectedOption)}></SelectedIcon>
+                        <SelectedIcon className="bx-x" onClick={handleRemoveOption(selectedOption)}></SelectedIcon>
                       )}
                     </SelectedOption>
                   );
@@ -143,16 +142,16 @@ const Select: FC<SelectProps> = ({ options, value, isMulti, isClearable, default
           <RightIcons>
             {isClearable && (
               <ClearButton onClick={handleRemoveAll}>
-                <i className="bx bx-x"></i>
+                <i className="bx-x"></i>
               </ClearButton>
             )}
             <div>
-              <i className="bx bx-chevron-down"></i>
+              <i className="bx-chevron-down"></i>
             </div>
           </RightIcons>
         </SelectBox>
       </PointerWrapper>
-      <DropDown isShown={isOpen} setIsShown={setIsOpen} options={unselectedOptions} left={-10} top={10} />
+      {/* <DropDown isShown={isOpen} setIsShown={setIsOpen} options={unselectedOptions} left={-10} top={10} /> */}
     </SelectBoxWrapper>
   );
 };

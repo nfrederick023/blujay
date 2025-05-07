@@ -25,7 +25,6 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
   }
 
   if (video) {
-
     if (video.requireAuth && !(checkHashedPassword(req.cookies.authToken ?? ""))) {
       res.statusCode = 401;
       res.end(JSON.stringify("Unauthorized"));
@@ -37,6 +36,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
       res.end(JSON.stringify("Video not found in file path!"));
       return;
     }
+
 
     if (video.type === "video") {
       serveVideo(req, res, video);
@@ -66,7 +66,7 @@ const getVideoByID = async (req: NextApiRequest, res: NextApiResponse): Promise<
 const serveVideo = (req: NextApiRequest, res: NextApiResponse, video: Video): void => {
   const range = req.headers.range ?? "0";
   const videoSize = video.size;
-  const chunkSize = 1 * 4e6; // 4mbs
+  const chunkSize = 3 * 1024 * 1024; // 4mbs
   const start = Number(range.replace(/\D/g, ""));
   const end = Math.min(start + chunkSize, videoSize - 1);
   const contentLength = end - start + 1;

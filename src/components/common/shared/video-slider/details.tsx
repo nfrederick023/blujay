@@ -1,12 +1,12 @@
 import { OrderType, SortType, Video } from "@client/utils/types";
+import { TextSmall } from "../text-size";
 import { getVideoCategory } from "@client/utils/sortVideo";
 import { screenSizes } from "@client/utils/constants";
 import Link from "next/link";
 import React, { FC, useRef, useState } from "react";
-import TimeAgo from "react-timeago";
+import TimeAgo from "@client/components/common/shared/timeago";
 import styled from "styled-components";
 
-// - ${(15 * (6 - 1)) / 6}px
 const VideoDetailsWrapper = styled.div`
   position: relative;
   user-select: none;
@@ -88,17 +88,28 @@ const VideoPlayer = styled.video.attrs(thumbnailAttr)`
 `;
 
 const VideoNameWrapper = styled.div`
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
+`;
 
-  h5 {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: pre;
-  }
+const VideoCategoryTime = styled(TextSmall)`
+  display: flex;
+  width: 100%;
+  color: ${(p): string => p.theme.textContrast};
+`;
 
-  h6 {
-    color: ${(p): string => p.theme.textContrast};
-  }
+const CategoryAndTimeSpacer = styled.div`
+  margin: 0px 5px 0px 5px;
+`;
+
+const CategoryName = styled.div`
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
 `;
 
 interface VideoDetailsProps {
@@ -115,21 +126,27 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, s
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [timeout, setTimeout] = useState<undefined | number>();
 
   const handleIsHoverTrueChange = async (): Promise<void> => {
-    setIsHovering(true);
-    if (videoRef.current) {
-      try {
-        await videoRef.current.play();
-        setIsPlaying(true);
-      } catch (e) {
-        //ignore "play was interrupted by call to pause" error, which can happen if we swipe over videos too fast
-      }
-    }
+    setTimeout(
+      window.setTimeout(async function () {
+        setIsHovering(true);
+        if (videoRef.current) {
+          try {
+            await videoRef.current.play();
+            setIsPlaying(true);
+          } catch (e) {
+            //ignore "play was interrupted by call to pause" error, which can happen if we swipe over videos too fast
+          }
+        }
+      }, 1)
+    );
   };
 
   const handleIsHoverFalseChange = (): void => {
     setIsHovering(false);
+    if (timeout) window.clearTimeout(timeout);
   };
 
   if (!isHovering && isPlaying) {
@@ -192,18 +209,22 @@ const VideoDetails: FC<VideoDetailsProps> = ({ video, category, onlyFavorites, s
                 src={"/api/watch/" + encodeURIComponent(video.id) + "." + video.extentsion + "?isPreview=true"}
                 draggable={false}
                 isPlaying={isHovering}
+                role="presentation"
               />
             )}
             <Thumbnail
               onMouseEnter={handleIsHoverTrueChange}
               src={"/api/thumb/" + encodeURIComponent(video.id)}
+              aria-labelledby={video.id}
               draggable={false}
             />
             <VideoNameWrapper>
-              <h5>{video.name}</h5>
-              <h6>
-                {videoCategory} · <TimeAgo date={video.updated} />
-              </h6>
+              <h3 id={video.id}>{video.name}</h3>
+              <VideoCategoryTime>
+                <CategoryName>{videoCategory}</CategoryName>
+                {"  ·  "}
+                <TimeAgo date={video.updated} />
+              </VideoCategoryTime>
             </VideoNameWrapper>
           </VideoDetailsContainer>
         ) : (

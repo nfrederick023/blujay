@@ -21,6 +21,10 @@ const SearchBarContent = styled.div`
     cursor: text;
   }
 
+  &:focus-within {
+    border-color: ${(p): string => p.theme.text};
+  }
+
   @media (max-width: ${screenSizes.smallScreenSize}px) {
     margin-left: 215px;
     margin-right: 70px;
@@ -81,7 +85,7 @@ const SearchBar: FC<SearchBarProps> = ({ setSearch, search }) => {
 
   return (
     <SearchBarContent onClick={handleSearchClick}>
-      <SearchIcon className="bx bx-search" />
+      <SearchIcon className="bx-search" />
       <SearchBarInput
         ref={searchInput}
         id="default-search"

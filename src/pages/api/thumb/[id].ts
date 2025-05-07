@@ -22,8 +22,8 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
   }
 
   if (!video) {
-    res.statusCode = 404;
-    res.end(JSON.stringify("Could not find the video associated with this ID!"));
+    res.writeHead(200, { "Content-Type": "image/webp", "Content-disposition": "filename=thumbnail_placeholder.png" });
+    fs.createReadStream("./public/images/thumbnail_placeholder.png").pipe(res);
     return;
   }
 
@@ -34,8 +34,8 @@ const useAuth = (async (req: NextApiRequest, res: NextApiResponse): Promise<void
   }
 
   if (!fs.existsSync(video.thumbnailFilepath)) {
-    res.statusCode = 404;
-    res.end(JSON.stringify("Thumbnail not found in file path!"));
+    res.writeHead(200, { "Content-Type": "image/webp", "Content-disposition": "filename=thumbnail_placeholder.png" });
+    fs.createReadStream("./public/images/thumbnail_placeholder.png").pipe(res);
     return;
   }
 

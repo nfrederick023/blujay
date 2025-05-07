@@ -49,10 +49,14 @@ export const getThumbnailFilename = (filepath: string): string => {
 
 
 const calculateImageDimensions = (filepath: string): Dimensions => {
-  const dimensions = sizeOf(filepath);
-  if (typeof dimensions.width === "number" && typeof dimensions.height === "number")
-    return { width: dimensions.width, height: dimensions.height };
+  try {
+    const dimensions = sizeOf(filepath);
+    if (typeof dimensions.width === "number" && typeof dimensions.height === "number")
+      return { width: dimensions.width, height: dimensions.height };
 
+  } catch (e) {
+    console.log(e);
+  }
   return { width: 0, height: 0 };
 };
 
@@ -83,11 +87,11 @@ const getDimensions = (filepath: string): Promise<Dimensions> => {
 
 const getVideoType = (filepath: string): VideoType => {
   const extension = getExtentsion(filepath);
-  if (imageExtensions.includes(extension)) {
-    return "image";
-  }
   if (extension === "gif") {
     return "gif";
+  }
+  if (imageExtensions.includes(extension)) {
+    return "image";
   }
   return "video";
 };

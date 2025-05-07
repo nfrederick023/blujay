@@ -166,10 +166,10 @@ const HorizontalSlider: FC<HorizontalSliderProps> = ({
       />
       <CarouselWrapper>
         <CarouselOverlay>
-          <ChevronIcon className={"bx bx-chevron-left bx-md"} onClick={resetScroll} />
+          <ChevronIcon className={"bx-chevron-left bx-md"} onClick={resetScroll} />
         </CarouselOverlay>
         <CarouselOverlayRight>
-          <ChevronIconRight className={"bx bx-chevron-right bx-md"} onClick={maxScroll} />
+          <ChevronIconRight className={"bx-chevron-right bx-md"} onClick={maxScroll} />
         </CarouselOverlayRight>
         <Carousel
           ref={draggingEl as React.ReactPortal & React.MutableRefObject<unknown>}

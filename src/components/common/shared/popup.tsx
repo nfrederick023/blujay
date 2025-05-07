@@ -14,7 +14,7 @@ const Overlay = styled.div`
   cursor: pointer;
 `;
 
-const PopupWrapper = styled.div`
+const PopupWrapper = styled.div<{ isSidebarEnabled: boolean }>`
   z-index: 6;
   position: fixed;
   top: 0;
@@ -25,7 +25,7 @@ const PopupWrapper = styled.div`
   pointer-events: none;
 
   @media (min-width: ${screenSizes.smallScreenSize}px) {
-    left: ${(p: { isSidebarEnabled: boolean }): string => (p.isSidebarEnabled ? "250px" : "0px")};
+    left: ${(p): string => (p.isSidebarEnabled ? "250px" : "0px")};
   }
 `;
 
@@ -76,7 +76,7 @@ const Popup: FC<PopupProps> = ({ children, closePopup }) => {
       <PopupWrapper isSidebarEnabled={isSidebarEnabled}>
         <PopupBox>
           <CloseWrapper>
-            <Icon onClick={closePopup} className="bx bx-x" />
+            <Icon onClick={closePopup} className="bx-x" />
           </CloseWrapper>
           {children}
         </PopupBox>

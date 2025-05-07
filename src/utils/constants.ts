@@ -1,4 +1,4 @@
-import { BluJayTheme, OrderType, SortType } from "./types";
+import { BlujayTheme } from "./types";
 
 export const videoMimeTypeList = [
   { name: "video/3gpp2", types: ["3g2"] },
@@ -24,6 +24,7 @@ export const videoMimeTypeList = [
   { name: "video/vnd.vivo", types: ["viv"] },
   { name: "video/mp2t", types: ["ts"] },
   { name: "video/x-matroska", types: ["mkv"] },
+  { name: "video/webm", types: ["webm"] },
 ];
 
 export const imageMimeTypeList = [
@@ -56,7 +57,6 @@ export const imageMimeTypeList = [
   { name: "image/vnd.net-fpx", types: ["npx"] },
   { name: "application/vnd.oasis.opendocument.image", types: ["odi"] },
   { name: "image/ogg", types: ["ogv"] },
-  { name: "image/webm", types: ["webm"] },
   { name: "image/webp", types: ["webp"] },
   { name: "application/vnd.oasis.opendocument.image-template", types: ["oti"] },
   { name: "image/x-portable-bitmap", types: ["pbm"] },
@@ -105,19 +105,22 @@ export const viewType = ["List View", "Grid View"] as const;
 export const sortOptions = ["Alphabetical", "Date Updated", "Date Uploaded", "File Size", "View Count"] as const;
 export const sliderType = ["verticle", "horizontal"] as const;
 export const orderOptions = ["Ascending", "Descending"] as const;
-export const sizeReductionPercent = 50;
+export const sizeReductionPercent = 99;
 
-export const blujayTheme: BluJayTheme = {
+export const blujayTheme: BlujayTheme = {
   background: "#0e0e0f",
   backgroundContrast: "#181819",
   text: "white",
   textContrast: "#868686",
   textContrastLight: "#8c8c8c",
   highlightDark: "#3c81eb",
-  highlightLight: "#04befe",
-  hightlightSilver: "#afdcff",
+  hightlightSilver: "white",
+  highlight: "#01A0D5",
+  highlightLight: "#0ac2ff",
   button: "#272727",
-  error: "#ff0000"
+  buttonLight: "#595959",
+  error: "#ff0000",
+  errorLight: "#ff3333",
 } as const;
 
 export const screenSizes = {

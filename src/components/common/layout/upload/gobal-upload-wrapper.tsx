@@ -106,8 +106,8 @@ const GlobalUploadWrapper: FC<GlobalUploadWrapperProps> = ({ children, setFilesT
           />
           <DragDropBox>
             <DragDropText>
-              <UploadIcon className="bx bx-cloud-upload bx-lg" />
-              <h5>Drop to Upload</h5>
+              <UploadIcon className="bx-cloud-upload bx-lg" />
+              <b>Drop to Upload</b>
             </DragDropText>
           </DragDropBox>
         </Overlay>
